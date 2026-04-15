@@ -1,3 +1,5 @@
+#encontrar las coordenadas del poligono a dibujar
+
 import cv2
 
 class Coordinates:
