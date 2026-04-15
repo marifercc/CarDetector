@@ -1,30 +1,40 @@
 import cv2
+import torch
 
-def detector(video_source: str) -> None:
-    """Función para mostrar frames de un video hasta que se presione 'q'."""
-    
-    cap = cv2.VideoCapture(video_source)
+def load_model():
+    model = torch.hub.load("ultralytics/yolov5", model="yolov5n", pretrained=True)
+    return model
 
-    if not cap.isOpened():
-        print("Error: No se pudo abrir el video.")
-        return
+def get_bboxes(prends: object):
+    #xmin, ymin, xmax, ymax 
+    df = prends.pandas().xyxy[0] # las predicciones las ponemos en formato pandas en fomrato de bounding boxes 
+    df = df[df["confidence"] >= 0.5] # solo los que esté mayor a .5 
+    df = df [df["name"] == "car"] # unicamente carros
 
-    while True:
+    return df[["xmin", "ymin", "xmax", "ymax"]].values.astype(int)
+
+def detector(cap: object):
+
+    model = load_model()
+
+    while cap.isOpened():
         status, frame = cap.read()
         if not status:
-            print("Fin del video o error al leer frame.")
             break
 
-        cv2.imshow("Frame", frame)
+        preds = model(frame)
+        bboxes = get_bboxes(preds)
+        print(bboxes)
+        break
 
-        # Espera 10 ms y verifica si se presionó 'q'
-        if cv2.waitKey(10) & 0xFF == ord('q'):
-            print("Detenido por el usuario.")
-            break
-    
+        # cv2.imshow("frame", frame)
+
+        # if cv2.waitKey(10) & 0xFF == ord('q'):
+        #     break
+
     cap.release()
-    cv2.destroyAllWindows()
 
+if __name__ == '__main__':
 
-if __name__ == "__main__":
-    detector("data/traffic.mp4")
+    cap = cv2.VideoCapture("data/traffic.mp4")
+    detector(cap)
