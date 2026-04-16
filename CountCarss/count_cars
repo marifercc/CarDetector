@@ -1,84 +1,96 @@
 import cv2
 import torch
 import numpy as np
-import matplotlib.path as mplPath 
+import matplotlib.path as mplPath
 
+# 1. Definimos la zona
 ZONE = np.array([
-    [333, 374],
-    [403, 470],
-    [476, 655],
-    [498, 710],
-    [1237, 714],
-    [1217, 523],
-    [1139, 469],
-    [1009, 393],
+    [333, 374], [403, 470], [476, 655], [498, 710],
+    [1237, 714], [1217, 523], [1139, 469], [1009, 393],
 ], np.int32)
 
 def load_model():
-    # Cargamos el modelo YOLOv5 Nano
-    model = torch.hub.load("ultralytics/yolov5", model="yolov5n", pretrained=True)
-    return model
+    return torch.hub.load("ultralytics/yolov5", model="yolov5n", pretrained=True)
 
 def get_center(bbox):
-    # Calcula el centro: x_centro = (xmin + xmax) / 2 , y_centro = (ymin + ymax) / 2
     xc = (bbox[0] + bbox[2]) // 2
     yc = (bbox[1] + bbox[3]) // 2
     return xc, yc
 
-def get_bboxes(preds: object):
+def get_bboxes(preds):
     df = preds.pandas().xyxy[0] 
-    df = df[df["confidence"] >= 0.5] 
-    df = df[df["name"] == "car"] 
+    df = df[(df["confidence"] >= 0.5) & (df["name"] == "car")]
     return df[["xmin", "ymin", "xmax", "ymax"]].values.astype(int)
 
 def is_valid_detection(xc, yc): 
-    
     return mplPath.Path(ZONE).contains_point((xc, yc))
 
-def detector(cap: object):
+def detector(cap):
     model = load_model()
+    
+    # --- VARIABLES PARA EL CONTADOR TOTAL ---
+    total_cars_count = 0
+    ids_en_zona = [] # Guardaremos los centros de los carros para "recordarlos"
+    # ----------------------------------------
 
     while cap.isOpened():
         status, frame = cap.read()
-        if not status:
-            break
+        if not status: break
 
         preds = model(frame)
         bboxes = get_bboxes(preds)
 
-        detections = 0
+        current_detections = 0
+        current_centers = []
+
         for box in bboxes:
             xc, yc = get_center(box)
             
-            # Validación de zona
             if is_valid_detection(xc, yc):
-                detections += 1
-                color_punto = (0, 255, 0) # Verde si está adentro
-                color_box = (0, 255, 0)
+                current_detections += 1
+                
+                # LÓGICA DE CONTEO TOTAL SIMPLIFICADA:
+                # Si el centro del carro no está cerca de uno que ya contamos, es nuevo
+                es_nuevo = True
+                for old_center in ids_en_zona:
+                    # Calculamos distancia entre el punto actual y los viejos
+                    distancia = np.linalg.norm(np.array([xc, yc]) - np.array(old_center))
+                    if distancia < 30: # Si está a menos de 30 pixeles, es el mismo carro
+                        es_nuevo = False
+                        # Actualizamos la posición del carro viejo
+                        ids_en_zona.remove(old_center)
+                        ids_en_zona.append([xc, yc])
+                        break
+                
+                if es_nuevo:
+                    total_cars_count += 1
+                    ids_en_zona.append([xc, yc])
+
+                color = (0, 255, 0)
             else:
-                color_punto = (0, 0, 255) # Rojo si está afuera
-                color_box = (255, 0, 0)   # Azul para la caja si está fuera
+                color = (0, 0, 255)
 
-            # Dibujar el punto central
-            cv2.circle(frame, (xc, yc), radius=6, color=color_punto, thickness=-1)
-            
-            # Dibujar la caja (Bounding Box)
-            xmin, ymin, xmax, ymax = box
-            cv2.rectangle(frame, (xmin, ymin), (xmax, ymax), color_box, 2)
+            # Dibujo
+            cv2.circle(frame, (xc, yc), 5, color, -1)
+            cv2.rectangle(frame, (box[0], box[1]), (box[2], box[3]), color, 2)
+
+        # Limpiar la lista de IDs para no saturar la memoria (opcional)
+        if len(ids_en_zona) > 50: ids_en_zona.pop(0)
+
+        # --- INTERFAZ ---
+        # Polígono de zona
+        cv2.polylines(frame, [ZONE], True, (255, 255, 255), 2)
         
-        # 4. Dibujar el polígono de la zona (pts debe ir en una lista [ZONE])
-        cv2.polylines(frame, [ZONE], isClosed=True, color=(0, 255, 255), thickness=2)
-        
-        # Dibujar el contador en pantalla
-        # Fondo para el texto para que se vea mejor
-        cv2.rectangle(frame, (80, 50), (350, 120), (255, 255, 255), -1)
-        cv2.putText(frame, f"Cars: {detections}", (100, 100), 
-                    cv2.FONT_HERSHEY_SIMPLEX, 1.5, (0, 0, 0), 3)
+        # Cuadro de información
+        cv2.rectangle(frame, (50, 40), (450, 160), (0, 0, 0), -1)
+        cv2.putText(frame, f"En zona: {current_detections}", (70, 90), 
+                    cv2.FONT_HERSHEY_SIMPLEX, 1.2, (0, 255, 0), 2)
+        cv2.putText(frame, f"Total histórico: {total_cars_count}", (70, 140), 
+                    cv2.FONT_HERSHEY_SIMPLEX, 1.2, (255, 255, 255), 2)
 
-        cv2.imshow("frame", frame)
+        cv2.imshow("Control de Trafico", frame)
 
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
+        if cv2.waitKey(1) & 0xFF == ord('q'): break
 
     cap.release()
     cv2.destroyAllWindows()
