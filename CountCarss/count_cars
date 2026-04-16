@@ -1,17 +1,39 @@
 import cv2
 import torch
+import numpy as np
+import matplotlib.path as mplPath 
+
+ZONE = np.array([
+    [333, 374],
+    [403, 470],
+    [476, 655],
+    [498, 710],
+    [1237, 714],
+    [1217, 523],
+    [1139, 469],
+    [1009, 393],
+], np.int32)
 
 def load_model():
+    # Cargamos el modelo YOLOv5 Nano
     model = torch.hub.load("ultralytics/yolov5", model="yolov5n", pretrained=True)
     return model
 
-def get_bboxes(preds: object): # Corregido typo de 'prends' a 'preds'
+def get_center(bbox):
+    # Calcula el centro: x_centro = (xmin + xmax) / 2 , y_centro = (ymin + ymax) / 2
+    xc = (bbox[0] + bbox[2]) // 2
+    yc = (bbox[1] + bbox[3]) // 2
+    return xc, yc
+
+def get_bboxes(preds: object):
     df = preds.pandas().xyxy[0] 
     df = df[df["confidence"] >= 0.5] 
     df = df[df["name"] == "car"] 
-
-    # Retorna las coordenadas como un array de enteros
     return df[["xmin", "ymin", "xmax", "ymax"]].values.astype(int)
+
+def is_valid_detection(xc, yc): 
+    
+    return mplPath.Path(ZONE).contains_point((xc, yc))
 
 def detector(cap: object):
     model = load_model()
@@ -24,18 +46,37 @@ def detector(cap: object):
         preds = model(frame)
         bboxes = get_bboxes(preds)
 
-        # DIBUJAR LOS RECTÁNGULOS 
+        detections = 0
         for box in bboxes:
+            xc, yc = get_center(box)
+            
+            # Validación de zona
+            if is_valid_detection(xc, yc):
+                detections += 1
+                color_punto = (0, 255, 0) # Verde si está adentro
+                color_box = (0, 255, 0)
+            else:
+                color_punto = (0, 0, 255) # Rojo si está afuera
+                color_box = (255, 0, 0)   # Azul para la caja si está fuera
+
+            # Dibujar el punto central
+            cv2.circle(frame, (xc, yc), radius=6, color=color_punto, thickness=-1)
+            
+            # Dibujar la caja (Bounding Box)
             xmin, ymin, xmax, ymax = box
-            # cv2.rectangle(imagen, punto_inicio, punto_fin, color(BGR), grosor)
-            cv2.rectangle(frame, (xmin, ymin), (xmax, ymax), (0, 255, 0), 2)
+            cv2.rectangle(frame, (xmin, ymin), (xmax, ymax), color_box, 2)
+        
+        # 4. Dibujar el polígono de la zona (pts debe ir en una lista [ZONE])
+        cv2.polylines(frame, [ZONE], isClosed=True, color=(0, 255, 255), thickness=2)
+        
+        # Dibujar el contador en pantalla
+        # Fondo para el texto para que se vea mejor
+        cv2.rectangle(frame, (80, 50), (350, 120), (255, 255, 255), -1)
+        cv2.putText(frame, f"Cars: {detections}", (100, 100), 
+                    cv2.FONT_HERSHEY_SIMPLEX, 1.5, (0, 0, 0), 3)
 
-        print(f"Carros detectados en este frame: {len(bboxes)}")
-
-        # MOSTRAR EL VIDEO
         cv2.imshow("frame", frame)
 
-        # Importante: waitKey(1) para que el video corra fluido
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
 
