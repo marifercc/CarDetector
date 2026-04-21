@@ -13,19 +13,14 @@ def load_model():
     return torch.hub.load("ultralytics/yolov5", model="yolov5n", pretrained=True)
 
 def get_center(bbox):
-    # bbox llega como [xmin, ymin, xmax, ymax]
     xc = (int(bbox[0]) + int(bbox[2])) // 2
     yc = (int(bbox[1]) + int(bbox[3])) // 2
     return xc, yc
 
 def get_detections(preds):
-    """Filtra detecciones por confianza y clases específicas"""
     df = preds.pandas().xyxy[0] 
-    # Clases: car, bus, motorcycle (etiquetas estándar de COCO)
     clases_objetivo = ['car', 'bus', 'motorcycle']
     df = df[(df["confidence"] >= 0.4) & (df["name"].isin(clases_objetivo))]
-    
-    # Retornamos coordenadas + el nombre de la clase
     return df[["xmin", "ymin", "xmax", "ymax", "name"]].values
 
 def is_valid_detection(xc, yc): 
@@ -34,10 +29,20 @@ def is_valid_detection(xc, yc):
 def detector(cap):
     model = load_model()
     
-    # --- DICCIONARIOS PARA CONTADORES TOTALES ---
+    # --- CONFIGURACIÓN PARA EXPORTAR VIDEO (NUEVO) ---
+    # Obtenemos las propiedades del video original
+    width  = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+    height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+    fps    = cap.get(cv2.CAP_PROP_FPS)
+    
+    # Definimos el codec y el archivo de salida
+    fourcc = cv2.VideoWriter_fourcc(*'mp4v') # Formato .mp4
+    out = cv2.VideoWriter('resultado_deteccion.mp4', fourcc, fps, (width, height))
+    print(f"Exportando video a: resultado_deteccion.mp4 ({width}x{height} a {fps} FPS)")
+    # --------------------------------------------------
+
     totales = {'car': 0, 'bus': 0, 'motorcycle': 0}
     memoria_ids = {'car': [], 'bus': [], 'motorcycle': []}
-    # --------------------------------------------
 
     while cap.isOpened():
         status, frame = cap.read()
@@ -51,11 +56,10 @@ def detector(cap):
             xc, yc = get_center([xmin, ymin, xmax, ymax])
             
             if is_valid_detection(xc, yc):
-                # Lógica de conteo histórico por categoría
                 es_nuevo = True
                 for old_center in memoria_ids[etiqueta]:
                     distancia = np.linalg.norm(np.array([xc, yc]) - np.array(old_center))
-                    if distancia < 35: # Umbral de pixeles para seguimiento
+                    if distancia < 35:
                         es_nuevo = False
                         memoria_ids[etiqueta].remove(old_center)
                         memoria_ids[etiqueta].append([xc, yc])
@@ -65,39 +69,34 @@ def detector(cap):
                     totales[etiqueta] += 1
                     memoria_ids[etiqueta].append([xc, yc])
 
-                color = (0, 255, 0) # Verde si está en zona
+                color = (0, 255, 0)
             else:
-                color = (0, 0, 255) # Rojo si está fuera
+                color = (0, 0, 255)
 
-            # Dibujar en el frame
             cv2.rectangle(frame, (int(xmin), int(ymin)), (int(xmax), int(ymax)), color, 2)
             cv2.putText(frame, etiqueta, (int(xmin), int(ymin)-10), 
                         cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
 
-        # Limpiar memoria vieja para no saturar
-        for k in memoria_ids:
-            if len(memoria_ids[k]) > 30: memoria_ids[k].pop(0)
-
-        # --- INTERFAZ DE USUARIO (HUD) ---
-        # Dibujar polígono de zona
+        # UI y HUD
         cv2.polylines(frame, [ZONE], True, (255, 255, 255), 2)
-        
-        # Panel de control (Fondo negro)
         cv2.rectangle(frame, (20, 20), (380, 180), (0, 0, 0), -1)
-        
-        # Textos de contadores
-        # Usamos colores diferentes para cada uno
         cv2.putText(frame, f"TOTAL HISTORICO:", (40, 50), 0, 0.7, (255,255,255), 2)
         cv2.putText(frame, f"Carros: {totales['car']}", (40, 85), 0, 0.8, (0, 255, 0), 2)
         cv2.putText(frame, f"Buses:  {totales['bus']}", (40, 120), 0, 0.8, (0, 255, 255), 2)
         cv2.putText(frame, f"Motos:  {totales['motorcycle']}", (40, 155), 0, 0.8, (255, 100, 0), 2)
 
-        cv2.imshow("Monitor de Trafico Inteligente", frame)
+        # --- ESCRIBIR FRAME EN EL VIDEO DE SALIDA (NUEVO) ---
+        out.write(frame)
+        # ----------------------------------------------------
 
+        cv2.imshow("Monitor de Trafico Inteligente", frame)
         if cv2.waitKey(1) & 0xFF == ord('q'): break
 
+    # --- LIMPIEZA (NUEVO: out.release) ---
     cap.release()
+    out.release() # Muy importante para cerrar el archivo correctamente
     cv2.destroyAllWindows()
+    print("Video exportado con éxito.")
 
 if __name__ == '__main__':
     cap = cv2.VideoCapture("data/traffic.mp4")
