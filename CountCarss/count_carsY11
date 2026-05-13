@@ -2,6 +2,7 @@ import cv2
 import numpy as np
 import matplotlib.path as mplPath
 from ultralytics import YOLO
+import csv # <--- Nueva librería para exportar
 
 # --- CONFIGURACIÓN DE CALIBRACIÓN ---
 DISTANCIA_REAL_METROS = 30 
@@ -13,26 +14,34 @@ ZONE = np.array([
 ], np.int32)
 
 def detector(video_path):
-    # 1. CARGAMOS YOLOv11 (puedes usar 'yolo11n.pt' para velocidad o 'yolo11s.pt' para más precisión)
     model = YOLO("yolo11s.pt") 
     
     cap = cv2.VideoCapture(video_path)
     fps = cap.get(cv2.CAP_PROP_FPS)
-    poly_path = mplPath.Path(ZONE)
+    w = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+    h = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+    
+    # --- CONFIGURACIÓN DE EXPORTACIÓN ---
+    # 1. Configurar grabador de video
+    video_writer = cv2.VideoWriter("resultado_trafico.mp4", 
+                                   cv2.VideoWriter_fourcc(*'mp4v'), 
+                                   fps, (w, h))
+    
+    # 2. Configurar archivo CSV
+    csv_file = open("reporte_trafico.csv", mode="w", newline="")
+    csv_writer = csv.writer(csv_file)
+    # Cabecera del CSV
+    csv_writer.writerow(["Frame", "ID", "Clase", "Velocidad_KMH"])
 
-    # Diccionario para guardar datos de velocidad por ID único
-    # Estructura: { id: { 'start_pos': (x,y), 'start_frame': f, 'speed': 0 } }
+    poly_path = mplPath.Path(ZONE)
     track_history = {}
-    totales_unicos = set() # Para contar sin duplicados
+    totales_unicos = set() 
     conteo_clases = {'car': 0, 'bus': 0, 'motorcycle': 0, 'truck': 0}
 
     while cap.isOpened():
         status, frame = cap.read()
         if not status: break
 
-        # 2. INFERENCIA CON TRACKING NATIVO
-        # persist=True mantiene los IDs entre frames
-        # classes=[2, 3, 5, 7] filtra: coche, moto, bus, camión
         results = model.track(frame, persist=True, classes=[2, 3, 5, 7], verbose=False)
 
         # Dibujar Zona
@@ -51,22 +60,17 @@ def detector(video_path):
                 etiqueta = nombres[cls_idx]
                 xc, yc = int((xmin + xmax) / 2), int((ymin + ymax) / 2)
 
-                # Verificar si está en la zona
                 if poly_path.contains_point((xc, yc)):
-                    
-                    # Si es un ID nuevo en la zona, registrar inicio
                     if id_obj not in track_history:
                         track_history[id_obj] = {
                             'start_pos': (xc, yc),
                             'start_frame': cap.get(cv2.CAP_PROP_POS_FRAMES),
                             'speed': 0
                         }
-                        # Contar solo una vez por ID
                         if id_obj not in totales_unicos:
                             conteo_clases[etiqueta] = conteo_clases.get(etiqueta, 0) + 1
                             totales_unicos.add(id_obj)
 
-                    # Calcular velocidad cada 15 frames para estabilidad
                     else:
                         frame_actual = cap.get(cv2.CAP_PROP_POS_FRAMES)
                         frames_pasados = frame_actual - track_history[id_obj]['start_frame']
@@ -74,36 +78,46 @@ def detector(video_path):
                         if frames_pasados >= 15:
                             p1 = track_history[id_obj]['start_pos']
                             p2 = (xc, yc)
-                            
                             dist_px = np.linalg.norm(np.array(p2) - np.array(p1))
                             dist_m = dist_px / PIXELS_PER_METER
                             tiempo_s = frames_pasados / fps
-                            
                             velocidad_kmh = (dist_m / tiempo_s) * 3.6
-                            track_history[id_obj]['speed'] = velocidad_kmh
                             
-                            # Actualizar referencia
+                            track_history[id_obj]['speed'] = round(velocidad_kmh, 2)
                             track_history[id_obj]['start_pos'] = (xc, yc)
                             track_history[id_obj]['start_frame'] = frame_actual
+                            
+                            # --- EXPORTAR CADA DETECCIÓN AL CSV ---
+                            csv_writer.writerow([int(frame_actual), id_obj, etiqueta, track_history[id_obj]['speed']])
 
                     # Dibujar
                     speed = track_history[id_obj]['speed']
                     color = (0, 255, 0) if speed < 90 else (0, 0, 255)
-                    
                     cv2.rectangle(frame, (int(xmin), int(ymin)), (int(xmax), int(ymax)), color, 2)
                     cv2.putText(frame, f"ID:{id_obj} {etiqueta} {int(speed)}km/h", 
                                 (int(xmin), int(ymin)-10), 0, 0.5, color, 2)
 
-        # HUD (Interfaz)
+        # HUD
         cv2.rectangle(frame, (20, 20), (230, 150), (0,0,0), -1)
         for i, (k, v) in enumerate(conteo_clases.items()):
             cv2.putText(frame, f"{k.upper()}: {v}", (30, 50 + (i*25)), 0, 0.6, (255,255,255), 2)
 
+        # Guardar frame en el video de salida
+        video_writer.write(frame)
+        
         cv2.imshow("YOLOv11 Traffic Tracker", frame)
         if cv2.waitKey(1) & 0xFF == ord('q'): break
 
+    # --- FINALIZACIÓN ---
     cap.release()
+    video_writer.release()
+    csv_file.close()
     cv2.destroyAllWindows()
+    
+    print("Exportación finalizada:")
+    print("- Reporte: reporte_trafico.csv")
+    print("- Video: resultado_trafico.mp4")
+    print("Resumen final:", conteo_clases)
 
 if __name__ == '__main__':
     detector("data/traffic.mp4")

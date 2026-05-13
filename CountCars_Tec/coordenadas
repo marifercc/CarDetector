@@ -1,0 +1,61 @@
+import cv2
+import sys
+from pathlib import Path
+
+class Coordinates:
+    def __init__(self, video_path: str):
+        print(f"Cargando video: {video_path}")
+        self.cap = cv2.VideoCapture(video_path)
+        if not self.cap.isOpened():
+            raise FileNotFoundError(f"No se pudo abrir el video: {video_path}")
+
+        # Forzamos el nombre de la ventana
+        cv2.namedWindow("OBTENER_COORDENADAS")
+        cv2.setMouseCallback("OBTENER_COORDENADAS", self.print_coordinates)
+        
+        # Tamaño estándar que usaremos en AMBOS scripts
+        self.width = 1280
+        self.height = 720
+
+        self.video()
+
+    def print_coordinates(self, event, x, y, flags, params):
+        if event == cv2.EVENT_LBUTTONDOWN:
+            # Ahora x,y serán exactos para el tamaño 1280x720
+            print(f"[{x}, {y}],")
+
+    def video(self):
+        while True:
+            status, frame = self.cap.read()
+            
+            if not status:
+                # Si llega al final, reinicia para que sigas marcando
+                self.cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
+                continue
+
+            # --- LA CLAVE ESTÁ AQUÍ ---
+            # Redimensionamos igual que en el detector para que coincidan
+            frame_resized = cv2.resize(frame, (self.width, self.height))
+
+            # Dibujar instrucciones en pantalla
+            cv2.putText(frame_resized, "Haz click en los puntos. 'q' para salir.", (10, 30), 
+                        cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
+
+            cv2.imshow("OBTENER_COORDENADAS", frame_resized)
+
+            if cv2.waitKey(30) & 0xFF == ord('q'): 
+                break
+
+    def __del__(self):
+        self.cap.release()
+        cv2.destroyAllWindows()
+
+if __name__ == '__main__':
+    script_dir = Path(__file__).resolve().parent
+    if len(sys.argv) > 1:
+        video_path = Path(sys.argv[1])
+    else:
+        video_path = script_dir / "Video_TECmin.mp4"
+
+    print(f"Video seleccionado: {video_path}")
+    c = Coordinates(str(video_path))
