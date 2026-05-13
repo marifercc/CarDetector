@@ -3,101 +3,135 @@ import torch
 import numpy as np
 import matplotlib.path as mplPath
 
-# 1. Definimos la zona de detección
+# --- CONFIGURACIÓN DE CALIBRACIÓN ---
+# Distancia real aproximada de la zona de detección (en metros)
+DISTANCIA_REAL_METROS = 30 
+# Factor de conversión (píxeles que representan esos metros en pantalla)
+# Si la zona es más grande en píxeles, la velocidad será más precisa.
+PIXELS_PER_METER = 350 / DISTANCIA_REAL_METROS 
+
+# Zona de detección (Polígono)
 ZONE = np.array([
     [333, 374], [403, 470], [476, 655], [498, 710],
     [1237, 714], [1217, 523], [1139, 469], [1009, 393],
 ], np.int32)
 
 def load_model():
-    return torch.hub.load("ultralytics/yolov5", model="yolov5n", pretrained=True)
+    device = 'cuda' if torch.cuda.is_available() else 'cpu'
+    print(f"Cargando modelo en: {device}")
+    model = torch.hub.load("ultralytics/yolov5", model="yolov5n", pretrained=True).to(device)
+    # Filtramos clases: car, motorcycle, bus, truck
+    model.classes = [2, 3, 5, 7] 
+    return model
 
-def get_center(bbox):
-    xc = (int(bbox[0]) + int(bbox[2])) // 2
-    yc = (int(bbox[1]) + int(bbox[3])) // 2
-    return xc, yc
-
-def get_detections(preds):
-    df = preds.pandas().xyxy[0] 
-    clases_objetivo = ['car', 'bus', 'motorcycle']
-    df = df[(df["confidence"] >= 0.4) & (df["name"].isin(clases_objetivo))]
-    return df[["xmin", "ymin", "xmax", "ymax", "name"]].values
-
-def is_valid_detection(xc, yc): 
-    return mplPath.Path(ZONE).contains_point((xc, yc))
-
-def detector(cap):
+def detector(video_path):
     model = load_model()
-    
-    # --- CONFIGURACIÓN PARA EXPORTAR VIDEO (NUEVO) ---
-    # Obtenemos las propiedades del video original
-    width  = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
-    height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
-    fps    = cap.get(cv2.CAP_PROP_FPS)
-    
-    # Definimos el codec y el archivo de salida
-    fourcc = cv2.VideoWriter_fourcc(*'mp4v') # Formato .mp4
-    out = cv2.VideoWriter('resultado_deteccion.mp4', fourcc, fps, (width, height))
-    print(f"Exportando video a: resultado_deteccion.mp4 ({width}x{height} a {fps} FPS)")
-    # --------------------------------------------------
+    cap = cv2.VideoCapture(video_path)
+    if not cap.isOpened():
+        print("Error al abrir el video.")
+        return
 
-    totales = {'car': 0, 'bus': 0, 'motorcycle': 0}
-    memoria_ids = {'car': [], 'bus': [], 'motorcycle': []}
+    fps = cap.get(cv2.CAP_PROP_FPS)
+    
+    # Tracking y conteo
+    track_data = {} # { id: { 'last_pos': (x,y), 'start_pos': (x,y), 'start_frame': f, 'speed': 0, 'last_seen': f } }
+    next_id = 0
+    totales = {'car': 0, 'bus': 0, 'motorcycle': 0, 'truck': 0}
+    poly_path = mplPath.Path(ZONE)
 
     while cap.isOpened():
         status, frame = cap.read()
         if not status: break
+        
+        frame_actual = int(cap.get(cv2.CAP_PROP_POS_FRAMES))
+        results = model(frame)
+        detecciones = results.pandas().xyxy[0]
 
-        preds = model(frame)
-        detecciones = get_detections(preds)
+        # Dibujar Zona de detección con transparencia
+        overlay = frame.copy()
+        cv2.fillPoly(overlay, [ZONE], (0, 255, 255))
+        cv2.addWeighted(overlay, 0.2, frame, 0.8, 0, frame)
 
-        for det in detecciones:
-            xmin, ymin, xmax, ymax, etiqueta = det
-            xc, yc = get_center([xmin, ymin, xmax, ymax])
+        for _, row in detecciones.iterrows():
+            if row['confidence'] < 0.4: continue
             
-            if is_valid_detection(xc, yc):
-                es_nuevo = True
-                for old_center in memoria_ids[etiqueta]:
-                    distancia = np.linalg.norm(np.array([xc, yc]) - np.array(old_center))
-                    if distancia < 35:
-                        es_nuevo = False
-                        memoria_ids[etiqueta].remove(old_center)
-                        memoria_ids[etiqueta].append([xc, yc])
+            xmin, ymin, xmax, ymax = int(row['xmin']), int(row['ymin']), int(row['xmax']), int(row['ymax'])
+            etiqueta = row['name']
+            xc, yc = (xmin + xmax) // 2, (ymin + ymax) // 2
+
+            # Solo procesar si el centro está dentro de la zona
+            if poly_path.contains_point((xc, yc)):
+                id_vehiculo = None
+                
+                # 1. Buscar si este vehículo ya lo teníamos identificado (Tracking por proximidad)
+                for vid, data in track_data.items():
+                    dist = np.linalg.norm(np.array([xc, yc]) - np.array(data['last_pos']))
+                    if dist < 60: # Umbral de píxeles para considerar que es el mismo objeto
+                        id_vehiculo = vid
                         break
                 
-                if es_nuevo:
-                    totales[etiqueta] += 1
-                    memoria_ids[etiqueta].append([xc, yc])
+                # 2. Si es nuevo, inicializar su registro y sumar al contador
+                if id_vehiculo is None:
+                    id_vehiculo = next_id
+                    track_data[id_vehiculo] = {
+                        'last_pos': (xc, yc),
+                        'start_pos': (xc, yc),
+                        'start_frame': frame_actual,
+                        'speed': 0,
+                        'last_seen': frame_actual
+                    }
+                    next_id += 1
+                    if etiqueta in totales: totales[etiqueta] += 1
+                
+                # 3. Actualizar datos y calcular velocidad cada 12 cuadros para mayor estabilidad
+                else:
+                    data = track_data[id_vehiculo]
+                    frames_pasados = frame_actual - data['start_frame']
+                    
+                    if frames_pasados >= 12: 
+                        dist_px = np.linalg.norm(np.array([xc, yc]) - np.array(data['start_pos']))
+                        dist_m = dist_px / PIXELS_PER_METER
+                        tiempo_s = frames_pasados / fps
+                        
+                        if tiempo_s > 0:
+                            velocidad_kmh = (dist_m / tiempo_s) * 3.6
+                            track_data[id_vehiculo]['speed'] = velocidad_kmh
+                            
+                        # Reiniciar puntos de referencia para el siguiente cálculo de velocidad
+                        track_data[id_vehiculo]['start_pos'] = (xc, yc)
+                        track_data[id_vehiculo]['start_frame'] = frame_actual
 
-                color = (0, 255, 0)
-            else:
-                color = (0, 0, 255)
+                    # Actualizar última posición vista y tiempo
+                    track_data[id_vehiculo]['last_pos'] = (xc, yc)
+                    track_data[id_vehiculo]['last_seen'] = frame_actual
 
-            cv2.rectangle(frame, (int(xmin), int(ymin)), (int(xmax), int(ymax)), color, 2)
-            cv2.putText(frame, etiqueta, (int(xmin), int(ymin)-10), 
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
+                # 4. Dibujar en pantalla
+                speed = track_data[id_vehiculo]['speed']
+                # Cambiar color si excede un límite (ej. 80 km/h)
+                color = (0, 0, 255) if speed > 80 else (0, 255, 0)
+                
+                cv2.rectangle(frame, (xmin, ymin), (xmax, ymax), color, 2)
+                label = f"{etiqueta.upper()} {int(speed)} km/h"
+                cv2.putText(frame, label, (xmin, ymin - 10), 0, 0.6, color, 2)
 
-        # UI y HUD
-        cv2.polylines(frame, [ZONE], True, (255, 255, 255), 2)
-        cv2.rectangle(frame, (20, 20), (380, 180), (0, 0, 0), -1)
-        cv2.putText(frame, f"TOTAL HISTORICO:", (40, 50), 0, 0.7, (255,255,255), 2)
-        cv2.putText(frame, f"Carros: {totales['car']}", (40, 85), 0, 0.8, (0, 255, 0), 2)
-        cv2.putText(frame, f"Buses:  {totales['bus']}", (40, 120), 0, 0.8, (0, 255, 255), 2)
-        cv2.putText(frame, f"Motos:  {totales['motorcycle']}", (40, 155), 0, 0.8, (255, 100, 0), 2)
+        # --- LIMPIEZA DE MEMORIA ---
+        # Borrar vehículos que no han sido vistos en los últimos 30 cuadros
+        ids_viejos = [vid for vid, data in track_data.items() if frame_actual - data['last_seen'] > 30]
+        for vid in ids_viejos:
+            del track_data[vid]
 
-        # --- ESCRIBIR FRAME EN EL VIDEO DE SALIDA (NUEVO) ---
-        out.write(frame)
-        # ----------------------------------------------------
+        # HUD: Mostrar Contadores
+        cv2.rectangle(frame, (20, 20), (250, 150), (0, 0, 0), -1)
+        y_pos = 50
+        for obj, count in totales.items():
+            cv2.putText(frame, f"{obj.capitalize()}s: {count}", (40, y_pos), 0, 0.7, (255, 255, 255), 2)
+            y_pos += 30
 
-        cv2.imshow("Monitor de Trafico Inteligente", frame)
+        cv2.imshow("Monitor de Velocidad en Tiempo Real", frame)
         if cv2.waitKey(1) & 0xFF == ord('q'): break
 
-    # --- LIMPIEZA (NUEVO: out.release) ---
     cap.release()
-    out.release() # Muy importante para cerrar el archivo correctamente
     cv2.destroyAllWindows()
-    print("Video exportado con éxito.")
 
 if __name__ == '__main__':
-    cap = cv2.VideoCapture("data/traffic.mp4")
-    detector(cap)
+    detector("data/traffic.mp4")
