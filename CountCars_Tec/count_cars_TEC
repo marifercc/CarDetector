@@ -30,6 +30,11 @@ def detector(video_path):
     fps = cap.get(cv2.CAP_PROP_FPS)
     w_out, h_out = 1280, 720 # Tamaño de visualización
 
+    # Configuración de exportación de video
+    video_writer = cv2.VideoWriter(os.path.join(ruta_base, "resultado_procesado.mp4"), 
+                                   cv2.VideoWriter_fourcc(*'mp4v'), 
+                                   fps, (w_out, h_out))
+
     # Configuración de exportación
     csv_file = open(os.path.join(ruta_base, "reporte_zonas.csv"), mode="w", newline="")
     csv_writer = csv.writer(csv_file)
@@ -106,10 +111,29 @@ def detector(video_path):
         cv2.imshow("Zona Traffic Tracker", frame)
         if cv2.waitKey(1) & 0xFF == ord('q'): break
 
+        # Guardar frame en video
+        video_writer.write(frame)
+
     cap.release()
+    video_writer.release()
     csv_file.close()
     cv2.destroyAllWindows()
 
-if __name__ == '__main__':
-    arg_video = sys.argv[1] if len(sys.argv) > 1 else "Video_TECmin.mp4"
-    detector(arg_video)
+    # --- RESUMEN FINAL ---
+    total_vehiculos = sum(conteo_a.values())
+    print(f"\n=== RESUMEN FINAL ===")
+    print(f"Total de vehículos detectados: {total_vehiculos}")
+    for tipo, cantidad in conteo_a.items():
+        print(f"{tipo.capitalize()}: {cantidad}")
+    print(f"Resultados guardados en: {os.path.join(ruta_base, 'reporte_zonas.csv')}")
+    print(f"Video procesado guardado en: {os.path.join(ruta_base, 'resultado_procesado.mp4')}")
+
+    # Agregar resumen al CSV
+    with open(os.path.join(ruta_base, "reporte_zonas.csv"), mode="a", newline="") as csv_file:
+        csv_writer = csv.writer(csv_file)
+        csv_writer.writerow([])
+        csv_writer.writerow(["RESUMEN"])
+        csv_writer.writerow(["Tipo", "Cantidad"])
+        for tipo, cantidad in conteo_a.items():
+            csv_writer.writerow([tipo, cantidad])
+        csv_writer.writerow(["Total", total_vehiculos])
