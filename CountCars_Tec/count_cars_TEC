@@ -8,57 +8,56 @@ import sys
 
 # --- DEFINE LAS COORDENADAS DE LA ZONA ---
 COORD_ZONA_A = np.array([
-    [348, 394],
-    [833, 394],
-    [833, 266],
-    [348, 266]
+    [841, 698],
+    [1044, 491],
+    [852, 420],
+    [700, 553],
+    [467, 373],
+    [291, 528],
+    [569, 684],
+    [688, 449],
 
 ], np.int32)
 
 # --- CALIBRACIÓN ---
-PIXELS_PER_METER = 11.6 # Ajustado según tu escala
+PIXELS_PER_METER = 77.83
 
 def detector(video_path):
     ruta_base = os.path.dirname(os.path.abspath(__file__))
     video_full_path = video_path if os.path.isabs(video_path) else os.path.join(ruta_base, video_path)
     print(f"Abriendo video: {video_full_path}")
-    model = YOLO("yolo11s.pt") 
+    model = YOLO("yolo11s.pt")
     cap = cv2.VideoCapture(video_full_path)
     if not cap.isOpened():
         raise FileNotFoundError(f"No se pudo abrir el video: {video_full_path}")
-    
+
     fps = cap.get(cv2.CAP_PROP_FPS)
-    w_out, h_out = 1280, 720 # Tamaño de visualización
+    w_out, h_out = 1280, 720
 
-    # Configuración de exportación de video
-    video_writer = cv2.VideoWriter(os.path.join(ruta_base, "resultado_procesado.mp4"), 
-                                   cv2.VideoWriter_fourcc(*'mp4v'), 
-                                   fps, (w_out, h_out))
+    video_writer = cv2.VideoWriter(
+        os.path.join(ruta_base, "resultado_procesado.mp4"),
+        cv2.VideoWriter_fourcc(*'mp4v'),
+        fps, (w_out, h_out)
+    )
 
-    # Configuración de exportación
     csv_file = open(os.path.join(ruta_base, "reporte_zonas.csv"), mode="w", newline="")
     csv_writer = csv.writer(csv_file)
     csv_writer.writerow(["Frame", "ID", "Clase", "Velocidad", "Zona"])
 
-    # Paths para detección
     path_a = mplPath.Path(COORD_ZONA_A)
 
-    # Diccionario para conteos
     conteo_a = {'car': 0, 'bus': 0, 'motorcycle': 0, 'truck': 0}
-    
-    # Para no contar dos veces el mismo ID en la misma zona
     ids_contados_a = set()
-    
-    track_history = {} # Para velocidades
+    track_history = {}
 
     while cap.isOpened():
         status, frame = cap.read()
-        if not status: break
+        if not status:
+            break
 
         frame = cv2.resize(frame, (w_out, h_out))
         results = model.track(frame, persist=True, classes=[2, 3, 5, 7], verbose=False)
 
-        # --- DIBUJAR ZONA ---
         cv2.polylines(frame, [COORD_ZONA_A], True, (255, 0, 0), 2)
 
         if results[0].boxes.id is not None:
@@ -73,45 +72,53 @@ def detector(video_path):
                 xc, yc = int((xmin + xmax) / 2), int((ymin + ymax) / 2)
 
                 zona_actual = None
-                
-                # VERIFICAR ZONA A
+
                 if path_a.contains_point((xc, yc)):
                     zona_actual = "Zona"
                     if id_obj not in ids_contados_a:
                         conteo_a[etiqueta] = conteo_a.get(etiqueta, 0) + 1
                         ids_contados_a.add(id_obj)
 
-                # Lógica de velocidad (solo si está en la zona)
                 if zona_actual:
                     if id_obj not in track_history:
-                        track_history[id_obj] = {'pos': (xc, yc), 'frame': cap.get(cv2.CAP_PROP_POS_FRAMES), 'speed': 0}
+                        track_history[id_obj] = {
+                            'pos': (xc, yc),
+                            'frame': cap.get(cv2.CAP_PROP_POS_FRAMES),
+                            'speed': 0
+                        }
                     else:
                         f_actual = cap.get(cv2.CAP_PROP_POS_FRAMES)
                         dif_f = f_actual - track_history[id_obj]['frame']
                         if dif_f >= 15:
-                            dist = np.linalg.norm(np.array((xc, yc)) - np.array(track_history[id_obj]['pos']))
+                            dist = np.linalg.norm(
+                                np.array((xc, yc)) - np.array(track_history[id_obj]['pos'])
+                            )
                             speed = ((dist / PIXELS_PER_METER) / (dif_f / fps)) * 3.6
                             track_history[id_obj]['speed'] = round(speed, 1)
                             track_history[id_obj]['pos'] = (xc, yc)
                             track_history[id_obj]['frame'] = f_actual
-                            # Guardar en CSV con nombre de zona
                             csv_writer.writerow([int(f_actual), id_obj, etiqueta, speed, zona_actual])
 
-                    # Dibujar etiqueta
-                    color = (255, 0, 0)
-                    cv2.putText(frame, f"ID:{id_obj} {zona_actual}", (int(xmin), int(ymin)-10), 0, 0.5, color, 2)
+                    # Mostrar ID + velocidad con color según rango
+                    speed_display = track_history[id_obj].get('speed', 0)
+                    color = (0, 255, 0) if speed_display < 60 else (0, 165, 255) if speed_display < 80 else (0, 0, 255)
+                    cv2.putText(
+                        frame,
+                        f"ID:{id_obj} | {speed_display} km/h",
+                        (int(xmin), int(ymin) - 10),
+                        0, 0.55, color, 2
+                    )
 
-        # --- HUD (CONTADORES EN PANTALLA) ---
-        # Panel de la zona
+        # --- HUD ---
         cv2.rectangle(frame, (10, 10), (200, 120), (255, 0, 0), -1)
-        cv2.putText(frame, "ZONA", (20, 30), 0, 0.6, (255,255,255), 2)
+        cv2.putText(frame, "ZONA", (20, 30), 0, 0.6, (255, 255, 255), 2)
         for i, (k, v) in enumerate(conteo_a.items()):
-            cv2.putText(frame, f"{k}: {v}", (20, 50+(i*15)), 0, 0.4, (255,255,255), 1)
+            cv2.putText(frame, f"{k}: {v}", (20, 50 + (i * 15)), 0, 0.4, (255, 255, 255), 1)
 
         cv2.imshow("Zona Traffic Tracker", frame)
-        if cv2.waitKey(1) & 0xFF == ord('q'): break
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
 
-        # Guardar frame en video
         video_writer.write(frame)
 
     cap.release()
@@ -137,3 +144,20 @@ def detector(video_path):
         for tipo, cantidad in conteo_a.items():
             csv_writer.writerow([tipo, cantidad])
         csv_writer.writerow(["Total", total_vehiculos])
+
+
+def main():
+    import argparse
+
+    parser = argparse.ArgumentParser(description="Detecta y cuenta vehículos en una zona de un video usando YOLOv8.")
+    parser.add_argument(
+        "video_path",
+        nargs="?",
+        default="Video_TECmin.mp4",
+        help="Ruta del video a procesar. Si no se especifica, usa Video_TECmin.mp4 en la carpeta del script.")
+    args = parser.parse_args()
+    detector(args.video_path)
+
+
+if __name__ == "__main__":
+    main()
