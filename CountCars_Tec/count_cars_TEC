@@ -8,19 +8,21 @@ import sys
 
 # --- DEFINE LAS COORDENADAS DE LA ZONA ---
 COORD_ZONA_A = np.array([
-    [841, 698],
-    [1044, 491],
-    [852, 420],
-    [700, 553],
-    [467, 373],
-    [291, 528],
-    [569, 684],
-    [688, 449],
+    [537, 312],
+    [219, 511],
+    [568, 713],
+    [704, 483],
+    [823, 351],
+    [1088, 427],
+    [918, 719],
+    [700, 554],
 
 ], np.int32)
 
 # --- CALIBRACIÓN ---
-PIXELS_PER_METER = 77.83
+
+factor_escala = 1280 / 1920  # = 0.667
+PIXELS_PER_METER = 77 * 0.667  # ≈ 7.7
 
 def detector(video_path):
     ruta_base = os.path.dirname(os.path.abspath(__file__))
