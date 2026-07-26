@@ -1,0 +1,12 @@
+# Basado en bytetrack.yaml de Ultralytics, ajustado para objetos rápidos/pequeños (motos):
+# match_thresh más bajo = acepta menos solapamiento entre frames como "mismo objeto"
+# track_buffer más alto = tolera más frames sin detección antes de dar por perdido el track
+# NOTA (log de debug): con match_thresh=0.6 seguían ocurriendo ID switches con huecos de
+# solo 2 frames -> el cuello de botella era el IoU mínimo exigido, no el buffer. Se bajó a 0.4.
+tracker_type: bytetrack
+track_high_thresh: 0.25
+track_low_thresh: 0.1
+new_track_thresh: 0.25
+track_buffer: 60
+match_thresh: 0.4
+fuse_score: True

@@ -28,7 +28,7 @@ def detector(video_path):
     ruta_base = os.path.dirname(os.path.abspath(__file__))
     video_full_path = video_path if os.path.isabs(video_path) else os.path.join(ruta_base, video_path)
     print(f"Abriendo video: {video_full_path}")
-    model = YOLO("yolo11s.pt")
+    model = YOLO("yolo11x.pt")
     cap = cv2.VideoCapture(video_full_path)
     if not cap.isOpened():
         raise FileNotFoundError(f"No se pudo abrir el video: {video_full_path}")
@@ -63,10 +63,10 @@ def detector(video_path):
         cv2.polylines(frame, [COORD_ZONA_A], True, (255, 0, 0), 2)
 
         if results[0].boxes.id is not None:
-            boxes = results[0].boxes.xyxy.cpu().numpy()
-            ids = results[0].boxes.id.cpu().numpy().astype(int)
-            clases = results[0].boxes.cls.cpu().numpy().astype(int)
-            nombres = results[0].names
+            boxes = results[0].boxes.xyxy.cpu().numpy() #pasa del gpu al cpu y lo convierte a numpy
+            ids = results[0].boxes.id.cpu().numpy().astype(int) #crea los ids que se van a contar, estan como decimales y se convierte en entero
+            clases = results[0].boxes.cls.cpu().numpy().astype(int) #tipo de vehiculo/objeto es lo del COCO, se convierte en entero
+            nombres = results[0].names #extrae los nombres de los objetos detectados
 
             for box, id_obj, cls_idx in zip(boxes, ids, clases):
                 xmin, ymin, xmax, ymax = box
