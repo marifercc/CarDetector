@@ -51,14 +51,19 @@ def detector(video_path):
     # afinar el tracker a la perfección, se fusiona el ID nuevo con el vehículo ya contado
     # si aparece cerca (en tiempo y posición) de donde uno desapareció.
     frame_count = 0
-    pos_contados = {}          # id contado y visible -> (xc, yc, último frame visto)
-    contados_desaparecidos = {}  # id contado que dejó de verse -> (xc, yc, frame, numero)
+    pos_contados = {}          # id contado y visible -> (xc, yc, último frame visto, cls, vx, vy)
+    contados_desaparecidos = {}  # id contado que dejó de verse -> (xc, yc, frame, numero, cls, vx, vy)
     # valores ajustados según los switches reales observados en el log de debug
     # (huecos de hasta ~20 frames, deriva de posición de ~15-40px). Si se usan valores
     # más grandes (ej. 60/100) se corre el riesgo de fusionar vehículos DISTINTOS que
     # pasan por el mismo punto de la vía en un tiempo parecido (normal en tráfico fluido)
+    # NOTA: comparar contra la ÚLTIMA posición fija fallaba con motos que encadenan
+    # varios ID switches seguidos mientras siguen avanzando (una sola moto cruzando la
+    # zona terminaba partida en 3-4 conteos porque a los ~15-20 frames ya se había
+    # movido más de MERGE_DIST px). Se agrega velocidad (vx, vy) para predecir dónde
+    # debería estar el vehículo ahora, en vez de asumir que sigue en el mismo punto.
     MERGE_WINDOW = 25   # frames de tolerancia
-    MERGE_DIST = 50      # px de tolerancia entre la última posición y la nueva
+    MERGE_DIST = 50      # px de tolerancia entre la posición PREDICHA (con velocidad) y la nueva
 
     while cap.isOpened():
         status, frame = cap.read()
@@ -101,7 +106,15 @@ def detector(video_path):
                     zona_actual = "Zona"
 
                     if id_obj in ids_contados_a:
-                        pos_contados[id_obj] = (xc, yc, frame_count, cls)
+                        prev = pos_contados.get(id_obj)
+                        if prev is not None:
+                            prev_x, prev_y, prev_frame, _prev_cls, _prev_vx, _prev_vy = prev
+                            dt = frame_count - prev_frame
+                            vx = (xc - prev_x) / dt if dt > 0 else 0
+                            vy = (yc - prev_y) / dt if dt > 0 else 0
+                        else:
+                            vx, vy = 0, 0
+                        pos_contados[id_obj] = (xc, yc, frame_count, cls, vx, vy)
                     else:
                         # ID nuevo dentro de la zona: ¿es continuación de un vehículo
                         # que el tracker "perdió" hace poco cerca de aquí? (típico en
@@ -112,23 +125,37 @@ def detector(video_path):
                         # bloqueaba fusiones legítimas (probado: subía el total de
                         # 35 a 45 al agregar esa restricción)
                         match_id = None
-                        for old_id, (old_x, old_y, old_frame, _num, _old_cls) in contados_desaparecidos.items():
-                            if (frame_count - old_frame <= MERGE_WINDOW
-                                    and abs(xc - old_x) < MERGE_DIST
-                                    and abs(yc - old_y) < MERGE_DIST):
+                        for old_id, (old_x, old_y, old_frame, _num, _old_cls, old_vx, old_vy) in contados_desaparecidos.items():
+                            dt = frame_count - old_frame
+                            pred_x = old_x + old_vx * dt
+                            pred_y = old_y + old_vy * dt
+                            if (dt <= MERGE_WINDOW
+                                    and abs(xc - pred_x) < MERGE_DIST
+                                    and abs(yc - pred_y) < MERGE_DIST):
                                 match_id = old_id
                                 break
 
                         ids_contados_a.add(id_obj)
                         if match_id is not None:
                             numero_contado[id_obj] = contados_desaparecidos[match_id][3]
+                            # se hereda la velocidad del tramo anterior para poder seguir
+                            # prediciendo si el tracker vuelve a cambiar de ID en cadena
+                            vx_inicial, vy_inicial = contados_desaparecidos[match_id][5], contados_desaparecidos[match_id][6]
                             del contados_desaparecidos[match_id]
                         else:
                             total_contados += 1
                             numero_contado[id_obj] = total_contados
                             clase_contado[total_contados] = nombres[cls]
+                            vx_inicial, vy_inicial = 0, 0
 
-                        pos_contados[id_obj] = (xc, yc, frame_count, cls)
+                        if cls == 3:  # DEBUG TEMPORAL: solo motos, para verificar si se siguen contando de más
+                            with open(os.path.join(ruta_base, "log_motos_debug.txt"), "a", encoding="utf-8") as f:
+                                if match_id is not None:
+                                    f.write(f"frame {frame_count} tracker_id {id_obj} -> FUSIONADO con conteo #{numero_contado[id_obj]} (pos {xc},{yc})\n")
+                                else:
+                                    f.write(f"frame {frame_count} tracker_id {id_obj} -> CONTADO NUEVO #{total_contados} (pos {xc},{yc})\n")
+
+                        pos_contados[id_obj] = (xc, yc, frame_count, cls, vx_inicial, vy_inicial)
 
                     ids_vistos_este_frame.add(id_obj)
 
@@ -145,8 +172,8 @@ def detector(video_path):
             # (se conservan por MERGE_WINDOW frames por si el tracker los recupera con ID nuevo)
             for old_id in list(pos_contados.keys()):
                 if old_id not in ids_vistos_este_frame:
-                    x, y, last_frame, cls = pos_contados.pop(old_id)
-                    contados_desaparecidos[old_id] = (x, y, last_frame, numero_contado[old_id], cls)
+                    x, y, last_frame, cls, vx, vy = pos_contados.pop(old_id)
+                    contados_desaparecidos[old_id] = (x, y, last_frame, numero_contado[old_id], cls, vx, vy)
 
         # --- HUD ---
         cv2.rectangle(frame, (10, 10), (200, 60), (255, 0, 0), -1)
