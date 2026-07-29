@@ -2,6 +2,8 @@ import cv2 #abirir video
 import numpy as np #matrices y operaciones matemáticas
 import matplotlib.path as mplPath #ver si centroide está dentro de la zona de conteo
 from ultralytics import YOLO #importar modelo de yolo
+from boxmot.trackers.bbox.ocsort import OcSort #para motos: bueno reconectando objetos rapidos que se pierden
+from boxmot.trackers.bbox.bytetrack import ByteTrack #para car/bus/truck: es el que ya dio el conteo correcto (28/1)
 import csv #usar csv para reporte final
 import os #abrir rutas de archivos
 import sys # permitir que python acceda a los argumentos de los comandos
@@ -29,12 +31,20 @@ def detector(video_path):
     w_out, h_out = 1280, 720 # si se le cambia acá rompe el video de dimensiones
 
     video_writer = cv2.VideoWriter(
-        os.path.join(ruta_base, "resultado_procesado.mp4"),
+        os.path.join(ruta_base, "resultado_procesado_ocsort_TEST.mp4"),
         cv2.VideoWriter_fourcc(*'mp4v'),
         fps, (w_out, h_out)
     )
 
-    tracker_config = os.path.join(ruta_base, "bytetrack_custom.yaml")
+    # HIBRIDO: un tracker por grupo de clases, cada uno en lo que ya sabemos que
+    # rinde bien (medido, no adivinado): ByteTrack para car/bus/truck (dio el 28/1
+    # correcto), OC-SORT solo para motos (dio el 2 correcto, el numero real
+    # confirmado a simple vista en el video). Asi no hay que elegir una sola
+    # configuracion que le sirva a la vez a autos (lentos, cajas grandes) y motos
+    # (rapidas, cajas angostas) -- que fue justo lo que fallo con BoT-SORT y con
+    # OC-SORT solo (mejoraban motos pero fusionaban autos distintos entre si).
+    byte_tracker = ByteTrack(track_thresh=0.1, match_thresh=0.4, track_buffer=60, frame_rate=int(round(fps)))
+    oc_tracker = OcSort(det_thresh=0.3, max_age=30, min_hits=1, iou_threshold=0.3)
     path_a = mplPath.Path(COORD_ZONA_A)
 
     ids_contados_a = set()
@@ -88,17 +98,42 @@ def detector(video_path):
         # tracker="bytetrack_custom.yaml": las motos (pequeñas y rápidas) se movían más
         # que el 80% de solapamiento que exige el tracker por defecto entre frames ->
         # perdía el track y les daba un ID nuevo -> se contaban 3-4 veces
-        results = model.track(
-            frame, persist=True, classes=[2, 3, 5, 7], verbose=False,
-            conf=0.4, agnostic_nms=True, tracker=tracker_config, imgsz=640 
-        ) # agregamos imgsz para usar el frame con el que yolo está entrenado ACÁ ES DONDE SE DEFINE SI 2 OBJETOS SON LOS MISMOS
+        results = model.predict(
+            frame, classes=[2, 3, 5, 7], verbose=False,
+            conf=0.4, agnostic_nms=True, imgsz=640
+        ) # solo deteccion, el tracking (asociar IDs entre frames) lo hace OC-SORT aparte
+
+        det_boxes = results[0].boxes.xyxy.cpu().numpy()
+        det_conf = results[0].boxes.conf.cpu().numpy()
+        det_cls = results[0].boxes.cls.cpu().numpy()
+        if len(det_boxes) > 0:
+            dets = np.concatenate([det_boxes, det_conf.reshape(-1, 1), det_cls.reshape(-1, 1)], axis=1)
+        else:
+            dets = np.empty((0, 6))
+
+        es_moto = dets[:, 5] == 3
+        dets_moto = dets[es_moto]
+        dets_otros = dets[~es_moto]
+        # hay que llamar a los dos trackers en CADA frame, incluso sin detecciones para ese grupo
+        tracks_otros = byte_tracker.update(dets_otros, frame)
+        tracks_moto = oc_tracker.update(dets_moto, frame)
 
         cv2.polylines(frame, [COORD_ZONA_A], True, (255, 0, 0), 2)
 
-        if results[0].boxes.id is not None:
-            boxes = results[0].boxes.xyxy.cpu().numpy()
-            ids = results[0].boxes.id.cpu().numpy().astype(int)
-            clses = results[0].boxes.cls.cpu().numpy().astype(int)
+        boxes_list, ids_list, clses_list = [], [], []
+        if len(tracks_otros) > 0:
+            boxes_list.append(tracks_otros.xyxy)
+            clses_list.append(tracks_otros.cls)
+            ids_list.extend(("B", int(i)) for i in tracks_otros.id)  # prefijo para no chocar con IDs de OC-SORT
+        if len(tracks_moto) > 0:
+            boxes_list.append(tracks_moto.xyxy)
+            clses_list.append(tracks_moto.cls)
+            ids_list.extend(("M", int(i)) for i in tracks_moto.id)
+
+        if ids_list:
+            boxes = np.concatenate(boxes_list, axis=0)
+            clses = np.concatenate(clses_list, axis=0)
+            ids = ids_list
             nombres = results[0].names
 
             # se quitó la clasificación por tipo (car/bus/motorcycle/truck) del reporte:
@@ -158,6 +193,13 @@ def detector(video_path):
                             clase_contado[total_contados] = nombres[cls]
                             vx_inicial, vy_inicial = 0, 0
 
+                        if cls == 3:  # DEBUG TEMPORAL comparativo con las pruebas anteriores (ByteTrack/BoT-SORT)
+                            with open(os.path.join(ruta_base, "log_motos_ocsort.txt"), "a", encoding="utf-8") as f:
+                                if match_id is not None:
+                                    f.write(f"frame {frame_count} tracker_id {id_obj} -> FUSIONADO con conteo #{numero_contado[id_obj]} (pos {xc},{yc})\n")
+                                else:
+                                    f.write(f"frame {frame_count} tracker_id {id_obj} -> CONTADO NUEVO #{total_contados} (pos {xc},{yc})\n")
+
                         pos_contados[id_obj] = (xc, yc, frame_count, cls, vx_inicial, vy_inicial)
 
                     ids_vistos_este_frame.add(id_obj)
@@ -203,11 +245,11 @@ def detector(video_path):
     print(f"Total de vehículos detectados: {total_vehiculos}")
     for nombre_clase, cantidad in desglose.items():
         print(f"  {nombre_clase}: {cantidad}")
-    print(f"Resultados guardados en: {os.path.join(ruta_base, 'reporte_zonas.csv')}")
-    print(f"Video procesado guardado en: {os.path.join(ruta_base, 'resultado_procesado.mp4')}")
+    print(f"Resultados guardados en: {os.path.join(ruta_base, 'reporte_zonas_ocsort_TEST.csv')}")
+    print(f"Video procesado guardado en: {os.path.join(ruta_base, 'resultado_procesado_ocsort_TEST.mp4')}")
 
     # Agregar resumen al CSV
-    with open(os.path.join(ruta_base, "reporte_zonas.csv"), mode="a", newline="") as csv_file:
+    with open(os.path.join(ruta_base, "reporte_zonas_ocsort_TEST.csv"), mode="a", newline="") as csv_file:
         csv_writer = csv.writer(csv_file)
         csv_writer.writerow([])
         csv_writer.writerow(["RESUMEN"])
