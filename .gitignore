@@ -1,0 +1,14 @@
+# Modelos pre-entrenados (pesados, se descargan solos con ultralytics)
+*.pt
+
+# Archivos comprimidos pesados
+*.zip
+
+# Videos de prueba pesados que no son el entregable final
+CountCarss/*.mp4
+CountCars_Tec/Video_TECmin_2min.mp4
+CountCars_Tec/resultado_trafico_intento1.mp4
+
+.venv/
+__pycache__/
+*.pyc
