@@ -2,18 +2,19 @@ import cv2 #abirir video
 import numpy as np #matrices y operaciones matemáticas
 import matplotlib.path as mplPath #ver si centroide está dentro de la zona de conteo
 from ultralytics import YOLO #importar modelo de yolo
+from boxmot.trackers.bbox.ocsort import OcSort #tracker unico para todas las clases
 import csv #usar csv para reporte final
 import os #abrir rutas de archivos
 import sys # permitir que python acceda a los argumentos de los comandos
 
 # --- DEFINE LAS COORDENADAS DE LA ZONA ---
 COORD_ZONA_A = np.array([ #camibio a solo 1 punto de encuentro
-    [400, 280],   
-    [750, 280],  
-    [1100, 450],  
-    [1100, 720], 
-    [600, 720],   
-    [300, 500],  
+    [400, 280],
+    [750, 280],
+    [1100, 450],
+    [1100, 720],
+    [600, 720],
+    [300, 500],
 ], np.int32)
 
 def detector(video_path):
@@ -34,22 +35,30 @@ def detector(video_path):
         fps, (w_out, h_out)
     )
 
-    tracker_config = os.path.join(ruta_base, "bytetrack_custom.yaml")
+    # OC-SORT para TODAS las clases (car/bus/truck/motorcycle), por decision del
+    # usuario. NOTA de tradeoff medido en pruebas: en este video, OC-SORT solo
+    # (sin separar por clase) dio 2 motos / 12 autos / 1 bus (15 total), contra
+    # 2 motos / 28 autos / 1 bus (31 total) usando ByteTrack para autos. Se aislo
+    # la causa (no era ReID ni max_age): con trafico fluido de varios autos en el
+    # mismo carril, la prediccion de Kalman de OC-SORT para un auto "perdido"
+    # sigue viva varios frames y a veces un auto DISTINTO que pasa por ahi
+    # cerca hereda ese mismo ID. Se opto por mantenerlo simple con un solo
+    # tracker de todas formas.
+    oc_tracker = OcSort(det_thresh=0.3, max_age=30, min_hits=1, iou_threshold=0.3)
     path_a = mplPath.Path(COORD_ZONA_A)
 
     ids_contados_a = set()
-    # el ID que da el tracker de YOLO es global a todo el video (sube con cualquier
+    # el ID que da el tracker es global a todo el video (sube con cualquier
     # objeto detectado, entre o no a la zona); acá se guarda un número propio y
     # secuencial solo para los vehículos que sí entran a la zona, en orden de entrada
     numero_contado = {}
     total_contados = 0  # contador real de vehículos únicos (no cuenta los IDs fusionados)
     clase_contado = {}  # numero de conteo -> nombre de clase (car/motorcycle/truck/bus), para el desglose final
 
-    # el tracker (ByteTrack) a veces "pierde" un objeto por 1-2 frames y le da un ID
-    # nuevo al reaparecer (típico en motos: cajas angostas + movimiento rápido ->
-    # el solapamiento entre frames cae por debajo del match_thresh). En vez de intentar
-    # afinar el tracker a la perfección, se fusiona el ID nuevo con el vehículo ya contado
-    # si aparece cerca (en tiempo y posición) de donde uno desapareció.
+    # aun con OC-SORT, a veces se pierde un objeto por unos frames y se le da un
+    # ID nuevo al reaparecer. Esta capa fusiona el ID nuevo con el vehículo ya
+    # contado si aparece cerca (en tiempo y posición) de donde uno desapareció --
+    # funciona como red de seguridad adicional sobre el tracker.
     frame_count = 0
     pos_contados = {}          # id contado y visible -> (xc, yc, último frame visto, cls, vx, vy)
     contados_desaparecidos = {}  # id contado que dejó de verse -> (xc, yc, frame, numero, cls, vx, vy)
@@ -59,20 +68,12 @@ def detector(video_path):
     # pasan por el mismo punto de la vía en un tiempo parecido (normal en tráfico fluido)
     # NOTA: comparar contra la ÚLTIMA posición fija fallaba con motos que encadenan
     # varios ID switches seguidos mientras siguen avanzando (una sola moto cruzando la
-    # zona terminaba partida en 3-4 conteos porque a los ~15-20 frames ya se había
+    # zona terminaba partida en varios conteos porque a los ~15-20 frames ya se había
     # movido más de MERGE_DIST px). Se agrega velocidad (vx, vy) para predecir dónde
     # debería estar el vehículo ahora, en vez de asumir que sigue en el mismo punto.
     MERGE_WINDOW = 25   # frames de tolerancia
     MERGE_DIST = 50      # px de tolerancia entre la posición PREDICHA (con velocidad) y la nueva
-    # Se probó reemplazar ByteTrack por BoT-SORT+ReID (compara apariencia visual, no solo
-    # posición) para arreglar esto de raíz, pero el modo "auto" de ReID resultó demasiado
-    # impreciso para autos (confundía autos distintos que se parecen -> el total cayó de
-    # 35 a 18). Se revirtió a ByteTrack y en su lugar se amplía el margen SOLO para motos
-    # (clase 3): en el log de debug se vio una moto real que se movió 62px en 18 frames,
-    # por encima de MERGE_DIST=50 pero dentro de MERGE_WINDOW=25 -> con MERGE_DIST=50
-    # fijo para todas las clases se hubiera tenido que aflojar también para autos, con
-    # riesgo de fusionar autos distintos (como pasó con BoT-SORT+ReID).
-    MERGE_DIST_MOTO = 75
+    MERGE_DIST_MOTO = 75  # margen mas amplio solo para motos (clase 3), que se mueven mas rapido
 
     while cap.isOpened():
         status, frame = cap.read()
@@ -85,20 +86,27 @@ def detector(video_path):
         # agnostic_nms=True: sin esto, un mismo vehículo puede generar 2 cajas superpuestas
         # con clases distintas (ej. duda entre "car" y "truck"), cada una con su propio ID
         # -> se contaba 2 veces el mismo vehículo en el mismo instante
-        # tracker="bytetrack_custom.yaml": las motos (pequeñas y rápidas) se movían más
-        # que el 80% de solapamiento que exige el tracker por defecto entre frames ->
-        # perdía el track y les daba un ID nuevo -> se contaban 3-4 veces
-        results = model.track(
-            frame, persist=True, classes=[2, 3, 5, 7], verbose=False,
-            conf=0.4, agnostic_nms=True, tracker=tracker_config, imgsz=640 
-        ) # agregamos imgsz para usar el frame con el que yolo está entrenado ACÁ ES DONDE SE DEFINE SI 2 OBJETOS SON LOS MISMOS
+        results = model.predict(
+            frame, classes=[2, 3, 5, 7], verbose=False,
+            conf=0.4, agnostic_nms=True, imgsz=640
+        ) # solo deteccion; el tracking (asociar IDs entre frames) lo hace OC-SORT aparte
+
+        det_boxes = results[0].boxes.xyxy.cpu().numpy()
+        det_conf = results[0].boxes.conf.cpu().numpy()
+        det_cls = results[0].boxes.cls.cpu().numpy()
+        if len(det_boxes) > 0:
+            dets = np.concatenate([det_boxes, det_conf.reshape(-1, 1), det_cls.reshape(-1, 1)], axis=1)
+        else:
+            dets = np.empty((0, 6))
+
+        tracks = oc_tracker.update(dets, frame)  # hay que llamarlo en CADA frame, incluso sin detecciones
 
         cv2.polylines(frame, [COORD_ZONA_A], True, (255, 0, 0), 2)
 
-        if results[0].boxes.id is not None:
-            boxes = results[0].boxes.xyxy.cpu().numpy()
-            ids = results[0].boxes.id.cpu().numpy().astype(int)
-            clses = results[0].boxes.cls.cpu().numpy().astype(int)
+        if len(tracks) > 0:
+            boxes = tracks.xyxy
+            ids = tracks.id
+            clses = tracks.cls
             nombres = results[0].names
 
             # se quitó la clasificación por tipo (car/bus/motorcycle/truck) del reporte:
@@ -126,13 +134,11 @@ def detector(video_path):
                         pos_contados[id_obj] = (xc, yc, frame_count, cls, vx, vy)
                     else:
                         # ID nuevo dentro de la zona: ¿es continuación de un vehículo
-                        # que el tracker "perdió" hace poco cerca de aquí? (típico en
-                        # motos: caja angosta + movimiento rápido -> el tracker le
-                        # asigna un ID nuevo al reaparecer). No se exige misma clase:
-                        # el mismo vehículo a veces cambia de clase entre frames (por
-                        # eso ya se usa agnostic_nms=True más arriba) -> exigirla
-                        # bloqueaba fusiones legítimas (probado: subía el total de
-                        # 35 a 45 al agregar esa restricción)
+                        # que el tracker "perdió" hace poco cerca de aquí? No se exige
+                        # misma clase: el mismo vehículo a veces cambia de clase entre
+                        # frames (por eso ya se usa agnostic_nms=True más arriba) ->
+                        # exigirla bloqueaba fusiones legítimas (probado: subía el
+                        # total de 35 a 45 al agregar esa restricción)
                         margen_dist = MERGE_DIST_MOTO if cls == 3 else MERGE_DIST
                         match_id = None
                         for old_id, (old_x, old_y, old_frame, _num, _old_cls, old_vx, old_vy) in contados_desaparecidos.items():

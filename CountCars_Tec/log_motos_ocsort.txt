@@ -1,3 +1,0 @@
-frame 167 tracker_id ('M', 0) -> CONTADO NUEVO #1 (pos 598,479)
-frame 392 tracker_id ('M', 1) -> CONTADO NUEVO #2 (pos 531,359)
-frame 410 tracker_id ('M', 2) -> FUSIONADO con conteo #2 (pos 469,411)
