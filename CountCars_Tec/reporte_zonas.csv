@@ -1,7 +1,14 @@
 
 RESUMEN
 Tipo,Cantidad
-motorcycle,2
-car,12
-bus,1
-Total,15
+car,33
+truck,4
+motorcycle,4
+bus,2
+Total,43
+
+Direccion,Cantidad
+izquierda,7
+centro,15
+derecha,19
+sin registrar,2

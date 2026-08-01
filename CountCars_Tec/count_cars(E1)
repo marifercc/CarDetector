@@ -17,6 +17,29 @@ COORD_ZONA_A = np.array([ #camibio a solo 1 punto de encuentro
     [300, 500],
 ], np.int32)
 
+# --- ZONAS DE SALIDA: para saber hacia donde se va cada vehiculo ya contado ---
+# (para futuro: saber direccion en la glorieta, no solo el total). Coordenadas
+# confirmadas visualmente sobre un frame con cuadricula (layout_grid2.png) -- si
+# se cambia el angulo de camara hay que revisar estas coordenadas de nuevo.
+COORD_SALIDA_IZQUIERDA = np.array([  # da vuelta a la izquierda (ej. el taxi)
+    [260, 370],
+    [470, 370],
+    [470, 500],
+    [260, 500],
+], np.int32)
+COORD_SALIDA_CENTRO = np.array([  # sigue derecho hacia la camara
+    [300, 560],
+    [750, 560],
+    [750, 720],
+    [300, 720],
+], np.int32)
+COORD_SALIDA_DERECHA = np.array([  # la rampa curva con borde amarillo
+    [880, 470],
+    [1120, 470],
+    [1120, 650],
+    [880, 650],
+], np.int32)
+
 def detector(video_path):
     ruta_base = os.path.dirname(os.path.abspath(__file__))
     video_full_path = video_path if os.path.isabs(video_path) else os.path.join(ruta_base, video_path)
@@ -46,6 +69,10 @@ def detector(video_path):
     # tracker de todas formas.
     oc_tracker = OcSort(det_thresh=0.3, max_age=30, min_hits=1, iou_threshold=0.3)
     path_a = mplPath.Path(COORD_ZONA_A)
+    path_salida_izquierda = mplPath.Path(COORD_SALIDA_IZQUIERDA)
+    path_salida_centro = mplPath.Path(COORD_SALIDA_CENTRO)
+    path_salida_derecha = mplPath.Path(COORD_SALIDA_DERECHA)
+    direccion_contado = {}  # numero de conteo -> "izquierda"/"centro"/"derecha" (primera zona de salida donde se le ve)
 
     ids_contados_a = set()
     # el ID que da el tracker es global a todo el video (sube con cualquier
@@ -102,6 +129,9 @@ def detector(video_path):
         tracks = oc_tracker.update(dets, frame)  # hay que llamarlo en CADA frame, incluso sin detecciones
 
         cv2.polylines(frame, [COORD_ZONA_A], True, (255, 0, 0), 2)
+        cv2.polylines(frame, [COORD_SALIDA_IZQUIERDA], True, (0, 200, 0), 2)
+        cv2.polylines(frame, [COORD_SALIDA_CENTRO], True, (0, 200, 0), 2)
+        cv2.polylines(frame, [COORD_SALIDA_DERECHA], True, (0, 200, 0), 2)
 
         if len(tracks) > 0:
             boxes = tracks.xyxy
@@ -116,6 +146,18 @@ def detector(video_path):
             for box, id_obj, cls in zip(boxes, ids, clses):
                 xmin, ymin, xmax, ymax = box
                 xc, yc = int((xmin + xmax) / 2), int((ymin + ymax) / 2)
+
+                # registrar direccion de salida (solo para vehiculos ya contados, la
+                # primera vez que se les ve en alguna de las 3 zonas de salida)
+                if id_obj in ids_contados_a:
+                    numero = numero_contado[id_obj]
+                    if numero not in direccion_contado:
+                        if path_salida_izquierda.contains_point((xc, yc)):
+                            direccion_contado[numero] = "izquierda"
+                        elif path_salida_centro.contains_point((xc, yc)):
+                            direccion_contado[numero] = "centro"
+                        elif path_salida_derecha.contains_point((xc, yc)):
+                            direccion_contado[numero] = "derecha"
 
                 zona_actual = None
 
@@ -168,11 +210,20 @@ def detector(video_path):
 
                     ids_vistos_este_frame.add(id_obj)
 
-                if zona_actual:
-                    # Mostrar número de conteo (no el ID crudo del tracker)
+                en_zona_salida = (id_obj in ids_contados_a
+                                  and (path_salida_izquierda.contains_point((xc, yc))
+                                       or path_salida_centro.contains_point((xc, yc))
+                                       or path_salida_derecha.contains_point((xc, yc))))
+
+                if zona_actual or en_zona_salida:
+                    # Mostrar número de conteo (no el ID crudo del tracker), y la
+                    # dirección de salida si ya se detectó
+                    numero = numero_contado[id_obj]
+                    etiqueta = f"#{numero} {clase_contado[numero]}"
+                    if numero in direccion_contado:
+                        etiqueta += f" -> {direccion_contado[numero]}"
                     cv2.putText(
-                        frame,
-                        f"#{numero_contado[id_obj]} {clase_contado[numero_contado[id_obj]]}",
+                        frame, etiqueta,
                         (int(xmin), int(ymin) - 10),
                         0, 0.55, (0, 255, 0), 2
                     )
@@ -205,10 +256,17 @@ def detector(video_path):
     for nombre_clase in clase_contado.values():
         desglose[nombre_clase] = desglose.get(nombre_clase, 0) + 1
 
+    desglose_direccion = {"izquierda": 0, "centro": 0, "derecha": 0, "sin registrar": 0}
+    for numero in range(1, total_vehiculos + 1):
+        desglose_direccion[direccion_contado.get(numero, "sin registrar")] += 1
+
     print(f"\n=== RESUMEN FINAL ===")
     print(f"Total de vehículos detectados: {total_vehiculos}")
     for nombre_clase, cantidad in desglose.items():
         print(f"  {nombre_clase}: {cantidad}")
+    print("Direccion de salida:")
+    for direccion, cantidad in desglose_direccion.items():
+        print(f"  {direccion}: {cantidad}")
     print(f"Resultados guardados en: {os.path.join(ruta_base, 'reporte_zonas.csv')}")
     print(f"Video procesado guardado en: {os.path.join(ruta_base, 'resultado_procesado.mp4')}")
 
@@ -221,6 +279,10 @@ def detector(video_path):
         for nombre_clase, cantidad in desglose.items():
             csv_writer.writerow([nombre_clase, cantidad])
         csv_writer.writerow(["Total", total_vehiculos])
+        csv_writer.writerow([])
+        csv_writer.writerow(["Direccion", "Cantidad"])
+        for direccion, cantidad in desglose_direccion.items():
+            csv_writer.writerow([direccion, cantidad])
 
 
 def main():
