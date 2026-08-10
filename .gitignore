@@ -7,6 +7,7 @@
 # Videos de prueba pesados que no son el entregable final
 CountCarss/*.mp4
 CountCars_Tec/Video_TECmin_2min.mp4
+CountCars_Tec/Video_TECmin_12min.mp4
 CountCars_Tec/resultado_trafico_intento1.mp4
 
 .venv/

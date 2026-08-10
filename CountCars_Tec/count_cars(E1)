@@ -101,6 +101,34 @@ def detector(video_path):
     MERGE_WINDOW = 25   # frames de tolerancia
     MERGE_DIST = 50      # px de tolerancia entre la posición PREDICHA (con velocidad) y la nueva
     MERGE_DIST_MOTO = 75  # margen mas amplio solo para motos (clase 3), que se mueven mas rapido
+    # BUG encontrado analizando el video de 12 min: cuando 2+ autos DISTINTOS entran por
+    # el mismo carril/punto en sucesion rapida, uno se "traga" el numero del otro. Se probo
+    # primero exigir un hueco minimo (MERGE_WINDOW_MIN) pensando que era una condicion de
+    # carrera con la recuperacion interna de OC-SORT -- medido y NO cambio nada (el hueco
+    # real ya era >6 frames). La causa real: justo en la linea de entrada de la zona
+    # (y=280) la velocidad calculada es casi cero (recien entra, casi no se ha movido), asi
+    # que la posicion PREDICHA se queda "pegada" ahi sin importar cuantos frames pasen -- y
+    # CUALQUIER auto nuevo que entre por ese mismo punto cae en esa posicion. Por eso se
+    # excluye del match una franja pegada a la entrada (ENTRADA_Y_BUFFER), solo para
+    # clases que no sean moto (las motos entran por otro punto y ya estan exentas).
+    MERGE_WINDOW_MIN = 6  # frames minimos de ausencia antes de intentar fusionar
+    ENTRADA_Y_BUFFER = 40  # px: un auto "desaparecido" muy cerca de la linea de entrada
+                            # (y=280) no es candidato confiable para fusionar
+
+    # Revision manual del video de 12 min encontro varios casos de doble conteo
+    # REPARTIDOS por todo el video (no solo en la entrada), tanto en autos como
+    # motos: el vehiculo se pierde por mas de MERGE_WINDOW (25 frames = 0.8s) y
+    # reaparece con un ID nuevo sin fusionarse. Se probo primero un segundo intento
+    # SOLO para motos con ventana larga + comparacion de color (huella HSV) -- pero
+    # midiendolo, el color salio poco confiable incluso en pares que probablemente
+    # SI eran el mismo vehiculo (correlaciones de 0.05 a 0.44, nunca pasaban el
+    # umbral). Se cambia de estrategia: segunda oportunidad de fusion para TODAS
+    # las clases, con ventana de tiempo mucho mas larga pero exigiendo posicion
+    # MUY exacta (sin predecir por velocidad, que ya no es confiable en huecos
+    # largos) -- razonamiento: a esa precision de posicion, es mucho mas probable
+    # que sea el mismo vehiculo parado/lento que una coincidencia con uno distinto.
+    MERGE_WINDOW_LARGO = 300   # frames (~10s a 30fps)
+    MERGE_DIST_LARGO = 40      # px -- posicion estatica, sin prediccion de velocidad
 
     while cap.isOpened():
         status, frame = cap.read()
@@ -165,6 +193,11 @@ def detector(video_path):
                     zona_actual = "Zona"
 
                     if id_obj in ids_contados_a:
+                        # si este id habia quedado marcado "desaparecido" (por un solo
+                        # frame sin verse, por ejemplo) pero en realidad sigue vivo -- se
+                        # limpia esa entrada fantasma, si no queda disponible para que un
+                        # vehiculo DISTINTO se fusione con el por error mas adelante
+                        contados_desaparecidos.pop(id_obj, None)
                         prev = pos_contados.get(id_obj)
                         if prev is not None:
                             prev_x, prev_y, prev_frame, _prev_cls, _prev_vx, _prev_vy = prev
@@ -182,14 +215,32 @@ def detector(video_path):
                         # exigirla bloqueaba fusiones legítimas (probado: subía el
                         # total de 35 a 45 al agregar esa restricción)
                         margen_dist = MERGE_DIST_MOTO if cls == 3 else MERGE_DIST
+                        # las motos se pierden casi cada frame (necesitan fusionarse incluso
+                        # con huecos de 1 frame) -> quedan exentas del minimo, que es
+                        # especificamente para el caso de autos entrando muy seguidos
+                        margen_window_min = 0 if cls == 3 else MERGE_WINDOW_MIN
                         match_id = None
                         for old_id, (old_x, old_y, old_frame, _num, _old_cls, old_vx, old_vy) in contados_desaparecidos.items():
+                            # cerca de la linea de entrada (y=280) la posicion predicha no es
+                            # confiable (ver nota arriba) -- se ignora como candidato, salvo motos
+                            if cls != 3 and old_y < 280 + ENTRADA_Y_BUFFER:
+                                continue
                             dt = frame_count - old_frame
                             pred_x = old_x + old_vx * dt
                             pred_y = old_y + old_vy * dt
-                            if (dt <= MERGE_WINDOW
+                            if (margen_window_min <= dt <= MERGE_WINDOW
                                     and abs(xc - pred_x) < margen_dist
                                     and abs(yc - pred_y) < margen_dist):
+                                match_id = old_id
+                                break
+                            # segunda oportunidad (todas las clases): hueco de tiempo mucho
+                            # mas largo (hasta 10s), pero exigiendo posicion MUY exacta y
+                            # ESTATICA (sin predecir por velocidad, que ya no es confiable a
+                            # esa distancia de tiempo) -- a esa precision de posicion es muy
+                            # poco probable que sea una coincidencia con un vehiculo distinto
+                            if (dt <= MERGE_WINDOW_LARGO
+                                    and abs(xc - old_x) < MERGE_DIST_LARGO
+                                    and abs(yc - old_y) < MERGE_DIST_LARGO):
                                 match_id = old_id
                                 break
 
@@ -236,9 +287,13 @@ def detector(video_path):
                     contados_desaparecidos[old_id] = (x, y, last_frame, numero_contado[old_id], cls, vx, vy)
 
         # --- HUD ---
-        cv2.rectangle(frame, (10, 10), (200, 60), (255, 0, 0), -1)
+        segundos_transcurridos = int(frame_count / fps) if fps > 0 else 0
+        tiempo_texto = f"{segundos_transcurridos // 60:02d}:{segundos_transcurridos % 60:02d}"
+
+        cv2.rectangle(frame, (10, 10), (200, 80), (255, 0, 0), -1)
         cv2.putText(frame, "ZONA", (20, 30), 0, 0.6, (255, 255, 255), 2)
         cv2.putText(frame, f"Total: {total_contados}", (20, 50), 0, 0.5, (255, 255, 255), 1)
+        cv2.putText(frame, f"Tiempo: {tiempo_texto}", (20, 70), 0, 0.5, (255, 255, 255), 1)
 
         cv2.imshow("Zona Traffic Tracker", frame)
         if cv2.waitKey(1) & 0xFF == ord('q'):
