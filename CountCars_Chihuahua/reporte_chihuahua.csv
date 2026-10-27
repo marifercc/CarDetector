@@ -1,0 +1,50 @@
+Numero,ID tracker,Segundo,Sentido,Clase
+1,0,0.6,izq -> der,car
+2,9,2.2,der -> izq,car
+3,8,2.4,izq -> der,car
+4,10,2.9,der -> izq,car
+5,11,3.9,der -> izq,car
+6,12,4.2,der -> izq,car
+7,13,5.1,izq -> der,car
+8,18,6.7,der -> izq,car
+9,17,7.2,izq -> der,car
+10,21,8.8,izq -> der,car
+11,23,12.1,der -> izq,car
+12,22,12.4,izq -> der,car
+13,25,16.1,izq -> der,car
+14,26,16.3,der -> izq,car
+15,30,17.2,izq -> der,car
+16,28,17.3,izq -> der,car
+17,32,18.4,izq -> der,truck
+18,33,18.5,der -> izq,car
+19,34,19.2,der -> izq,truck
+20,35,19.6,der -> izq,car
+21,36,21.2,der -> izq,car
+22,39,22.1,der -> izq,car
+23,44,23.8,der -> izq,car
+24,40,23.9,izq -> der,car
+25,46,25.8,der -> izq,car
+26,45,26.0,der -> izq,car
+27,51,27.8,der -> izq,car
+28,53,28.7,der -> izq,car
+29,54,29.1,der -> izq,car
+30,55,30.5,der -> izq,car
+31,59,31.0,der -> izq,car
+32,61,32.2,der -> izq,car
+33,64,33.4,der -> izq,car
+34,62,34.2,izq -> der,car
+35,66,34.6,der -> izq,car
+36,67,37.1,izq -> der,car
+37,69,40.4,izq -> der,truck
+38,76,50.1,der -> izq,car
+39,78,51.3,der -> izq,car
+40,81,52.8,der -> izq,car
+41,82,53.4,der -> izq,car
+42,90,56.7,der -> izq,car
+43,94,59.5,der -> izq,car
+44,95,60.8,der -> izq,car
+
+RESUMEN
+izq -> der,14
+der -> izq,30
+Total,44
