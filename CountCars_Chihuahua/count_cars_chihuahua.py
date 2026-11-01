@@ -36,14 +36,20 @@ def lado_de(xc, yc, x_izq, x_der):
     return None
 
 
-def detector(video_path, mostrar, x_izq=FRANJA_X_IZQ, x_der=FRANJA_X_DER):
+def detector(video_path, mostrar, x_izq=FRANJA_X_IZQ, x_der=FRANJA_X_DER, max_age=30, imgsz=640, iou=0.7):
     ruta_base = os.path.dirname(os.path.abspath(__file__))
     video_full_path = video_path if os.path.isabs(video_path) else os.path.join(ruta_base, video_path)
     nombre = os.path.splitext(os.path.basename(video_full_path))[0]
-    # si se prueba otra franja, las salidas llevan la franja en el nombre para no
-    # sobreescribir los resultados de la franja de default
+    # si se prueba otra configuracion, las salidas llevan lo que cambio en el nombre
+    # para no sobreescribir los resultados de la configuracion de default
     if (x_izq, x_der) != (FRANJA_X_IZQ, FRANJA_X_DER):
         nombre += f"_x{x_izq}-{x_der}"
+    if max_age != 30:
+        nombre += f"_age{max_age}"
+    if imgsz != 640:
+        nombre += f"_img{imgsz}"
+    if iou != 0.7:
+        nombre += f"_iou{iou}"
     print(f"Abriendo video: {video_full_path}")
     # el modelo vive en la carpeta del TEC (114 MB, para no tenerlo duplicado)
     model = YOLO(os.path.join(ruta_base, "..", "CountCars_Tec", "yolo11x.pt"))
@@ -57,8 +63,9 @@ def detector(video_path, mostrar, x_izq=FRANJA_X_IZQ, x_der=FRANJA_X_DER):
     ruta_csv = os.path.join(ruta_base, f"reporte_{nombre}.csv")
     video_writer = cv2.VideoWriter(ruta_video_salida, cv2.VideoWriter_fourcc(*'mp4v'), fps, (W, H))
 
-    # mismos parametros que en el TEC
-    oc_tracker = OcSort(det_thresh=0.3, max_age=30, min_hits=1, iou_threshold=0.3)
+    # mismos parametros que en el TEC, salvo max_age: aqui los autos se detienen en
+    # el semaforo y se tapan entre si, y con 30 frames (1 s) pierden el ID
+    oc_tracker = OcSort(det_thresh=0.3, max_age=max_age, min_hits=1, iou_threshold=0.3)
 
     ultimo_lado = {} # id del tracker -> ultimo lado ("izq"/"der") donde se le vio fuera de la franja
     contados = [] # (numero, id, segundo, sentido, clase)
@@ -73,10 +80,11 @@ def detector(video_path, mostrar, x_izq=FRANJA_X_IZQ, x_der=FRANJA_X_DER):
         frame_count += 1
         frame = cv2.resize(frame, (W, H))
 
-        # mismos parametros de deteccion que en el TEC (ver comentarios en count_cars(E1))
+        # mismos parametros de deteccion que en el TEC (ver comentarios en count_cars(E1));
+        # imgsz e iou se pueden subir para no perder autos chicos o encimados
         results = model.predict(
             frame, classes=[2, 3, 5, 7], verbose=False,
-            conf=0.4, agnostic_nms=True, imgsz=640
+            conf=0.4, agnostic_nms=True, imgsz=imgsz, iou=iou
         )
         det_boxes = results[0].boxes.xyxy.cpu().numpy()
         det_conf = results[0].boxes.conf.cpu().numpy()
@@ -165,5 +173,8 @@ if __name__ == "__main__":
     parser.add_argument("--franja", type=int, nargs=2, metavar=("X_IZQ", "X_DER"),
                         default=[FRANJA_X_IZQ, FRANJA_X_DER],
                         help=f"Bordes x de la franja de conteo (default {FRANJA_X_IZQ} {FRANJA_X_DER}).")
+    parser.add_argument("--max-age", type=int, default=30, help="Frames que el tracker aguanta sin ver un auto (default 30).")
+    parser.add_argument("--imgsz", type=int, default=640, help="Tamaño de imagen para YOLO (default 640).")
+    parser.add_argument("--iou", type=float, default=0.7, help="Umbral IoU del NMS de YOLO (default 0.7).")
     args = parser.parse_args()
-    detector(args.video_path, not args.sin_ventana, *args.franja)
+    detector(args.video_path, not args.sin_ventana, *args.franja, args.max_age, args.imgsz, args.iou)
