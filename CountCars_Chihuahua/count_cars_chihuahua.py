@@ -58,7 +58,7 @@ def sin_anidados(boxes, umbral=0.9, y_max=None):
     return quedan
 
 
-def detector(video_path, mostrar, x_izq=FRANJA_X_IZQ, x_der=FRANJA_X_DER, max_age=30, imgsz=640, iou=0.7, conf=0.4, modelo="yolo11x", anidados=None, anidados_y=None):
+def detector(video_path, mostrar, x_izq=FRANJA_X_IZQ, x_der=FRANJA_X_DER, max_age=30, imgsz=640, iou=0.7, conf=0.4, modelo="yolo11x", anidados=None, anidados_y=None, conf_arriba=None):
     ruta_base = os.path.dirname(os.path.abspath(__file__))
     video_full_path = video_path if os.path.isabs(video_path) else os.path.join(ruta_base, video_path)
     nombre = os.path.splitext(os.path.basename(video_full_path))[0]
@@ -80,6 +80,8 @@ def detector(video_path, mostrar, x_izq=FRANJA_X_IZQ, x_der=FRANJA_X_DER, max_ag
         nombre += f"_anid{anidados}"
         if anidados_y is not None:
             nombre += f"_y{anidados_y}"
+    if conf_arriba is not None:
+        nombre += f"_confarriba{conf_arriba}"
     print(f"Abriendo video: {video_full_path}")
     if modelo == "yolo11x":
         # el modelo vive en la carpeta del TEC (114 MB, para no tenerlo duplicado)
@@ -127,6 +129,13 @@ def detector(video_path, mostrar, x_izq=FRANJA_X_IZQ, x_der=FRANJA_X_DER, max_ag
         det_boxes = results[0].boxes.xyxy.cpu().numpy()
         det_conf = results[0].boxes.conf.cpu().numpy()
         det_cls = results[0].boxes.cls.cpu().numpy()
+        if conf_arriba is not None:
+            # confianza distinta por carril: abajo (izq -> der, autos tapados) basta con
+            # conf; arriba de anidados_y (der -> izq) se pide conf_arriba para no
+            # meter detecciones dudosas en el carril que ya cuenta bien
+            arriba = (det_boxes[:, 1] + det_boxes[:, 3]) / 2 < anidados_y
+            quedan = ~arriba | (det_conf >= conf_arriba)
+            det_boxes, det_conf, det_cls = det_boxes[quedan], det_conf[quedan], det_cls[quedan]
         if anidados is not None and len(det_boxes) > 1:
             quedan = sin_anidados(det_boxes, anidados, anidados_y)
             det_boxes, det_conf, det_cls = det_boxes[quedan], det_conf[quedan], det_cls[quedan]
@@ -223,6 +232,10 @@ if __name__ == "__main__":
                         help="Quitar cuadros que quedan al menos esta fraccion dentro de otro mas grande (ej. 0.9). Default: no filtrar.")
     parser.add_argument("--anidados-y", type=int, default=None,
                         help="Aplicar --anidados solo a cuadros con centro arriba de esta y (ej. 335: carril der -> izq).")
+    parser.add_argument("--conf-arriba", type=float, default=None,
+                        help="Confianza minima para cuadros arriba de --anidados-y (carril der -> izq). Requiere --anidados-y.")
     args = parser.parse_args()
+    if args.conf_arriba is not None and args.anidados_y is None:
+        parser.error("--conf-arriba requiere --anidados-y")
     detector(args.video_path, not args.sin_ventana, *args.franja, args.max_age, args.imgsz, args.iou, args.conf,
-             args.modelo, args.anidados, args.anidados_y)
+             args.modelo, args.anidados, args.anidados_y, args.conf_arriba)
