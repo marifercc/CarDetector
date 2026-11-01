@@ -1,6 +1,6 @@
 import cv2 #abrir video
 import numpy as np #matrices y operaciones matemáticas
-from ultralytics import YOLO #importar modelo de yolo
+from ultralytics import YOLO, RTDETR #importar modelo de yolo (o RT-DETR)
 from boxmot.trackers.bbox.ocsort import OcSort #mismo tracker que count_cars(E1) del TEC
 import csv #usar csv para reporte final
 import os #abrir rutas de archivos
@@ -36,7 +36,7 @@ def lado_de(xc, yc, x_izq, x_der):
     return None
 
 
-def detector(video_path, mostrar, x_izq=FRANJA_X_IZQ, x_der=FRANJA_X_DER, max_age=30, imgsz=640, iou=0.7, conf=0.4):
+def detector(video_path, mostrar, x_izq=FRANJA_X_IZQ, x_der=FRANJA_X_DER, max_age=30, imgsz=640, iou=0.7, conf=0.4, modelo="yolo11x"):
     ruta_base = os.path.dirname(os.path.abspath(__file__))
     video_full_path = video_path if os.path.isabs(video_path) else os.path.join(ruta_base, video_path)
     nombre = os.path.splitext(os.path.basename(video_full_path))[0]
@@ -52,9 +52,18 @@ def detector(video_path, mostrar, x_izq=FRANJA_X_IZQ, x_der=FRANJA_X_DER, max_ag
         nombre += f"_iou{iou}"
     if conf != 0.4:
         nombre += f"_conf{conf}"
+    if modelo != "yolo11x":
+        nombre += f"_{modelo}"
     print(f"Abriendo video: {video_full_path}")
-    # el modelo vive en la carpeta del TEC (114 MB, para no tenerlo duplicado)
-    model = YOLO(os.path.join(ruta_base, "..", "CountCars_Tec", "yolo11x.pt"))
+    if modelo == "yolo11x":
+        # el modelo vive en la carpeta del TEC (114 MB, para no tenerlo duplicado)
+        model = YOLO(os.path.join(ruta_base, "..", "CountCars_Tec", "yolo11x.pt"))
+    elif modelo.startswith("rtdetr"):
+        # RT-DETR (transformer): detecta mas autos medio tapados en la fila del
+        # semaforo; se descarga solo la primera vez a esta carpeta
+        model = RTDETR(os.path.join(ruta_base, f"{modelo}.pt"))
+    else:
+        model = YOLO(os.path.join(ruta_base, f"{modelo}.pt"))
     cap = cv2.VideoCapture(video_full_path)
     if not cap.isOpened():
         raise FileNotFoundError(f"No se pudo abrir el video: {video_full_path}")
@@ -180,5 +189,6 @@ if __name__ == "__main__":
     parser.add_argument("--imgsz", type=int, default=640, help="Tamaño de imagen para YOLO (default 640).")
     parser.add_argument("--iou", type=float, default=0.7, help="Umbral IoU del NMS de YOLO (default 0.7).")
     parser.add_argument("--conf", type=float, default=0.4, help="Confianza minima de YOLO (default 0.4).")
+    parser.add_argument("--modelo", default="yolo11x", help="Modelo de deteccion: yolo11x (default), rtdetr-x, rtdetr-l, yolo12x...")
     args = parser.parse_args()
-    detector(args.video_path, not args.sin_ventana, *args.franja, args.max_age, args.imgsz, args.iou, args.conf)
+    detector(args.video_path, not args.sin_ventana, *args.franja, args.max_age, args.imgsz, args.iou, args.conf, args.modelo)
