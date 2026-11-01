@@ -36,7 +36,7 @@ def lado_de(xc, yc, x_izq, x_der):
     return None
 
 
-def detector(video_path, mostrar, x_izq=FRANJA_X_IZQ, x_der=FRANJA_X_DER, max_age=30, imgsz=640, iou=0.7):
+def detector(video_path, mostrar, x_izq=FRANJA_X_IZQ, x_der=FRANJA_X_DER, max_age=30, imgsz=640, iou=0.7, conf=0.4):
     ruta_base = os.path.dirname(os.path.abspath(__file__))
     video_full_path = video_path if os.path.isabs(video_path) else os.path.join(ruta_base, video_path)
     nombre = os.path.splitext(os.path.basename(video_full_path))[0]
@@ -50,6 +50,8 @@ def detector(video_path, mostrar, x_izq=FRANJA_X_IZQ, x_der=FRANJA_X_DER, max_ag
         nombre += f"_img{imgsz}"
     if iou != 0.7:
         nombre += f"_iou{iou}"
+    if conf != 0.4:
+        nombre += f"_conf{conf}"
     print(f"Abriendo video: {video_full_path}")
     # el modelo vive en la carpeta del TEC (114 MB, para no tenerlo duplicado)
     model = YOLO(os.path.join(ruta_base, "..", "CountCars_Tec", "yolo11x.pt"))
@@ -81,10 +83,11 @@ def detector(video_path, mostrar, x_izq=FRANJA_X_IZQ, x_der=FRANJA_X_DER, max_ag
         frame = cv2.resize(frame, (W, H))
 
         # mismos parametros de deteccion que en el TEC (ver comentarios en count_cars(E1));
-        # imgsz e iou se pueden subir para no perder autos chicos o encimados
+        # imgsz e iou se pueden subir para no perder autos chicos o encimados;
+        # conf se puede bajar para aceptar autos medio tapados (con poca confianza)
         results = model.predict(
             frame, classes=[2, 3, 5, 7], verbose=False,
-            conf=0.4, agnostic_nms=True, imgsz=imgsz, iou=iou
+            conf=conf, agnostic_nms=True, imgsz=imgsz, iou=iou
         )
         det_boxes = results[0].boxes.xyxy.cpu().numpy()
         det_conf = results[0].boxes.conf.cpu().numpy()
@@ -176,5 +179,6 @@ if __name__ == "__main__":
     parser.add_argument("--max-age", type=int, default=30, help="Frames que el tracker aguanta sin ver un auto (default 30).")
     parser.add_argument("--imgsz", type=int, default=640, help="Tamaño de imagen para YOLO (default 640).")
     parser.add_argument("--iou", type=float, default=0.7, help="Umbral IoU del NMS de YOLO (default 0.7).")
+    parser.add_argument("--conf", type=float, default=0.4, help="Confianza minima de YOLO (default 0.4).")
     args = parser.parse_args()
-    detector(args.video_path, not args.sin_ventana, *args.franja, args.max_age, args.imgsz, args.iou)
+    detector(args.video_path, not args.sin_ventana, *args.franja, args.max_age, args.imgsz, args.iou, args.conf)
