@@ -25,21 +25,25 @@ FRANJA_Y_MAX = 430 # abajo de esto ya es banqueta
 W, H = 1280, 720 # mismo tamaño que en el TEC: las coordenadas estan en este espacio
 
 
-def lado_de(xc, yc):
+def lado_de(xc, yc, x_izq, x_der):
     # "izq"/"der" si esta fuera de la franja (y dentro de la calle), None si no
     if not (FRANJA_Y_MIN <= yc <= FRANJA_Y_MAX):
         return None
-    if xc < FRANJA_X_IZQ:
+    if xc < x_izq:
         return "izq"
-    if xc > FRANJA_X_DER:
+    if xc > x_der:
         return "der"
     return None
 
 
-def detector(video_path, mostrar):
+def detector(video_path, mostrar, x_izq=FRANJA_X_IZQ, x_der=FRANJA_X_DER):
     ruta_base = os.path.dirname(os.path.abspath(__file__))
     video_full_path = video_path if os.path.isabs(video_path) else os.path.join(ruta_base, video_path)
     nombre = os.path.splitext(os.path.basename(video_full_path))[0]
+    # si se prueba otra franja, las salidas llevan la franja en el nombre para no
+    # sobreescribir los resultados de la franja de default
+    if (x_izq, x_der) != (FRANJA_X_IZQ, FRANJA_X_DER):
+        nombre += f"_x{x_izq}-{x_der}"
     print(f"Abriendo video: {video_full_path}")
     # el modelo vive en la carpeta del TEC (114 MB, para no tenerlo duplicado)
     model = YOLO(os.path.join(ruta_base, "..", "CountCars_Tec", "yolo11x.pt"))
@@ -84,7 +88,7 @@ def detector(video_path, mostrar):
 
         tracks = oc_tracker.update(dets, frame)  # hay que llamarlo en CADA frame, incluso sin detecciones
 
-        cv2.rectangle(frame, (FRANJA_X_IZQ, FRANJA_Y_MIN), (FRANJA_X_DER, FRANJA_Y_MAX), (255, 0, 0), 2)
+        cv2.rectangle(frame, (x_izq, FRANJA_Y_MIN), (x_der, FRANJA_Y_MAX), (255, 0, 0), 2)
 
         if len(tracks) > 0:
             nombres = results[0].names
@@ -93,7 +97,7 @@ def detector(video_path, mostrar):
                 xmin, ymin, xmax, ymax = box
                 xc, yc = int((xmin + xmax) / 2), int((ymin + ymax) / 2)
 
-                lado = lado_de(xc, yc)
+                lado = lado_de(xc, yc, x_izq, x_der)
                 if lado is not None:
                     anterior = ultimo_lado.get(id_obj)
                     if anterior is not None and anterior != lado and id_obj not in id_contado:
@@ -158,5 +162,8 @@ if __name__ == "__main__":
     parser.add_argument("video_path", nargs="?", default="chihuahua.mp4",
                         help="Ruta del video a procesar. Si no se especifica, usa chihuahua.mp4 en la carpeta del script.")
     parser.add_argument("--sin-ventana", action="store_true", help="No mostrar la ventana mientras procesa (mas rapido).")
+    parser.add_argument("--franja", type=int, nargs=2, metavar=("X_IZQ", "X_DER"),
+                        default=[FRANJA_X_IZQ, FRANJA_X_DER],
+                        help=f"Bordes x de la franja de conteo (default {FRANJA_X_IZQ} {FRANJA_X_DER}).")
     args = parser.parse_args()
-    detector(args.video_path, not args.sin_ventana)
+    detector(args.video_path, not args.sin_ventana, *args.franja)
