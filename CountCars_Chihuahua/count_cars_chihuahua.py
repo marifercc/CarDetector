@@ -36,7 +36,25 @@ def lado_de(xc, yc, x_izq, x_der):
     return None
 
 
-def detector(video_path, mostrar, x_izq=FRANJA_X_IZQ, x_der=FRANJA_X_DER, max_age=30, imgsz=640, iou=0.7, conf=0.4, modelo="yolo11x"):
+def sin_anidados(boxes, umbral=0.9):
+    # RT-DETR a veces pone un cuadro extra sobre una parte del mismo auto (ej. el
+    # techo o la mitad de una camioneta). Si un cuadro queda >= umbral dentro de
+    # otro mas grande, es un duplicado y se quita. Devuelve que cuadros se quedan.
+    areas = (boxes[:, 2] - boxes[:, 0]) * (boxes[:, 3] - boxes[:, 1])
+    quedan = np.ones(len(boxes), dtype=bool)
+    for i in range(len(boxes)):
+        for j in range(len(boxes)):
+            if i == j or areas[j] <= areas[i]:
+                continue
+            ancho = min(boxes[i, 2], boxes[j, 2]) - max(boxes[i, 0], boxes[j, 0])
+            alto = min(boxes[i, 3], boxes[j, 3]) - max(boxes[i, 1], boxes[j, 1])
+            if ancho > 0 and alto > 0 and ancho * alto >= umbral * areas[i]:
+                quedan[i] = False
+                break
+    return quedan
+
+
+def detector(video_path, mostrar, x_izq=FRANJA_X_IZQ, x_der=FRANJA_X_DER, max_age=30, imgsz=640, iou=0.7, conf=0.4, modelo="yolo11x", anidados=None):
     ruta_base = os.path.dirname(os.path.abspath(__file__))
     video_full_path = video_path if os.path.isabs(video_path) else os.path.join(ruta_base, video_path)
     nombre = os.path.splitext(os.path.basename(video_full_path))[0]
@@ -54,6 +72,8 @@ def detector(video_path, mostrar, x_izq=FRANJA_X_IZQ, x_der=FRANJA_X_DER, max_ag
         nombre += f"_conf{conf}"
     if modelo != "yolo11x":
         nombre += f"_{modelo}"
+    if anidados is not None:
+        nombre += f"_anid{anidados}"
     print(f"Abriendo video: {video_full_path}")
     if modelo == "yolo11x":
         # el modelo vive en la carpeta del TEC (114 MB, para no tenerlo duplicado)
@@ -101,6 +121,9 @@ def detector(video_path, mostrar, x_izq=FRANJA_X_IZQ, x_der=FRANJA_X_DER, max_ag
         det_boxes = results[0].boxes.xyxy.cpu().numpy()
         det_conf = results[0].boxes.conf.cpu().numpy()
         det_cls = results[0].boxes.cls.cpu().numpy()
+        if anidados is not None and len(det_boxes) > 1:
+            quedan = sin_anidados(det_boxes, anidados)
+            det_boxes, det_conf, det_cls = det_boxes[quedan], det_conf[quedan], det_cls[quedan]
         if len(det_boxes) > 0:
             dets = np.concatenate([det_boxes, det_conf.reshape(-1, 1), det_cls.reshape(-1, 1)], axis=1)
         else:
@@ -190,5 +213,7 @@ if __name__ == "__main__":
     parser.add_argument("--iou", type=float, default=0.7, help="Umbral IoU del NMS de YOLO (default 0.7).")
     parser.add_argument("--conf", type=float, default=0.4, help="Confianza minima de YOLO (default 0.4).")
     parser.add_argument("--modelo", default="yolo11x", help="Modelo de deteccion: yolo11x (default), rtdetr-x, rtdetr-l, yolo12x...")
+    parser.add_argument("--anidados", type=float, default=None,
+                        help="Quitar cuadros que quedan al menos esta fraccion dentro de otro mas grande (ej. 0.9). Default: no filtrar.")
     args = parser.parse_args()
-    detector(args.video_path, not args.sin_ventana, *args.franja, args.max_age, args.imgsz, args.iou, args.conf, args.modelo)
+    detector(args.video_path, not args.sin_ventana, *args.franja, args.max_age, args.imgsz, args.iou, args.conf, args.modelo, args.anidados)
