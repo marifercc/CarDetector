@@ -2,6 +2,7 @@ import cv2 #abrir video
 import numpy as np #matrices y operaciones matemáticas
 from ultralytics import YOLO, RTDETR #importar modelo de yolo (o RT-DETR)
 from boxmot.trackers.bbox.ocsort import OcSort #mismo tracker que count_cars(E1) del TEC
+import torch #saber si hay GPU para el modelo de apariencia (ReID) de los otros trackers
 import csv #usar csv para reporte final
 import os #abrir rutas de archivos
 import argparse #leer argumentos de la terminal
@@ -44,7 +45,36 @@ DEFAULTS = {
     "conf_arriba": 0.4, # carril de arriba (der -> izq); 0 = misma conf que abajo
     "modelo": "rtdetr-x",
     "anidados": 0.9, # 0 = no quitar cuadros anidados
+    "tracker": "ocsort",
 }
+
+
+def crear_tracker(nombre, max_age):
+    # OC-SORT (default) solo usa posicion y movimiento. BoT-SORT, DeepOC-SORT y
+    # StrongSORT ademas comparan la apariencia del auto (modelo ReID), para no
+    # cambiarle el ID cuando queda tapado un rato en la fila del semaforo.
+    # Los umbrales van en 0.3 (igual que conf) porque los autos tapados salen con
+    # poca confianza y con los defaults de boxmot (0.45-0.6) no abririan track.
+    comunes = dict(det_thresh=0.3, max_age=max_age, min_hits=1, iou_threshold=0.3)
+    if nombre == "ocsort":
+        return OcSort(**comunes)
+    if nombre == "bytetrack":
+        from boxmot.trackers.bbox.bytetrack import ByteTrack
+        return ByteTrack(track_thresh=0.3, track_buffer=max_age, **comunes)
+    # el modelo ReID (osnet, ~1 MB) se descarga solo la primera vez
+    from boxmot.reid.core.reid import ReID
+    reid = ReID(weights="osnet_x0_25_msmt17.pt", device="cuda:0" if torch.cuda.is_available() else "cpu").model
+    if nombre == "botsort":
+        from boxmot.trackers.bbox.botsort import BotSort
+        return BotSort(reid_model=reid, track_high_thresh=0.3, new_track_thresh=0.3,
+                       track_buffer=max_age, **comunes)
+    if nombre == "deepocsort":
+        from boxmot.trackers.bbox.deepocsort import DeepOcSort
+        return DeepOcSort(reid_model=reid, **comunes)
+    if nombre == "strongsort":
+        from boxmot.trackers.bbox.strongsort import StrongSort
+        return StrongSort(reid_model=reid, n_init=1, **comunes)
+    raise ValueError(f"Tracker desconocido: {nombre}")
 
 
 def lado_de(xc, yc, x_izq, x_der):
@@ -82,7 +112,7 @@ def sin_anidados(boxes, umbral=0.9, y_max=None):
 
 def detector(video_path, mostrar, x_izq=FRANJA_X_IZQ, x_der=FRANJA_X_DER, max_age=DEFAULTS["max_age"],
              imgsz=DEFAULTS["imgsz"], iou=DEFAULTS["iou"], conf=DEFAULTS["conf"], modelo=DEFAULTS["modelo"],
-             anidados=DEFAULTS["anidados"], conf_arriba=DEFAULTS["conf_arriba"]):
+             anidados=DEFAULTS["anidados"], conf_arriba=DEFAULTS["conf_arriba"], tracker=DEFAULTS["tracker"]):
     ruta_base = os.path.dirname(os.path.abspath(__file__))
     video_full_path = video_path if os.path.isabs(video_path) else os.path.join(ruta_base, video_path)
     nombre = os.path.splitext(os.path.basename(video_full_path))[0]
@@ -91,7 +121,7 @@ def detector(video_path, mostrar, x_izq=FRANJA_X_IZQ, x_der=FRANJA_X_DER, max_ag
     if (x_izq, x_der) != (FRANJA_X_IZQ, FRANJA_X_DER):
         nombre += f"_x{x_izq}-{x_der}"
     usados = {"max_age": max_age, "imgsz": imgsz, "iou": iou, "conf": conf,
-              "conf_arriba": conf_arriba, "modelo": modelo, "anidados": anidados}
+              "conf_arriba": conf_arriba, "modelo": modelo, "anidados": anidados, "tracker": tracker}
     for clave, valor in usados.items():
         if valor != DEFAULTS[clave]:
             nombre += f"_{clave.replace('_', '')}{valor}"
@@ -117,7 +147,7 @@ def detector(video_path, mostrar, x_izq=FRANJA_X_IZQ, x_der=FRANJA_X_DER, max_ag
 
     # mismos parametros que en el TEC, salvo max_age: aqui los autos se detienen en
     # el semaforo y se tapan entre si, y con 30 frames (1 s) pierden el ID
-    oc_tracker = OcSort(det_thresh=0.3, max_age=max_age, min_hits=1, iou_threshold=0.3)
+    oc_tracker = crear_tracker(tracker, max_age)
 
     ultimo_lado = {} # id del tracker -> ultimo lado ("izq"/"der") donde se le vio fuera de la franja
     contados = [] # (numero, id, segundo, sentido, clase)
@@ -251,6 +281,9 @@ if __name__ == "__main__":
                         help="Modelo de deteccion: rtdetr-x (default), rtdetr-l, yolo11x, yolo12x...")
     parser.add_argument("--anidados", type=float, default=DEFAULTS["anidados"],
                         help=f"Quitar en el carril de arriba cuadros que quedan al menos esta fraccion dentro de otro (default {DEFAULTS['anidados']}; 0 = no filtrar).")
+    parser.add_argument("--tracker", default=DEFAULTS["tracker"],
+                        choices=["ocsort", "bytetrack", "botsort", "deepocsort", "strongsort"],
+                        help=f"Tracker de boxmot (default {DEFAULTS['tracker']}).")
     args = parser.parse_args()
     detector(args.video_path, not args.sin_ventana, *args.franja, args.max_age, args.imgsz, args.iou, args.conf,
-             args.modelo, args.anidados, args.conf_arriba)
+             args.modelo, args.anidados, args.conf_arriba, args.tracker)
