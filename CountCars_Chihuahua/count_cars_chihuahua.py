@@ -50,24 +50,26 @@ DEFAULTS = {
 }
 
 
-def crear_tracker(nombre, max_age):
+def crear_tracker(nombre, max_age, umbral):
     # OC-SORT (default) solo usa posicion y movimiento. BoT-SORT, DeepOC-SORT y
     # StrongSORT ademas comparan la apariencia del auto (modelo ReID), para no
     # cambiarle el ID cuando queda tapado un rato en la fila del semaforo.
-    # Los umbrales van en 0.3 (igual que conf) porque los autos tapados salen con
-    # poca confianza y con los defaults de boxmot (0.45-0.6) no abririan track.
-    comunes = dict(det_thresh=0.3, max_age=max_age, min_hits=1, iou_threshold=0.3)
+    # Los umbrales van igual que conf porque los autos tapados salen con poca
+    # confianza y con los defaults de boxmot (0.45-0.6) no abririan track. Ojo: si
+    # det_thresh queda arriba de conf, el tracker tira esas detecciones y bajar
+    # conf no sirve de nada.
+    comunes = dict(det_thresh=umbral, max_age=max_age, min_hits=1, iou_threshold=0.3)
     if nombre == "ocsort":
         return OcSort(**comunes)
     if nombre == "bytetrack":
         from boxmot.trackers.bbox.bytetrack import ByteTrack
-        return ByteTrack(track_thresh=0.3, track_buffer=max_age, **comunes)
+        return ByteTrack(track_thresh=umbral, track_buffer=max_age, **comunes)
     # el modelo ReID (osnet, ~1 MB) se descarga solo la primera vez
     from boxmot.reid.core.reid import ReID
     reid = ReID(weights="osnet_x0_25_msmt17.pt", device="cuda:0" if torch.cuda.is_available() else "cpu").model
     if nombre == "botsort":
         from boxmot.trackers.bbox.botsort import BotSort
-        return BotSort(reid_model=reid, track_high_thresh=0.3, new_track_thresh=0.3,
+        return BotSort(reid_model=reid, track_high_thresh=umbral, new_track_thresh=umbral,
                        track_buffer=max_age, **comunes)
     if nombre == "deepocsort":
         from boxmot.trackers.bbox.deepocsort import DeepOcSort
@@ -76,6 +78,15 @@ def crear_tracker(nombre, max_age):
         from boxmot.trackers.bbox.strongsort import StrongSort
         return StrongSort(reid_model=reid, n_init=1, **comunes)
     raise ValueError(f"Tracker desconocido: {nombre}")
+
+
+def encimado(a, b):
+    # fraccion de la caja mas chica que queda dentro de la otra
+    ancho = min(a[2], b[2]) - max(a[0], b[0])
+    alto = min(a[3], b[3]) - max(a[1], b[1])
+    if ancho <= 0 or alto <= 0:
+        return 0.0
+    return ancho * alto / min((a[2] - a[0]) * (a[3] - a[1]), (b[2] - b[0]) * (b[3] - b[1]))
 
 
 def lado_de(xc, yc, x_izq, x_der):
@@ -113,7 +124,8 @@ def sin_anidados(boxes, umbral=0.9, y_max=None):
 
 def detector(video_path, mostrar, x_izq=FRANJA_X_IZQ, x_der=FRANJA_X_DER, max_age=DEFAULTS["max_age"],
              imgsz=DEFAULTS["imgsz"], iou=DEFAULTS["iou"], conf=DEFAULTS["conf"], modelo=DEFAULTS["modelo"],
-             anidados=DEFAULTS["anidados"], conf_arriba=DEFAULTS["conf_arriba"], tracker=DEFAULTS["tracker"]):
+             anidados=DEFAULTS["anidados"], conf_arriba=DEFAULTS["conf_arriba"], tracker=DEFAULTS["tracker"],
+             trayectorias=False):
     ruta_base = os.path.dirname(os.path.abspath(__file__))
     video_full_path = video_path if os.path.isabs(video_path) else os.path.join(ruta_base, video_path)
     nombre = os.path.splitext(os.path.basename(video_full_path))[0]
@@ -145,14 +157,26 @@ def detector(video_path, mostrar, x_izq=FRANJA_X_IZQ, x_der=FRANJA_X_DER, max_ag
     ruta_video_salida = os.path.join(ruta_base, f"resultado_{nombre}.mp4")
     ruta_csv = os.path.join(ruta_base, f"reporte_{nombre}.csv")
     video_writer = cv2.VideoWriter(ruta_video_salida, cv2.VideoWriter_fourcc(*'mp4v'), fps, (W, H))
+    # caja de cada ID en cada frame, para estudiar donde se cortan los recorridos
+    # sin volver a correr el detector
+    archivo_tray = None
+    if trayectorias:
+        archivo_tray = open(os.path.join(ruta_base, f"trayectorias_{nombre}.csv"), "w", newline="")
+        csv_tray = csv.writer(archivo_tray)
+        csv_tray.writerow(["frame", "id", "x1", "y1", "x2", "y2", "conf", "clase"])
 
     # mismos parametros que en el TEC, salvo max_age: aqui los autos se detienen en
     # el semaforo y se tapan entre si, y con 30 frames (1 s) pierden el ID
-    oc_tracker = crear_tracker(tracker, max_age)
+    oc_tracker = crear_tracker(tracker, max_age, conf)
 
     ultimo_lado = {} # id del tracker -> ultimo lado ("izq"/"der") donde se le vio fuera de la franja
     contados = [] # (numero, id, segundo, sentido, clase, x1, y1, x2, y2)
     id_contado = {} # id del tracker -> numero de conteo (cada ID cuenta una sola vez)
+    # Dos IDs sobre el mismo auto (un cuadro chico dentro de otro que el NMS no quita)
+    # cruzan la franja juntos: si un conteo cae a menos de SEG_DOBLE de otro del mismo
+    # sentido y su caja queda >= ENCIMADO_DOBLE dentro de la del otro, es el mismo auto
+    # y se le da el mismo numero. Dos autos reales en fila se enciman ~50-60%.
+    SEG_DOBLE, ENCIMADO_DOBLE = 0.2, 0.8
     conteo_sentido = {"izq -> der": 0, "der -> izq": 0}
     frame_count = 0
 
@@ -200,9 +224,12 @@ def detector(video_path, mostrar, x_izq=FRANJA_X_IZQ, x_der=FRANJA_X_DER, max_ag
 
         if len(tracks) > 0:
             nombres = results[0].names
-            for box, id_obj, cls in zip(tracks.xyxy, tracks.id, tracks.cls):
+            for box, id_obj, cls, conf_obj in zip(tracks.xyxy, tracks.id, tracks.cls, tracks.conf):
                 id_obj = int(id_obj)
                 xmin, ymin, xmax, ymax = box
+                if archivo_tray:
+                    csv_tray.writerow([frame_count, id_obj, int(xmin), int(ymin), int(xmax), int(ymax),
+                                       round(float(conf_obj), 2), nombres[int(cls)]])
                 xc, yc = int((xmin + xmax) / 2), int((ymin + ymax) / 2)
 
                 lado = lado_de(xc, yc, x_izq, x_der)
@@ -210,11 +237,18 @@ def detector(video_path, mostrar, x_izq=FRANJA_X_IZQ, x_der=FRANJA_X_DER, max_ag
                     anterior = ultimo_lado.get(id_obj)
                     if anterior is not None and anterior != lado and id_obj not in id_contado:
                         sentido = "izq -> der" if lado == "der" else "der -> izq"
-                        numero = len(contados) + 1
-                        id_contado[id_obj] = numero
-                        conteo_sentido[sentido] += 1
-                        contados.append((numero, id_obj, round(frame_count / fps, 1), sentido, nombres[int(cls)],
-                                         int(xmin), int(ymin), int(xmax), int(ymax)))
+                        segundo = round(frame_count / fps, 1)
+                        caja = (int(xmin), int(ymin), int(xmax), int(ymax))
+                        doble = next((c for c in reversed(contados)
+                                      if segundo - c[2] <= SEG_DOBLE and c[3] == sentido
+                                      and encimado(caja, c[5:9]) >= ENCIMADO_DOBLE), None)
+                        if doble is not None:
+                            id_contado[id_obj] = doble[0]
+                        else:
+                            numero = len(contados) + 1
+                            id_contado[id_obj] = numero
+                            conteo_sentido[sentido] += 1
+                            contados.append((numero, id_obj, segundo, sentido, nombres[int(cls)], *caja))
                     ultimo_lado[id_obj] = lado
 
                 color = (0, 255, 0) if id_obj in id_contado else (200, 200, 200)
@@ -242,6 +276,8 @@ def detector(video_path, mostrar, x_izq=FRANJA_X_IZQ, x_der=FRANJA_X_DER, max_ag
 
     cap.release()
     video_writer.release()
+    if archivo_tray:
+        archivo_tray.close()
     cv2.destroyAllWindows()
 
     # --- RESUMEN FINAL ---
@@ -294,6 +330,8 @@ if __name__ == "__main__":
     parser.add_argument("--tracker", default=DEFAULTS["tracker"],
                         choices=["ocsort", "bytetrack", "botsort", "deepocsort", "strongsort"],
                         help=f"Tracker de boxmot (default {DEFAULTS['tracker']}).")
+    parser.add_argument("--trayectorias", action="store_true",
+                        help="Guardar la caja de cada ID en cada frame en trayectorias_<nombre>.csv.")
     args = parser.parse_args()
     detector(args.video_path, not args.sin_ventana, *args.franja, args.max_age, args.imgsz, args.iou, args.conf,
-             args.modelo, args.anidados, args.conf_arriba, args.tracker)
+             args.modelo, args.anidados, args.conf_arriba, args.tracker, args.trayectorias)
