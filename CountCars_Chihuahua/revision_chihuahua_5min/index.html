@@ -1,0 +1,1574 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Revisión chihuahua_5min</title>
+<style>
+body { font-family: system-ui, sans-serif; margin: 16px; background: #f4f4f4; color: #222; }
+header { position: sticky; top: 0; background: #f4f4f4; padding: 8px 0; z-index: 1; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(460px, 1fr)); gap: 12px; }
+.tarjeta { background: #fff; border: 2px solid #ddd; border-radius: 6px; padding: 6px; }
+.tarjeta.mal { border-color: #d33; background: #fff0f0; }
+.tarjeta img { width: 100%; display: block; }
+.datos { margin: 4px 0; font-size: 14px; }
+.opciones { display: flex; flex-wrap: wrap; gap: 10px; font-size: 14px; }
+.aviso { background: #f5c542; padding: 1px 6px; border-radius: 4px; font-size: 12px; }
+.oculta { display: none; }
+</style></head><body>
+<header>
+  <b>chihuahua_5min</b> —
+  Mostrar: <select id="filtro"><option value="der-izq">der → izq</option><option value="izq-der">izq → der</option><option value="todos">todos</option></select>
+  <label><input type="checkbox" id="solo_dobles"> solo posibles dobles</label>
+  · <span id="cuenta"></span>
+  <button id="descargar">Descargar marcas (CSV)</button>
+  <div style="font-size:13px">Busca la etiqueta verde <b>#N</b> en cada recorte. Doble = ese auto ya se contó con otro número.</div>
+</header>
+<div class="grid">
+<div class="tarjeta" data-sentido="izq-der" data-numero="1" data-id="1" data-segundo="0.6">
+  <img src="001.jpg" loading="lazy" alt="#1">
+  <div class="datos"><b>#1</b> · 0.6 s · izq -&gt; der · car · id 1 </div>
+  <div class="opciones"><label><input type="radio" name="m1" value="bien" checked> Bien</label><label><input type="radio" name="m1" value="doble"> Doble</label><label><input type="radio" name="m1" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m1" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="2" data-id="10" data-segundo="2.2">
+  <img src="002.jpg" loading="lazy" alt="#2">
+  <div class="datos"><b>#2</b> · 2.2 s · der -&gt; izq · car · id 10 </div>
+  <div class="opciones"><label><input type="radio" name="m2" value="bien" checked> Bien</label><label><input type="radio" name="m2" value="doble"> Doble</label><label><input type="radio" name="m2" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m2" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="3" data-id="14" data-segundo="2.4">
+  <img src="003.jpg" loading="lazy" alt="#3">
+  <div class="datos"><b>#3</b> · 2.4 s · izq -&gt; der · car · id 14 </div>
+  <div class="opciones"><label><input type="radio" name="m3" value="bien" checked> Bien</label><label><input type="radio" name="m3" value="doble"> Doble</label><label><input type="radio" name="m3" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m3" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="4" data-id="17" data-segundo="2.9">
+  <img src="004.jpg" loading="lazy" alt="#4">
+  <div class="datos"><b>#4</b> · 2.9 s · der -&gt; izq · car · id 17 </div>
+  <div class="opciones"><label><input type="radio" name="m4" value="bien" checked> Bien</label><label><input type="radio" name="m4" value="doble"> Doble</label><label><input type="radio" name="m4" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m4" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="5" data-id="22" data-segundo="3.9">
+  <img src="005.jpg" loading="lazy" alt="#5">
+  <div class="datos"><b>#5</b> · 3.9 s · der -&gt; izq · car · id 22 </div>
+  <div class="opciones"><label><input type="radio" name="m5" value="bien" checked> Bien</label><label><input type="radio" name="m5" value="doble"> Doble</label><label><input type="radio" name="m5" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m5" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="6" data-id="18" data-segundo="4.2">
+  <img src="006.jpg" loading="lazy" alt="#6">
+  <div class="datos"><b>#6</b> · 4.2 s · der -&gt; izq · car · id 18 </div>
+  <div class="opciones"><label><input type="radio" name="m6" value="bien" checked> Bien</label><label><input type="radio" name="m6" value="doble"> Doble</label><label><input type="radio" name="m6" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m6" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="7" data-id="24" data-segundo="5.1">
+  <img src="007.jpg" loading="lazy" alt="#7">
+  <div class="datos"><b>#7</b> · 5.1 s · izq -&gt; der · car · id 24 </div>
+  <div class="opciones"><label><input type="radio" name="m7" value="bien" checked> Bien</label><label><input type="radio" name="m7" value="doble"> Doble</label><label><input type="radio" name="m7" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m7" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="8" data-id="39" data-segundo="6.7">
+  <img src="008.jpg" loading="lazy" alt="#8">
+  <div class="datos"><b>#8</b> · 6.7 s · der -&gt; izq · car · id 39 </div>
+  <div class="opciones"><label><input type="radio" name="m8" value="bien" checked> Bien</label><label><input type="radio" name="m8" value="doble"> Doble</label><label><input type="radio" name="m8" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m8" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="9" data-id="34" data-segundo="7.2">
+  <img src="009.jpg" loading="lazy" alt="#9">
+  <div class="datos"><b>#9</b> · 7.2 s · izq -&gt; der · car · id 34 </div>
+  <div class="opciones"><label><input type="radio" name="m9" value="bien" checked> Bien</label><label><input type="radio" name="m9" value="doble"> Doble</label><label><input type="radio" name="m9" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m9" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="10" data-id="36" data-segundo="8.8">
+  <img src="010.jpg" loading="lazy" alt="#10">
+  <div class="datos"><b>#10</b> · 8.8 s · izq -&gt; der · car · id 36 </div>
+  <div class="opciones"><label><input type="radio" name="m10" value="bien" checked> Bien</label><label><input type="radio" name="m10" value="doble"> Doble</label><label><input type="radio" name="m10" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m10" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="11" data-id="55" data-segundo="12.1">
+  <img src="011.jpg" loading="lazy" alt="#11">
+  <div class="datos"><b>#11</b> · 12.1 s · der -&gt; izq · truck · id 55 </div>
+  <div class="opciones"><label><input type="radio" name="m11" value="bien" checked> Bien</label><label><input type="radio" name="m11" value="doble"> Doble</label><label><input type="radio" name="m11" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m11" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="12" data-id="52" data-segundo="12.4">
+  <img src="012.jpg" loading="lazy" alt="#12">
+  <div class="datos"><b>#12</b> · 12.4 s · izq -&gt; der · car · id 52 </div>
+  <div class="opciones"><label><input type="radio" name="m12" value="bien" checked> Bien</label><label><input type="radio" name="m12" value="doble"> Doble</label><label><input type="radio" name="m12" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m12" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="13" data-id="60" data-segundo="16.1">
+  <img src="013.jpg" loading="lazy" alt="#13">
+  <div class="datos"><b>#13</b> · 16.1 s · izq -&gt; der · car · id 60 </div>
+  <div class="opciones"><label><input type="radio" name="m13" value="bien" checked> Bien</label><label><input type="radio" name="m13" value="doble"> Doble</label><label><input type="radio" name="m13" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m13" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="14" data-id="66" data-segundo="16.3">
+  <img src="014.jpg" loading="lazy" alt="#14">
+  <div class="datos"><b>#14</b> · 16.3 s · der -&gt; izq · car · id 66 </div>
+  <div class="opciones"><label><input type="radio" name="m14" value="bien" checked> Bien</label><label><input type="radio" name="m14" value="doble"> Doble</label><label><input type="radio" name="m14" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m14" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="15" data-id="73" data-segundo="17.3">
+  <img src="015.jpg" loading="lazy" alt="#15">
+  <div class="datos"><b>#15</b> · 17.3 s · izq -&gt; der · car · id 73 </div>
+  <div class="opciones"><label><input type="radio" name="m15" value="bien" checked> Bien</label><label><input type="radio" name="m15" value="doble"> Doble</label><label><input type="radio" name="m15" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m15" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="16" data-id="63" data-segundo="17.3">
+  <img src="016.jpg" loading="lazy" alt="#16">
+  <div class="datos"><b>#16</b> · 17.3 s · izq -&gt; der · car · id 63 </div>
+  <div class="opciones"><label><input type="radio" name="m16" value="bien" checked> Bien</label><label><input type="radio" name="m16" value="doble"> Doble</label><label><input type="radio" name="m16" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m16" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="17" data-id="81" data-segundo="18.4">
+  <img src="017.jpg" loading="lazy" alt="#17">
+  <div class="datos"><b>#17</b> · 18.4 s · izq -&gt; der · car · id 81 </div>
+  <div class="opciones"><label><input type="radio" name="m17" value="bien" checked> Bien</label><label><input type="radio" name="m17" value="doble"> Doble</label><label><input type="radio" name="m17" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m17" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="18" data-id="77" data-segundo="18.4">
+  <img src="018.jpg" loading="lazy" alt="#18">
+  <div class="datos"><b>#18</b> · 18.4 s · izq -&gt; der · truck · id 77 </div>
+  <div class="opciones"><label><input type="radio" name="m18" value="bien" checked> Bien</label><label><input type="radio" name="m18" value="doble"> Doble</label><label><input type="radio" name="m18" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m18" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="19" data-id="89" data-segundo="18.5">
+  <img src="019.jpg" loading="lazy" alt="#19">
+  <div class="datos"><b>#19</b> · 18.5 s · der -&gt; izq · car · id 89 </div>
+  <div class="opciones"><label><input type="radio" name="m19" value="bien" checked> Bien</label><label><input type="radio" name="m19" value="doble"> Doble</label><label><input type="radio" name="m19" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m19" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="20" data-id="94" data-segundo="19.2">
+  <img src="020.jpg" loading="lazy" alt="#20">
+  <div class="datos"><b>#20</b> · 19.2 s · der -&gt; izq · truck · id 94 </div>
+  <div class="opciones"><label><input type="radio" name="m20" value="bien" checked> Bien</label><label><input type="radio" name="m20" value="doble"> Doble</label><label><input type="radio" name="m20" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m20" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="21" data-id="92" data-segundo="19.6">
+  <img src="021.jpg" loading="lazy" alt="#21">
+  <div class="datos"><b>#21</b> · 19.6 s · der -&gt; izq · car · id 92 </div>
+  <div class="opciones"><label><input type="radio" name="m21" value="bien" checked> Bien</label><label><input type="radio" name="m21" value="doble"> Doble</label><label><input type="radio" name="m21" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m21" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="22" data-id="101" data-segundo="21.2">
+  <img src="022.jpg" loading="lazy" alt="#22">
+  <div class="datos"><b>#22</b> · 21.2 s · der -&gt; izq · car · id 101 </div>
+  <div class="opciones"><label><input type="radio" name="m22" value="bien" checked> Bien</label><label><input type="radio" name="m22" value="doble"> Doble</label><label><input type="radio" name="m22" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m22" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="23" data-id="95" data-segundo="22.1">
+  <img src="023.jpg" loading="lazy" alt="#23">
+  <div class="datos"><b>#23</b> · 22.1 s · der -&gt; izq · car · id 95 </div>
+  <div class="opciones"><label><input type="radio" name="m23" value="bien" checked> Bien</label><label><input type="radio" name="m23" value="doble"> Doble</label><label><input type="radio" name="m23" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m23" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="24" data-id="114" data-segundo="23.8">
+  <img src="024.jpg" loading="lazy" alt="#24">
+  <div class="datos"><b>#24</b> · 23.8 s · der -&gt; izq · car · id 114 </div>
+  <div class="opciones"><label><input type="radio" name="m24" value="bien" checked> Bien</label><label><input type="radio" name="m24" value="doble"> Doble</label><label><input type="radio" name="m24" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m24" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="25" data-id="105" data-segundo="23.9">
+  <img src="025.jpg" loading="lazy" alt="#25">
+  <div class="datos"><b>#25</b> · 23.9 s · izq -&gt; der · car · id 105 </div>
+  <div class="opciones"><label><input type="radio" name="m25" value="bien" checked> Bien</label><label><input type="radio" name="m25" value="doble"> Doble</label><label><input type="radio" name="m25" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m25" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="26" data-id="103" data-segundo="25.9">
+  <img src="026.jpg" loading="lazy" alt="#26">
+  <div class="datos"><b>#26</b> · 25.9 s · der -&gt; izq · bus · id 103 </div>
+  <div class="opciones"><label><input type="radio" name="m26" value="bien" checked> Bien</label><label><input type="radio" name="m26" value="doble"> Doble</label><label><input type="radio" name="m26" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m26" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="27" data-id="122" data-segundo="27.9">
+  <img src="027.jpg" loading="lazy" alt="#27">
+  <div class="datos"><b>#27</b> · 27.9 s · der -&gt; izq · car · id 122 </div>
+  <div class="opciones"><label><input type="radio" name="m27" value="bien" checked> Bien</label><label><input type="radio" name="m27" value="doble"> Doble</label><label><input type="radio" name="m27" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m27" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="28" data-id="129" data-segundo="28.7">
+  <img src="028.jpg" loading="lazy" alt="#28">
+  <div class="datos"><b>#28</b> · 28.7 s · der -&gt; izq · car · id 129 </div>
+  <div class="opciones"><label><input type="radio" name="m28" value="bien" checked> Bien</label><label><input type="radio" name="m28" value="doble"> Doble</label><label><input type="radio" name="m28" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m28" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="29" data-id="128" data-segundo="29.1">
+  <img src="029.jpg" loading="lazy" alt="#29">
+  <div class="datos"><b>#29</b> · 29.1 s · der -&gt; izq · car · id 128 </div>
+  <div class="opciones"><label><input type="radio" name="m29" value="bien" checked> Bien</label><label><input type="radio" name="m29" value="doble"> Doble</label><label><input type="radio" name="m29" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m29" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="30" data-id="91" data-segundo="30.5">
+  <img src="030.jpg" loading="lazy" alt="#30">
+  <div class="datos"><b>#30</b> · 30.5 s · der -&gt; izq · car · id 91 </div>
+  <div class="opciones"><label><input type="radio" name="m30" value="bien" checked> Bien</label><label><input type="radio" name="m30" value="doble"> Doble</label><label><input type="radio" name="m30" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m30" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="31" data-id="126" data-segundo="31.0">
+  <img src="031.jpg" loading="lazy" alt="#31">
+  <div class="datos"><b>#31</b> · 31.0 s · der -&gt; izq · car · id 126 </div>
+  <div class="opciones"><label><input type="radio" name="m31" value="bien" checked> Bien</label><label><input type="radio" name="m31" value="doble"> Doble</label><label><input type="radio" name="m31" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m31" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="32" data-id="132" data-segundo="32.2">
+  <img src="032.jpg" loading="lazy" alt="#32">
+  <div class="datos"><b>#32</b> · 32.2 s · der -&gt; izq · car · id 132 </div>
+  <div class="opciones"><label><input type="radio" name="m32" value="bien" checked> Bien</label><label><input type="radio" name="m32" value="doble"> Doble</label><label><input type="radio" name="m32" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m32" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="33" data-id="140" data-segundo="33.3">
+  <img src="033.jpg" loading="lazy" alt="#33">
+  <div class="datos"><b>#33</b> · 33.3 s · der -&gt; izq · car · id 140 </div>
+  <div class="opciones"><label><input type="radio" name="m33" value="bien" checked> Bien</label><label><input type="radio" name="m33" value="doble"> Doble</label><label><input type="radio" name="m33" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m33" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="34" data-id="137" data-segundo="34.2">
+  <img src="034.jpg" loading="lazy" alt="#34">
+  <div class="datos"><b>#34</b> · 34.2 s · izq -&gt; der · car · id 137 </div>
+  <div class="opciones"><label><input type="radio" name="m34" value="bien" checked> Bien</label><label><input type="radio" name="m34" value="doble"> Doble</label><label><input type="radio" name="m34" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m34" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="35" data-id="148" data-segundo="34.6">
+  <img src="035.jpg" loading="lazy" alt="#35">
+  <div class="datos"><b>#35</b> · 34.6 s · der -&gt; izq · car · id 148 </div>
+  <div class="opciones"><label><input type="radio" name="m35" value="bien" checked> Bien</label><label><input type="radio" name="m35" value="doble"> Doble</label><label><input type="radio" name="m35" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m35" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="36" data-id="155" data-segundo="37.1">
+  <img src="036.jpg" loading="lazy" alt="#36">
+  <div class="datos"><b>#36</b> · 37.1 s · izq -&gt; der · car · id 155 </div>
+  <div class="opciones"><label><input type="radio" name="m36" value="bien" checked> Bien</label><label><input type="radio" name="m36" value="doble"> Doble</label><label><input type="radio" name="m36" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m36" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="37" data-id="161" data-segundo="40.4">
+  <img src="037.jpg" loading="lazy" alt="#37">
+  <div class="datos"><b>#37</b> · 40.4 s · izq -&gt; der · car · id 161 </div>
+  <div class="opciones"><label><input type="radio" name="m37" value="bien" checked> Bien</label><label><input type="radio" name="m37" value="doble"> Doble</label><label><input type="radio" name="m37" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m37" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="38" data-id="158" data-segundo="40.4">
+  <img src="038.jpg" loading="lazy" alt="#38">
+  <div class="datos"><b>#38</b> · 40.4 s · izq -&gt; der · truck · id 158 </div>
+  <div class="opciones"><label><input type="radio" name="m38" value="bien" checked> Bien</label><label><input type="radio" name="m38" value="doble"> Doble</label><label><input type="radio" name="m38" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m38" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="39" data-id="183" data-segundo="50.1">
+  <img src="039.jpg" loading="lazy" alt="#39">
+  <div class="datos"><b>#39</b> · 50.1 s · der -&gt; izq · car · id 183 </div>
+  <div class="opciones"><label><input type="radio" name="m39" value="bien" checked> Bien</label><label><input type="radio" name="m39" value="doble"> Doble</label><label><input type="radio" name="m39" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m39" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="40" data-id="190" data-segundo="51.3">
+  <img src="040.jpg" loading="lazy" alt="#40">
+  <div class="datos"><b>#40</b> · 51.3 s · der -&gt; izq · car · id 190 </div>
+  <div class="opciones"><label><input type="radio" name="m40" value="bien" checked> Bien</label><label><input type="radio" name="m40" value="doble"> Doble</label><label><input type="radio" name="m40" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m40" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="41" data-id="182" data-segundo="52.8">
+  <img src="041.jpg" loading="lazy" alt="#41">
+  <div class="datos"><b>#41</b> · 52.8 s · der -&gt; izq · truck · id 182 </div>
+  <div class="opciones"><label><input type="radio" name="m41" value="bien" checked> Bien</label><label><input type="radio" name="m41" value="doble"> Doble</label><label><input type="radio" name="m41" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m41" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="42" data-id="209" data-segundo="53.4">
+  <img src="042.jpg" loading="lazy" alt="#42">
+  <div class="datos"><b>#42</b> · 53.4 s · der -&gt; izq · car · id 209 <span class="aviso">posible doble</span></div>
+  <div class="opciones"><label><input type="radio" name="m42" value="bien" checked> Bien</label><label><input type="radio" name="m42" value="doble"> Doble</label><label><input type="radio" name="m42" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m42" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="43" data-id="204" data-segundo="53.4">
+  <img src="043.jpg" loading="lazy" alt="#43">
+  <div class="datos"><b>#43</b> · 53.4 s · der -&gt; izq · truck · id 204 <span class="aviso">posible doble</span></div>
+  <div class="opciones"><label><input type="radio" name="m43" value="bien" checked> Bien</label><label><input type="radio" name="m43" value="doble"> Doble</label><label><input type="radio" name="m43" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m43" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="44" data-id="185" data-segundo="53.4">
+  <img src="044.jpg" loading="lazy" alt="#44">
+  <div class="datos"><b>#44</b> · 53.4 s · der -&gt; izq · car · id 185 <span class="aviso">posible doble</span></div>
+  <div class="opciones"><label><input type="radio" name="m44" value="bien" checked> Bien</label><label><input type="radio" name="m44" value="doble"> Doble</label><label><input type="radio" name="m44" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m44" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="45" data-id="219" data-segundo="56.7">
+  <img src="045.jpg" loading="lazy" alt="#45">
+  <div class="datos"><b>#45</b> · 56.7 s · der -&gt; izq · car · id 219 <span class="aviso">posible doble</span></div>
+  <div class="opciones"><label><input type="radio" name="m45" value="bien" checked> Bien</label><label><input type="radio" name="m45" value="doble"> Doble</label><label><input type="radio" name="m45" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m45" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="46" data-id="211" data-segundo="56.7">
+  <img src="046.jpg" loading="lazy" alt="#46">
+  <div class="datos"><b>#46</b> · 56.7 s · der -&gt; izq · truck · id 211 <span class="aviso">posible doble</span></div>
+  <div class="opciones"><label><input type="radio" name="m46" value="bien" checked> Bien</label><label><input type="radio" name="m46" value="doble"> Doble</label><label><input type="radio" name="m46" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m46" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="47" data-id="229" data-segundo="59.5">
+  <img src="047.jpg" loading="lazy" alt="#47">
+  <div class="datos"><b>#47</b> · 59.5 s · der -&gt; izq · car · id 229 </div>
+  <div class="opciones"><label><input type="radio" name="m47" value="bien" checked> Bien</label><label><input type="radio" name="m47" value="doble"> Doble</label><label><input type="radio" name="m47" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m47" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="48" data-id="221" data-segundo="60.8">
+  <img src="048.jpg" loading="lazy" alt="#48">
+  <div class="datos"><b>#48</b> · 60.8 s · der -&gt; izq · car · id 221 </div>
+  <div class="opciones"><label><input type="radio" name="m48" value="bien" checked> Bien</label><label><input type="radio" name="m48" value="doble"> Doble</label><label><input type="radio" name="m48" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m48" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="49" data-id="248" data-segundo="72.3">
+  <img src="049.jpg" loading="lazy" alt="#49">
+  <div class="datos"><b>#49</b> · 72.3 s · der -&gt; izq · car · id 248 </div>
+  <div class="opciones"><label><input type="radio" name="m49" value="bien" checked> Bien</label><label><input type="radio" name="m49" value="doble"> Doble</label><label><input type="radio" name="m49" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m49" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="50" data-id="244" data-segundo="76.9">
+  <img src="050.jpg" loading="lazy" alt="#50">
+  <div class="datos"><b>#50</b> · 76.9 s · izq -&gt; der · car · id 244 </div>
+  <div class="opciones"><label><input type="radio" name="m50" value="bien" checked> Bien</label><label><input type="radio" name="m50" value="doble"> Doble</label><label><input type="radio" name="m50" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m50" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="51" data-id="147" data-segundo="78.2">
+  <img src="051.jpg" loading="lazy" alt="#51">
+  <div class="datos"><b>#51</b> · 78.2 s · izq -&gt; der · car · id 147 </div>
+  <div class="opciones"><label><input type="radio" name="m51" value="bien" checked> Bien</label><label><input type="radio" name="m51" value="doble"> Doble</label><label><input type="radio" name="m51" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m51" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="52" data-id="246" data-segundo="78.3">
+  <img src="052.jpg" loading="lazy" alt="#52">
+  <div class="datos"><b>#52</b> · 78.3 s · izq -&gt; der · car · id 246 </div>
+  <div class="opciones"><label><input type="radio" name="m52" value="bien" checked> Bien</label><label><input type="radio" name="m52" value="doble"> Doble</label><label><input type="radio" name="m52" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m52" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="53" data-id="214" data-segundo="78.6">
+  <img src="053.jpg" loading="lazy" alt="#53">
+  <div class="datos"><b>#53</b> · 78.6 s · izq -&gt; der · car · id 214 </div>
+  <div class="opciones"><label><input type="radio" name="m53" value="bien" checked> Bien</label><label><input type="radio" name="m53" value="doble"> Doble</label><label><input type="radio" name="m53" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m53" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="54" data-id="237" data-segundo="78.7">
+  <img src="054.jpg" loading="lazy" alt="#54">
+  <div class="datos"><b>#54</b> · 78.7 s · izq -&gt; der · car · id 237 </div>
+  <div class="opciones"><label><input type="radio" name="m54" value="bien" checked> Bien</label><label><input type="radio" name="m54" value="doble"> Doble</label><label><input type="radio" name="m54" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m54" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="55" data-id="207" data-segundo="78.8">
+  <img src="055.jpg" loading="lazy" alt="#55">
+  <div class="datos"><b>#55</b> · 78.8 s · izq -&gt; der · car · id 207 </div>
+  <div class="opciones"><label><input type="radio" name="m55" value="bien" checked> Bien</label><label><input type="radio" name="m55" value="doble"> Doble</label><label><input type="radio" name="m55" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m55" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="56" data-id="218" data-segundo="79.8">
+  <img src="056.jpg" loading="lazy" alt="#56">
+  <div class="datos"><b>#56</b> · 79.8 s · izq -&gt; der · car · id 218 </div>
+  <div class="opciones"><label><input type="radio" name="m56" value="bien" checked> Bien</label><label><input type="radio" name="m56" value="doble"> Doble</label><label><input type="radio" name="m56" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m56" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="57" data-id="216" data-segundo="80.4">
+  <img src="057.jpg" loading="lazy" alt="#57">
+  <div class="datos"><b>#57</b> · 80.4 s · izq -&gt; der · car · id 216 </div>
+  <div class="opciones"><label><input type="radio" name="m57" value="bien" checked> Bien</label><label><input type="radio" name="m57" value="doble"> Doble</label><label><input type="radio" name="m57" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m57" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="58" data-id="266" data-segundo="80.6">
+  <img src="058.jpg" loading="lazy" alt="#58">
+  <div class="datos"><b>#58</b> · 80.6 s · izq -&gt; der · truck · id 266 </div>
+  <div class="opciones"><label><input type="radio" name="m58" value="bien" checked> Bien</label><label><input type="radio" name="m58" value="doble"> Doble</label><label><input type="radio" name="m58" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m58" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="59" data-id="252" data-segundo="80.6">
+  <img src="059.jpg" loading="lazy" alt="#59">
+  <div class="datos"><b>#59</b> · 80.6 s · izq -&gt; der · car · id 252 </div>
+  <div class="opciones"><label><input type="radio" name="m59" value="bien" checked> Bien</label><label><input type="radio" name="m59" value="doble"> Doble</label><label><input type="radio" name="m59" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m59" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="60" data-id="195" data-segundo="80.6">
+  <img src="060.jpg" loading="lazy" alt="#60">
+  <div class="datos"><b>#60</b> · 80.6 s · izq -&gt; der · car · id 195 </div>
+  <div class="opciones"><label><input type="radio" name="m60" value="bien" checked> Bien</label><label><input type="radio" name="m60" value="doble"> Doble</label><label><input type="radio" name="m60" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m60" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="61" data-id="272" data-segundo="82.8">
+  <img src="061.jpg" loading="lazy" alt="#61">
+  <div class="datos"><b>#61</b> · 82.8 s · izq -&gt; der · car · id 272 </div>
+  <div class="opciones"><label><input type="radio" name="m61" value="bien" checked> Bien</label><label><input type="radio" name="m61" value="doble"> Doble</label><label><input type="radio" name="m61" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m61" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="62" data-id="275" data-segundo="83.0">
+  <img src="062.jpg" loading="lazy" alt="#62">
+  <div class="datos"><b>#62</b> · 83.0 s · izq -&gt; der · car · id 275 </div>
+  <div class="opciones"><label><input type="radio" name="m62" value="bien" checked> Bien</label><label><input type="radio" name="m62" value="doble"> Doble</label><label><input type="radio" name="m62" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m62" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="63" data-id="238" data-segundo="83.7">
+  <img src="063.jpg" loading="lazy" alt="#63">
+  <div class="datos"><b>#63</b> · 83.7 s · izq -&gt; der · car · id 238 </div>
+  <div class="opciones"><label><input type="radio" name="m63" value="bien" checked> Bien</label><label><input type="radio" name="m63" value="doble"> Doble</label><label><input type="radio" name="m63" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m63" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="64" data-id="279" data-segundo="84.1">
+  <img src="064.jpg" loading="lazy" alt="#64">
+  <div class="datos"><b>#64</b> · 84.1 s · izq -&gt; der · car · id 279 </div>
+  <div class="opciones"><label><input type="radio" name="m64" value="bien" checked> Bien</label><label><input type="radio" name="m64" value="doble"> Doble</label><label><input type="radio" name="m64" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m64" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="65" data-id="294" data-segundo="85.0">
+  <img src="065.jpg" loading="lazy" alt="#65">
+  <div class="datos"><b>#65</b> · 85.0 s · izq -&gt; der · car · id 294 </div>
+  <div class="opciones"><label><input type="radio" name="m65" value="bien" checked> Bien</label><label><input type="radio" name="m65" value="doble"> Doble</label><label><input type="radio" name="m65" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m65" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="66" data-id="245" data-segundo="85.2">
+  <img src="066.jpg" loading="lazy" alt="#66">
+  <div class="datos"><b>#66</b> · 85.2 s · izq -&gt; der · car · id 245 </div>
+  <div class="opciones"><label><input type="radio" name="m66" value="bien" checked> Bien</label><label><input type="radio" name="m66" value="doble"> Doble</label><label><input type="radio" name="m66" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m66" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="67" data-id="178" data-segundo="85.6">
+  <img src="067.jpg" loading="lazy" alt="#67">
+  <div class="datos"><b>#67</b> · 85.6 s · der -&gt; izq · car · id 178 </div>
+  <div class="opciones"><label><input type="radio" name="m67" value="bien" checked> Bien</label><label><input type="radio" name="m67" value="doble"> Doble</label><label><input type="radio" name="m67" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m67" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="68" data-id="297" data-segundo="86.2">
+  <img src="068.jpg" loading="lazy" alt="#68">
+  <div class="datos"><b>#68</b> · 86.2 s · izq -&gt; der · car · id 297 </div>
+  <div class="opciones"><label><input type="radio" name="m68" value="bien" checked> Bien</label><label><input type="radio" name="m68" value="doble"> Doble</label><label><input type="radio" name="m68" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m68" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="69" data-id="308" data-segundo="86.7">
+  <img src="069.jpg" loading="lazy" alt="#69">
+  <div class="datos"><b>#69</b> · 86.7 s · izq -&gt; der · car · id 308 </div>
+  <div class="opciones"><label><input type="radio" name="m69" value="bien" checked> Bien</label><label><input type="radio" name="m69" value="doble"> Doble</label><label><input type="radio" name="m69" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m69" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="70" data-id="282" data-segundo="86.7">
+  <img src="070.jpg" loading="lazy" alt="#70">
+  <div class="datos"><b>#70</b> · 86.7 s · izq -&gt; der · car · id 282 </div>
+  <div class="opciones"><label><input type="radio" name="m70" value="bien" checked> Bien</label><label><input type="radio" name="m70" value="doble"> Doble</label><label><input type="radio" name="m70" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m70" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="71" data-id="283" data-segundo="86.9">
+  <img src="071.jpg" loading="lazy" alt="#71">
+  <div class="datos"><b>#71</b> · 86.9 s · izq -&gt; der · car · id 283 </div>
+  <div class="opciones"><label><input type="radio" name="m71" value="bien" checked> Bien</label><label><input type="radio" name="m71" value="doble"> Doble</label><label><input type="radio" name="m71" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m71" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="72" data-id="305" data-segundo="87.1">
+  <img src="072.jpg" loading="lazy" alt="#72">
+  <div class="datos"><b>#72</b> · 87.1 s · der -&gt; izq · car · id 305 </div>
+  <div class="opciones"><label><input type="radio" name="m72" value="bien" checked> Bien</label><label><input type="radio" name="m72" value="doble"> Doble</label><label><input type="radio" name="m72" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m72" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="73" data-id="257" data-segundo="87.8">
+  <img src="073.jpg" loading="lazy" alt="#73">
+  <div class="datos"><b>#73</b> · 87.8 s · der -&gt; izq · car · id 257 </div>
+  <div class="opciones"><label><input type="radio" name="m73" value="bien" checked> Bien</label><label><input type="radio" name="m73" value="doble"> Doble</label><label><input type="radio" name="m73" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m73" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="74" data-id="299" data-segundo="88.6">
+  <img src="074.jpg" loading="lazy" alt="#74">
+  <div class="datos"><b>#74</b> · 88.6 s · izq -&gt; der · truck · id 299 </div>
+  <div class="opciones"><label><input type="radio" name="m74" value="bien" checked> Bien</label><label><input type="radio" name="m74" value="doble"> Doble</label><label><input type="radio" name="m74" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m74" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="75" data-id="342" data-segundo="89.1">
+  <img src="075.jpg" loading="lazy" alt="#75">
+  <div class="datos"><b>#75</b> · 89.1 s · der -&gt; izq · car · id 342 </div>
+  <div class="opciones"><label><input type="radio" name="m75" value="bien" checked> Bien</label><label><input type="radio" name="m75" value="doble"> Doble</label><label><input type="radio" name="m75" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m75" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="76" data-id="331" data-segundo="89.2">
+  <img src="076.jpg" loading="lazy" alt="#76">
+  <div class="datos"><b>#76</b> · 89.2 s · izq -&gt; der · car · id 331 </div>
+  <div class="opciones"><label><input type="radio" name="m76" value="bien" checked> Bien</label><label><input type="radio" name="m76" value="doble"> Doble</label><label><input type="radio" name="m76" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m76" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="77" data-id="330" data-segundo="89.2">
+  <img src="077.jpg" loading="lazy" alt="#77">
+  <div class="datos"><b>#77</b> · 89.2 s · izq -&gt; der · car · id 330 </div>
+  <div class="opciones"><label><input type="radio" name="m77" value="bien" checked> Bien</label><label><input type="radio" name="m77" value="doble"> Doble</label><label><input type="radio" name="m77" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m77" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="78" data-id="321" data-segundo="89.7">
+  <img src="078.jpg" loading="lazy" alt="#78">
+  <div class="datos"><b>#78</b> · 89.7 s · der -&gt; izq · car · id 321 </div>
+  <div class="opciones"><label><input type="radio" name="m78" value="bien" checked> Bien</label><label><input type="radio" name="m78" value="doble"> Doble</label><label><input type="radio" name="m78" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m78" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="79" data-id="347" data-segundo="90.4">
+  <img src="079.jpg" loading="lazy" alt="#79">
+  <div class="datos"><b>#79</b> · 90.4 s · izq -&gt; der · truck · id 347 </div>
+  <div class="opciones"><label><input type="radio" name="m79" value="bien" checked> Bien</label><label><input type="radio" name="m79" value="doble"> Doble</label><label><input type="radio" name="m79" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m79" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="80" data-id="328" data-segundo="90.4">
+  <img src="080.jpg" loading="lazy" alt="#80">
+  <div class="datos"><b>#80</b> · 90.4 s · izq -&gt; der · car · id 328 </div>
+  <div class="opciones"><label><input type="radio" name="m80" value="bien" checked> Bien</label><label><input type="radio" name="m80" value="doble"> Doble</label><label><input type="radio" name="m80" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m80" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="81" data-id="352" data-segundo="90.6">
+  <img src="081.jpg" loading="lazy" alt="#81">
+  <div class="datos"><b>#81</b> · 90.6 s · der -&gt; izq · car · id 352 </div>
+  <div class="opciones"><label><input type="radio" name="m81" value="bien" checked> Bien</label><label><input type="radio" name="m81" value="doble"> Doble</label><label><input type="radio" name="m81" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m81" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="82" data-id="309" data-segundo="90.9">
+  <img src="082.jpg" loading="lazy" alt="#82">
+  <div class="datos"><b>#82</b> · 90.9 s · izq -&gt; der · car · id 309 </div>
+  <div class="opciones"><label><input type="radio" name="m82" value="bien" checked> Bien</label><label><input type="radio" name="m82" value="doble"> Doble</label><label><input type="radio" name="m82" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m82" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="83" data-id="356" data-segundo="91.1">
+  <img src="083.jpg" loading="lazy" alt="#83">
+  <div class="datos"><b>#83</b> · 91.1 s · izq -&gt; der · car · id 356 </div>
+  <div class="opciones"><label><input type="radio" name="m83" value="bien" checked> Bien</label><label><input type="radio" name="m83" value="doble"> Doble</label><label><input type="radio" name="m83" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m83" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="84" data-id="341" data-segundo="91.3">
+  <img src="084.jpg" loading="lazy" alt="#84">
+  <div class="datos"><b>#84</b> · 91.3 s · der -&gt; izq · car · id 341 </div>
+  <div class="opciones"><label><input type="radio" name="m84" value="bien" checked> Bien</label><label><input type="radio" name="m84" value="doble"> Doble</label><label><input type="radio" name="m84" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m84" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="85" data-id="361" data-segundo="93.1">
+  <img src="085.jpg" loading="lazy" alt="#85">
+  <div class="datos"><b>#85</b> · 93.1 s · izq -&gt; der · car · id 361 </div>
+  <div class="opciones"><label><input type="radio" name="m85" value="bien" checked> Bien</label><label><input type="radio" name="m85" value="doble"> Doble</label><label><input type="radio" name="m85" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m85" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="86" data-id="312" data-segundo="93.4">
+  <img src="086.jpg" loading="lazy" alt="#86">
+  <div class="datos"><b>#86</b> · 93.4 s · der -&gt; izq · car · id 312 </div>
+  <div class="opciones"><label><input type="radio" name="m86" value="bien" checked> Bien</label><label><input type="radio" name="m86" value="doble"> Doble</label><label><input type="radio" name="m86" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m86" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="87" data-id="345" data-segundo="93.7">
+  <img src="087.jpg" loading="lazy" alt="#87">
+  <div class="datos"><b>#87</b> · 93.7 s · izq -&gt; der · car · id 345 </div>
+  <div class="opciones"><label><input type="radio" name="m87" value="bien" checked> Bien</label><label><input type="radio" name="m87" value="doble"> Doble</label><label><input type="radio" name="m87" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m87" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="88" data-id="365" data-segundo="94.0">
+  <img src="088.jpg" loading="lazy" alt="#88">
+  <div class="datos"><b>#88</b> · 94.0 s · izq -&gt; der · car · id 365 </div>
+  <div class="opciones"><label><input type="radio" name="m88" value="bien" checked> Bien</label><label><input type="radio" name="m88" value="doble"> Doble</label><label><input type="radio" name="m88" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m88" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="89" data-id="369" data-segundo="94.9">
+  <img src="089.jpg" loading="lazy" alt="#89">
+  <div class="datos"><b>#89</b> · 94.9 s · izq -&gt; der · car · id 369 </div>
+  <div class="opciones"><label><input type="radio" name="m89" value="bien" checked> Bien</label><label><input type="radio" name="m89" value="doble"> Doble</label><label><input type="radio" name="m89" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m89" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="90" data-id="383" data-segundo="95.5">
+  <img src="090.jpg" loading="lazy" alt="#90">
+  <div class="datos"><b>#90</b> · 95.5 s · der -&gt; izq · car · id 383 <span class="aviso">posible doble</span></div>
+  <div class="opciones"><label><input type="radio" name="m90" value="bien" checked> Bien</label><label><input type="radio" name="m90" value="doble"> Doble</label><label><input type="radio" name="m90" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m90" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="91" data-id="379" data-segundo="95.8">
+  <img src="091.jpg" loading="lazy" alt="#91">
+  <div class="datos"><b>#91</b> · 95.8 s · der -&gt; izq · truck · id 379 <span class="aviso">posible doble</span></div>
+  <div class="opciones"><label><input type="radio" name="m91" value="bien" checked> Bien</label><label><input type="radio" name="m91" value="doble"> Doble</label><label><input type="radio" name="m91" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m91" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="92" data-id="375" data-segundo="96.1">
+  <img src="092.jpg" loading="lazy" alt="#92">
+  <div class="datos"><b>#92</b> · 96.1 s · izq -&gt; der · car · id 375 </div>
+  <div class="opciones"><label><input type="radio" name="m92" value="bien" checked> Bien</label><label><input type="radio" name="m92" value="doble"> Doble</label><label><input type="radio" name="m92" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m92" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="93" data-id="362" data-segundo="96.2">
+  <img src="093.jpg" loading="lazy" alt="#93">
+  <div class="datos"><b>#93</b> · 96.2 s · izq -&gt; der · car · id 362 </div>
+  <div class="opciones"><label><input type="radio" name="m93" value="bien" checked> Bien</label><label><input type="radio" name="m93" value="doble"> Doble</label><label><input type="radio" name="m93" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m93" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="94" data-id="394" data-segundo="96.3">
+  <img src="094.jpg" loading="lazy" alt="#94">
+  <div class="datos"><b>#94</b> · 96.3 s · izq -&gt; der · truck · id 394 </div>
+  <div class="opciones"><label><input type="radio" name="m94" value="bien" checked> Bien</label><label><input type="radio" name="m94" value="doble"> Doble</label><label><input type="radio" name="m94" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m94" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="95" data-id="391" data-segundo="96.3">
+  <img src="095.jpg" loading="lazy" alt="#95">
+  <div class="datos"><b>#95</b> · 96.3 s · der -&gt; izq · car · id 391 </div>
+  <div class="opciones"><label><input type="radio" name="m95" value="bien" checked> Bien</label><label><input type="radio" name="m95" value="doble"> Doble</label><label><input type="radio" name="m95" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m95" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="96" data-id="376" data-segundo="96.3">
+  <img src="096.jpg" loading="lazy" alt="#96">
+  <div class="datos"><b>#96</b> · 96.3 s · izq -&gt; der · car · id 376 </div>
+  <div class="opciones"><label><input type="radio" name="m96" value="bien" checked> Bien</label><label><input type="radio" name="m96" value="doble"> Doble</label><label><input type="radio" name="m96" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m96" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="97" data-id="390" data-segundo="96.7">
+  <img src="097.jpg" loading="lazy" alt="#97">
+  <div class="datos"><b>#97</b> · 96.7 s · izq -&gt; der · car · id 390 </div>
+  <div class="opciones"><label><input type="radio" name="m97" value="bien" checked> Bien</label><label><input type="radio" name="m97" value="doble"> Doble</label><label><input type="radio" name="m97" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m97" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="98" data-id="380" data-segundo="97.5">
+  <img src="098.jpg" loading="lazy" alt="#98">
+  <div class="datos"><b>#98</b> · 97.5 s · izq -&gt; der · car · id 380 </div>
+  <div class="opciones"><label><input type="radio" name="m98" value="bien" checked> Bien</label><label><input type="radio" name="m98" value="doble"> Doble</label><label><input type="radio" name="m98" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m98" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="99" data-id="402" data-segundo="97.6">
+  <img src="099.jpg" loading="lazy" alt="#99">
+  <div class="datos"><b>#99</b> · 97.6 s · der -&gt; izq · truck · id 402 </div>
+  <div class="opciones"><label><input type="radio" name="m99" value="bien" checked> Bien</label><label><input type="radio" name="m99" value="doble"> Doble</label><label><input type="radio" name="m99" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m99" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="100" data-id="400" data-segundo="98.6">
+  <img src="100.jpg" loading="lazy" alt="#100">
+  <div class="datos"><b>#100</b> · 98.6 s · der -&gt; izq · truck · id 400 </div>
+  <div class="opciones"><label><input type="radio" name="m100" value="bien" checked> Bien</label><label><input type="radio" name="m100" value="doble"> Doble</label><label><input type="radio" name="m100" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m100" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="101" data-id="388" data-segundo="98.8">
+  <img src="101.jpg" loading="lazy" alt="#101">
+  <div class="datos"><b>#101</b> · 98.8 s · izq -&gt; der · car · id 388 </div>
+  <div class="opciones"><label><input type="radio" name="m101" value="bien" checked> Bien</label><label><input type="radio" name="m101" value="doble"> Doble</label><label><input type="radio" name="m101" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m101" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="102" data-id="386" data-segundo="99.3">
+  <img src="102.jpg" loading="lazy" alt="#102">
+  <div class="datos"><b>#102</b> · 99.3 s · der -&gt; izq · car · id 386 </div>
+  <div class="opciones"><label><input type="radio" name="m102" value="bien" checked> Bien</label><label><input type="radio" name="m102" value="doble"> Doble</label><label><input type="radio" name="m102" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m102" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="103" data-id="410" data-segundo="100.0">
+  <img src="103.jpg" loading="lazy" alt="#103">
+  <div class="datos"><b>#103</b> · 100.0 s · izq -&gt; der · car · id 410 </div>
+  <div class="opciones"><label><input type="radio" name="m103" value="bien" checked> Bien</label><label><input type="radio" name="m103" value="doble"> Doble</label><label><input type="radio" name="m103" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m103" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="104" data-id="324" data-segundo="100.3">
+  <img src="104.jpg" loading="lazy" alt="#104">
+  <div class="datos"><b>#104</b> · 100.3 s · der -&gt; izq · car · id 324 </div>
+  <div class="opciones"><label><input type="radio" name="m104" value="bien" checked> Bien</label><label><input type="radio" name="m104" value="doble"> Doble</label><label><input type="radio" name="m104" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m104" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="105" data-id="405" data-segundo="100.7">
+  <img src="105.jpg" loading="lazy" alt="#105">
+  <div class="datos"><b>#105</b> · 100.7 s · der -&gt; izq · car · id 405 </div>
+  <div class="opciones"><label><input type="radio" name="m105" value="bien" checked> Bien</label><label><input type="radio" name="m105" value="doble"> Doble</label><label><input type="radio" name="m105" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m105" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="106" data-id="406" data-segundo="101.1">
+  <img src="106.jpg" loading="lazy" alt="#106">
+  <div class="datos"><b>#106</b> · 101.1 s · der -&gt; izq · car · id 406 </div>
+  <div class="opciones"><label><input type="radio" name="m106" value="bien" checked> Bien</label><label><input type="radio" name="m106" value="doble"> Doble</label><label><input type="radio" name="m106" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m106" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="107" data-id="403" data-segundo="102.1">
+  <img src="107.jpg" loading="lazy" alt="#107">
+  <div class="datos"><b>#107</b> · 102.1 s · izq -&gt; der · car · id 403 </div>
+  <div class="opciones"><label><input type="radio" name="m107" value="bien" checked> Bien</label><label><input type="radio" name="m107" value="doble"> Doble</label><label><input type="radio" name="m107" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m107" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="108" data-id="421" data-segundo="102.2">
+  <img src="108.jpg" loading="lazy" alt="#108">
+  <div class="datos"><b>#108</b> · 102.2 s · der -&gt; izq · car · id 421 <span class="aviso">posible doble</span></div>
+  <div class="opciones"><label><input type="radio" name="m108" value="bien" checked> Bien</label><label><input type="radio" name="m108" value="doble"> Doble</label><label><input type="radio" name="m108" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m108" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="109" data-id="417" data-segundo="102.4">
+  <img src="109.jpg" loading="lazy" alt="#109">
+  <div class="datos"><b>#109</b> · 102.4 s · izq -&gt; der · car · id 417 </div>
+  <div class="opciones"><label><input type="radio" name="m109" value="bien" checked> Bien</label><label><input type="radio" name="m109" value="doble"> Doble</label><label><input type="radio" name="m109" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m109" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="110" data-id="408" data-segundo="102.5">
+  <img src="110.jpg" loading="lazy" alt="#110">
+  <div class="datos"><b>#110</b> · 102.5 s · der -&gt; izq · car · id 408 <span class="aviso">posible doble</span></div>
+  <div class="opciones"><label><input type="radio" name="m110" value="bien" checked> Bien</label><label><input type="radio" name="m110" value="doble"> Doble</label><label><input type="radio" name="m110" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m110" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="111" data-id="431" data-segundo="103.3">
+  <img src="111.jpg" loading="lazy" alt="#111">
+  <div class="datos"><b>#111</b> · 103.3 s · der -&gt; izq · car · id 431 </div>
+  <div class="opciones"><label><input type="radio" name="m111" value="bien" checked> Bien</label><label><input type="radio" name="m111" value="doble"> Doble</label><label><input type="radio" name="m111" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m111" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="112" data-id="427" data-segundo="103.6">
+  <img src="112.jpg" loading="lazy" alt="#112">
+  <div class="datos"><b>#112</b> · 103.6 s · izq -&gt; der · car · id 427 </div>
+  <div class="opciones"><label><input type="radio" name="m112" value="bien" checked> Bien</label><label><input type="radio" name="m112" value="doble"> Doble</label><label><input type="radio" name="m112" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m112" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="113" data-id="392" data-segundo="103.6">
+  <img src="113.jpg" loading="lazy" alt="#113">
+  <div class="datos"><b>#113</b> · 103.6 s · izq -&gt; der · truck · id 392 </div>
+  <div class="opciones"><label><input type="radio" name="m113" value="bien" checked> Bien</label><label><input type="radio" name="m113" value="doble"> Doble</label><label><input type="radio" name="m113" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m113" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="114" data-id="418" data-segundo="104.2">
+  <img src="114.jpg" loading="lazy" alt="#114">
+  <div class="datos"><b>#114</b> · 104.2 s · der -&gt; izq · car · id 418 </div>
+  <div class="opciones"><label><input type="radio" name="m114" value="bien" checked> Bien</label><label><input type="radio" name="m114" value="doble"> Doble</label><label><input type="radio" name="m114" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m114" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="115" data-id="407" data-segundo="104.7">
+  <img src="115.jpg" loading="lazy" alt="#115">
+  <div class="datos"><b>#115</b> · 104.7 s · der -&gt; izq · car · id 407 </div>
+  <div class="opciones"><label><input type="radio" name="m115" value="bien" checked> Bien</label><label><input type="radio" name="m115" value="doble"> Doble</label><label><input type="radio" name="m115" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m115" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="116" data-id="438" data-segundo="105.3">
+  <img src="116.jpg" loading="lazy" alt="#116">
+  <div class="datos"><b>#116</b> · 105.3 s · izq -&gt; der · car · id 438 </div>
+  <div class="opciones"><label><input type="radio" name="m116" value="bien" checked> Bien</label><label><input type="radio" name="m116" value="doble"> Doble</label><label><input type="radio" name="m116" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m116" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="117" data-id="436" data-segundo="105.9">
+  <img src="117.jpg" loading="lazy" alt="#117">
+  <div class="datos"><b>#117</b> · 105.9 s · der -&gt; izq · car · id 436 </div>
+  <div class="opciones"><label><input type="radio" name="m117" value="bien" checked> Bien</label><label><input type="radio" name="m117" value="doble"> Doble</label><label><input type="radio" name="m117" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m117" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="118" data-id="446" data-segundo="107.6">
+  <img src="118.jpg" loading="lazy" alt="#118">
+  <div class="datos"><b>#118</b> · 107.6 s · der -&gt; izq · car · id 446 </div>
+  <div class="opciones"><label><input type="radio" name="m118" value="bien" checked> Bien</label><label><input type="radio" name="m118" value="doble"> Doble</label><label><input type="radio" name="m118" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m118" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="119" data-id="450" data-segundo="109.2">
+  <img src="119.jpg" loading="lazy" alt="#119">
+  <div class="datos"><b>#119</b> · 109.2 s · izq -&gt; der · car · id 450 </div>
+  <div class="opciones"><label><input type="radio" name="m119" value="bien" checked> Bien</label><label><input type="radio" name="m119" value="doble"> Doble</label><label><input type="radio" name="m119" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m119" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="120" data-id="451" data-segundo="109.3">
+  <img src="120.jpg" loading="lazy" alt="#120">
+  <div class="datos"><b>#120</b> · 109.3 s · izq -&gt; der · car · id 451 </div>
+  <div class="opciones"><label><input type="radio" name="m120" value="bien" checked> Bien</label><label><input type="radio" name="m120" value="doble"> Doble</label><label><input type="radio" name="m120" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m120" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="121" data-id="458" data-segundo="109.7">
+  <img src="121.jpg" loading="lazy" alt="#121">
+  <div class="datos"><b>#121</b> · 109.7 s · der -&gt; izq · car · id 458 </div>
+  <div class="opciones"><label><input type="radio" name="m121" value="bien" checked> Bien</label><label><input type="radio" name="m121" value="doble"> Doble</label><label><input type="radio" name="m121" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m121" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="122" data-id="452" data-segundo="110.7">
+  <img src="122.jpg" loading="lazy" alt="#122">
+  <div class="datos"><b>#122</b> · 110.7 s · izq -&gt; der · car · id 452 </div>
+  <div class="opciones"><label><input type="radio" name="m122" value="bien" checked> Bien</label><label><input type="radio" name="m122" value="doble"> Doble</label><label><input type="radio" name="m122" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m122" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="123" data-id="456" data-segundo="110.8">
+  <img src="123.jpg" loading="lazy" alt="#123">
+  <div class="datos"><b>#123</b> · 110.8 s · der -&gt; izq · truck · id 456 </div>
+  <div class="opciones"><label><input type="radio" name="m123" value="bien" checked> Bien</label><label><input type="radio" name="m123" value="doble"> Doble</label><label><input type="radio" name="m123" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m123" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="124" data-id="460" data-segundo="111.7">
+  <img src="124.jpg" loading="lazy" alt="#124">
+  <div class="datos"><b>#124</b> · 111.7 s · izq -&gt; der · car · id 460 </div>
+  <div class="opciones"><label><input type="radio" name="m124" value="bien" checked> Bien</label><label><input type="radio" name="m124" value="doble"> Doble</label><label><input type="radio" name="m124" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m124" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="125" data-id="468" data-segundo="111.9">
+  <img src="125.jpg" loading="lazy" alt="#125">
+  <div class="datos"><b>#125</b> · 111.9 s · der -&gt; izq · car · id 468 </div>
+  <div class="opciones"><label><input type="radio" name="m125" value="bien" checked> Bien</label><label><input type="radio" name="m125" value="doble"> Doble</label><label><input type="radio" name="m125" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m125" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="126" data-id="448" data-segundo="114.1">
+  <img src="126.jpg" loading="lazy" alt="#126">
+  <div class="datos"><b>#126</b> · 114.1 s · der -&gt; izq · truck · id 448 </div>
+  <div class="opciones"><label><input type="radio" name="m126" value="bien" checked> Bien</label><label><input type="radio" name="m126" value="doble"> Doble</label><label><input type="radio" name="m126" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m126" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="127" data-id="469" data-segundo="114.3">
+  <img src="127.jpg" loading="lazy" alt="#127">
+  <div class="datos"><b>#127</b> · 114.3 s · izq -&gt; der · car · id 469 </div>
+  <div class="opciones"><label><input type="radio" name="m127" value="bien" checked> Bien</label><label><input type="radio" name="m127" value="doble"> Doble</label><label><input type="radio" name="m127" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m127" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="128" data-id="477" data-segundo="114.8">
+  <img src="128.jpg" loading="lazy" alt="#128">
+  <div class="datos"><b>#128</b> · 114.8 s · der -&gt; izq · car · id 477 </div>
+  <div class="opciones"><label><input type="radio" name="m128" value="bien" checked> Bien</label><label><input type="radio" name="m128" value="doble"> Doble</label><label><input type="radio" name="m128" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m128" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="129" data-id="483" data-segundo="116.3">
+  <img src="129.jpg" loading="lazy" alt="#129">
+  <div class="datos"><b>#129</b> · 116.3 s · der -&gt; izq · car · id 483 <span class="aviso">posible doble</span></div>
+  <div class="opciones"><label><input type="radio" name="m129" value="bien" checked> Bien</label><label><input type="radio" name="m129" value="doble"> Doble</label><label><input type="radio" name="m129" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m129" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="130" data-id="476" data-segundo="116.6">
+  <img src="130.jpg" loading="lazy" alt="#130">
+  <div class="datos"><b>#130</b> · 116.6 s · der -&gt; izq · car · id 476 <span class="aviso">posible doble</span></div>
+  <div class="opciones"><label><input type="radio" name="m130" value="bien" checked> Bien</label><label><input type="radio" name="m130" value="doble"> Doble</label><label><input type="radio" name="m130" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m130" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="131" data-id="466" data-segundo="117.9">
+  <img src="131.jpg" loading="lazy" alt="#131">
+  <div class="datos"><b>#131</b> · 117.9 s · der -&gt; izq · car · id 466 <span class="aviso">posible doble</span></div>
+  <div class="opciones"><label><input type="radio" name="m131" value="bien" checked> Bien</label><label><input type="radio" name="m131" value="doble"> Doble</label><label><input type="radio" name="m131" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m131" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="132" data-id="487" data-segundo="118.0">
+  <img src="132.jpg" loading="lazy" alt="#132">
+  <div class="datos"><b>#132</b> · 118.0 s · der -&gt; izq · car · id 487 <span class="aviso">posible doble</span></div>
+  <div class="opciones"><label><input type="radio" name="m132" value="bien" checked> Bien</label><label><input type="radio" name="m132" value="doble"> Doble</label><label><input type="radio" name="m132" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m132" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="133" data-id="442" data-segundo="119.5">
+  <img src="133.jpg" loading="lazy" alt="#133">
+  <div class="datos"><b>#133</b> · 119.5 s · der -&gt; izq · car · id 442 </div>
+  <div class="opciones"><label><input type="radio" name="m133" value="bien" checked> Bien</label><label><input type="radio" name="m133" value="doble"> Doble</label><label><input type="radio" name="m133" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m133" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="134" data-id="490" data-segundo="120.2">
+  <img src="134.jpg" loading="lazy" alt="#134">
+  <div class="datos"><b>#134</b> · 120.2 s · der -&gt; izq · car · id 490 </div>
+  <div class="opciones"><label><input type="radio" name="m134" value="bien" checked> Bien</label><label><input type="radio" name="m134" value="doble"> Doble</label><label><input type="radio" name="m134" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m134" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="135" data-id="497" data-segundo="121.5">
+  <img src="135.jpg" loading="lazy" alt="#135">
+  <div class="datos"><b>#135</b> · 121.5 s · izq -&gt; der · car · id 497 </div>
+  <div class="opciones"><label><input type="radio" name="m135" value="bien" checked> Bien</label><label><input type="radio" name="m135" value="doble"> Doble</label><label><input type="radio" name="m135" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m135" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="136" data-id="502" data-segundo="121.7">
+  <img src="136.jpg" loading="lazy" alt="#136">
+  <div class="datos"><b>#136</b> · 121.7 s · izq -&gt; der · car · id 502 </div>
+  <div class="opciones"><label><input type="radio" name="m136" value="bien" checked> Bien</label><label><input type="radio" name="m136" value="doble"> Doble</label><label><input type="radio" name="m136" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m136" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="137" data-id="501" data-segundo="121.7">
+  <img src="137.jpg" loading="lazy" alt="#137">
+  <div class="datos"><b>#137</b> · 121.7 s · izq -&gt; der · truck · id 501 </div>
+  <div class="opciones"><label><input type="radio" name="m137" value="bien" checked> Bien</label><label><input type="radio" name="m137" value="doble"> Doble</label><label><input type="radio" name="m137" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m137" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="138" data-id="507" data-segundo="122.8">
+  <img src="138.jpg" loading="lazy" alt="#138">
+  <div class="datos"><b>#138</b> · 122.8 s · der -&gt; izq · car · id 507 </div>
+  <div class="opciones"><label><input type="radio" name="m138" value="bien" checked> Bien</label><label><input type="radio" name="m138" value="doble"> Doble</label><label><input type="radio" name="m138" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m138" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="139" data-id="504" data-segundo="123.1">
+  <img src="139.jpg" loading="lazy" alt="#139">
+  <div class="datos"><b>#139</b> · 123.1 s · izq -&gt; der · car · id 504 </div>
+  <div class="opciones"><label><input type="radio" name="m139" value="bien" checked> Bien</label><label><input type="radio" name="m139" value="doble"> Doble</label><label><input type="radio" name="m139" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m139" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="140" data-id="488" data-segundo="124.1">
+  <img src="140.jpg" loading="lazy" alt="#140">
+  <div class="datos"><b>#140</b> · 124.1 s · der -&gt; izq · truck · id 488 </div>
+  <div class="opciones"><label><input type="radio" name="m140" value="bien" checked> Bien</label><label><input type="radio" name="m140" value="doble"> Doble</label><label><input type="radio" name="m140" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m140" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="141" data-id="511" data-segundo="125.0">
+  <img src="141.jpg" loading="lazy" alt="#141">
+  <div class="datos"><b>#141</b> · 125.0 s · izq -&gt; der · car · id 511 </div>
+  <div class="opciones"><label><input type="radio" name="m141" value="bien" checked> Bien</label><label><input type="radio" name="m141" value="doble"> Doble</label><label><input type="radio" name="m141" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m141" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="142" data-id="510" data-segundo="125.0">
+  <img src="142.jpg" loading="lazy" alt="#142">
+  <div class="datos"><b>#142</b> · 125.0 s · izq -&gt; der · truck · id 510 </div>
+  <div class="opciones"><label><input type="radio" name="m142" value="bien" checked> Bien</label><label><input type="radio" name="m142" value="doble"> Doble</label><label><input type="radio" name="m142" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m142" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="143" data-id="517" data-segundo="126.3">
+  <img src="143.jpg" loading="lazy" alt="#143">
+  <div class="datos"><b>#143</b> · 126.3 s · der -&gt; izq · truck · id 517 </div>
+  <div class="opciones"><label><input type="radio" name="m143" value="bien" checked> Bien</label><label><input type="radio" name="m143" value="doble"> Doble</label><label><input type="radio" name="m143" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m143" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="144" data-id="520" data-segundo="126.8">
+  <img src="144.jpg" loading="lazy" alt="#144">
+  <div class="datos"><b>#144</b> · 126.8 s · izq -&gt; der · car · id 520 </div>
+  <div class="opciones"><label><input type="radio" name="m144" value="bien" checked> Bien</label><label><input type="radio" name="m144" value="doble"> Doble</label><label><input type="radio" name="m144" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m144" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="145" data-id="526" data-segundo="127.9">
+  <img src="145.jpg" loading="lazy" alt="#145">
+  <div class="datos"><b>#145</b> · 127.9 s · der -&gt; izq · car · id 526 </div>
+  <div class="opciones"><label><input type="radio" name="m145" value="bien" checked> Bien</label><label><input type="radio" name="m145" value="doble"> Doble</label><label><input type="radio" name="m145" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m145" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="146" data-id="524" data-segundo="128.4">
+  <img src="146.jpg" loading="lazy" alt="#146">
+  <div class="datos"><b>#146</b> · 128.4 s · izq -&gt; der · car · id 524 </div>
+  <div class="opciones"><label><input type="radio" name="m146" value="bien" checked> Bien</label><label><input type="radio" name="m146" value="doble"> Doble</label><label><input type="radio" name="m146" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m146" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="147" data-id="519" data-segundo="128.4">
+  <img src="147.jpg" loading="lazy" alt="#147">
+  <div class="datos"><b>#147</b> · 128.4 s · izq -&gt; der · truck · id 519 </div>
+  <div class="opciones"><label><input type="radio" name="m147" value="bien" checked> Bien</label><label><input type="radio" name="m147" value="doble"> Doble</label><label><input type="radio" name="m147" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m147" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="148" data-id="529" data-segundo="128.5">
+  <img src="148.jpg" loading="lazy" alt="#148">
+  <div class="datos"><b>#148</b> · 128.5 s · der -&gt; izq · truck · id 529 </div>
+  <div class="opciones"><label><input type="radio" name="m148" value="bien" checked> Bien</label><label><input type="radio" name="m148" value="doble"> Doble</label><label><input type="radio" name="m148" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m148" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="149" data-id="475" data-segundo="129.3">
+  <img src="149.jpg" loading="lazy" alt="#149">
+  <div class="datos"><b>#149</b> · 129.3 s · der -&gt; izq · car · id 475 </div>
+  <div class="opciones"><label><input type="radio" name="m149" value="bien" checked> Bien</label><label><input type="radio" name="m149" value="doble"> Doble</label><label><input type="radio" name="m149" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m149" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="150" data-id="527" data-segundo="129.9">
+  <img src="150.jpg" loading="lazy" alt="#150">
+  <div class="datos"><b>#150</b> · 129.9 s · izq -&gt; der · car · id 527 </div>
+  <div class="opciones"><label><input type="radio" name="m150" value="bien" checked> Bien</label><label><input type="radio" name="m150" value="doble"> Doble</label><label><input type="radio" name="m150" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m150" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="151" data-id="537" data-segundo="130.3">
+  <img src="151.jpg" loading="lazy" alt="#151">
+  <div class="datos"><b>#151</b> · 130.3 s · izq -&gt; der · car · id 537 </div>
+  <div class="opciones"><label><input type="radio" name="m151" value="bien" checked> Bien</label><label><input type="radio" name="m151" value="doble"> Doble</label><label><input type="radio" name="m151" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m151" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="152" data-id="542" data-segundo="131.0">
+  <img src="152.jpg" loading="lazy" alt="#152">
+  <div class="datos"><b>#152</b> · 131.0 s · der -&gt; izq · truck · id 542 </div>
+  <div class="opciones"><label><input type="radio" name="m152" value="bien" checked> Bien</label><label><input type="radio" name="m152" value="doble"> Doble</label><label><input type="radio" name="m152" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m152" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="153" data-id="544" data-segundo="132.0">
+  <img src="153.jpg" loading="lazy" alt="#153">
+  <div class="datos"><b>#153</b> · 132.0 s · izq -&gt; der · car · id 544 </div>
+  <div class="opciones"><label><input type="radio" name="m153" value="bien" checked> Bien</label><label><input type="radio" name="m153" value="doble"> Doble</label><label><input type="radio" name="m153" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m153" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="154" data-id="543" data-segundo="132.0">
+  <img src="154.jpg" loading="lazy" alt="#154">
+  <div class="datos"><b>#154</b> · 132.0 s · izq -&gt; der · truck · id 543 </div>
+  <div class="opciones"><label><input type="radio" name="m154" value="bien" checked> Bien</label><label><input type="radio" name="m154" value="doble"> Doble</label><label><input type="radio" name="m154" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m154" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="155" data-id="550" data-segundo="132.9">
+  <img src="155.jpg" loading="lazy" alt="#155">
+  <div class="datos"><b>#155</b> · 132.9 s · der -&gt; izq · car · id 550 <span class="aviso">posible doble</span></div>
+  <div class="opciones"><label><input type="radio" name="m155" value="bien" checked> Bien</label><label><input type="radio" name="m155" value="doble"> Doble</label><label><input type="radio" name="m155" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m155" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="156" data-id="554" data-segundo="133.2">
+  <img src="156.jpg" loading="lazy" alt="#156">
+  <div class="datos"><b>#156</b> · 133.2 s · der -&gt; izq · car · id 554 <span class="aviso">posible doble</span></div>
+  <div class="opciones"><label><input type="radio" name="m156" value="bien" checked> Bien</label><label><input type="radio" name="m156" value="doble"> Doble</label><label><input type="radio" name="m156" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m156" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="157" data-id="536" data-segundo="134.9">
+  <img src="157.jpg" loading="lazy" alt="#157">
+  <div class="datos"><b>#157</b> · 134.9 s · izq -&gt; der · car · id 536 </div>
+  <div class="opciones"><label><input type="radio" name="m157" value="bien" checked> Bien</label><label><input type="radio" name="m157" value="doble"> Doble</label><label><input type="radio" name="m157" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m157" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="158" data-id="552" data-segundo="136.5">
+  <img src="158.jpg" loading="lazy" alt="#158">
+  <div class="datos"><b>#158</b> · 136.5 s · izq -&gt; der · truck · id 552 </div>
+  <div class="opciones"><label><input type="radio" name="m158" value="bien" checked> Bien</label><label><input type="radio" name="m158" value="doble"> Doble</label><label><input type="radio" name="m158" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m158" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="159" data-id="575" data-segundo="141.4">
+  <img src="159.jpg" loading="lazy" alt="#159">
+  <div class="datos"><b>#159</b> · 141.4 s · der -&gt; izq · car · id 575 </div>
+  <div class="opciones"><label><input type="radio" name="m159" value="bien" checked> Bien</label><label><input type="radio" name="m159" value="doble"> Doble</label><label><input type="radio" name="m159" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m159" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="160" data-id="578" data-segundo="142.4">
+  <img src="160.jpg" loading="lazy" alt="#160">
+  <div class="datos"><b>#160</b> · 142.4 s · der -&gt; izq · car · id 578 </div>
+  <div class="opciones"><label><input type="radio" name="m160" value="bien" checked> Bien</label><label><input type="radio" name="m160" value="doble"> Doble</label><label><input type="radio" name="m160" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m160" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="161" data-id="579" data-segundo="143.3">
+  <img src="161.jpg" loading="lazy" alt="#161">
+  <div class="datos"><b>#161</b> · 143.3 s · der -&gt; izq · car · id 579 </div>
+  <div class="opciones"><label><input type="radio" name="m161" value="bien" checked> Bien</label><label><input type="radio" name="m161" value="doble"> Doble</label><label><input type="radio" name="m161" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m161" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="162" data-id="576" data-segundo="143.7">
+  <img src="162.jpg" loading="lazy" alt="#162">
+  <div class="datos"><b>#162</b> · 143.7 s · der -&gt; izq · car · id 576 </div>
+  <div class="opciones"><label><input type="radio" name="m162" value="bien" checked> Bien</label><label><input type="radio" name="m162" value="doble"> Doble</label><label><input type="radio" name="m162" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m162" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="163" data-id="584" data-segundo="145.3">
+  <img src="163.jpg" loading="lazy" alt="#163">
+  <div class="datos"><b>#163</b> · 145.3 s · der -&gt; izq · car · id 584 </div>
+  <div class="opciones"><label><input type="radio" name="m163" value="bien" checked> Bien</label><label><input type="radio" name="m163" value="doble"> Doble</label><label><input type="radio" name="m163" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m163" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="164" data-id="592" data-segundo="146.8">
+  <img src="164.jpg" loading="lazy" alt="#164">
+  <div class="datos"><b>#164</b> · 146.8 s · der -&gt; izq · car · id 592 </div>
+  <div class="opciones"><label><input type="radio" name="m164" value="bien" checked> Bien</label><label><input type="radio" name="m164" value="doble"> Doble</label><label><input type="radio" name="m164" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m164" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="165" data-id="593" data-segundo="147.4">
+  <img src="165.jpg" loading="lazy" alt="#165">
+  <div class="datos"><b>#165</b> · 147.4 s · der -&gt; izq · car · id 593 </div>
+  <div class="opciones"><label><input type="radio" name="m165" value="bien" checked> Bien</label><label><input type="radio" name="m165" value="doble"> Doble</label><label><input type="radio" name="m165" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m165" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="166" data-id="606" data-segundo="151.1">
+  <img src="166.jpg" loading="lazy" alt="#166">
+  <div class="datos"><b>#166</b> · 151.1 s · der -&gt; izq · car · id 606 </div>
+  <div class="opciones"><label><input type="radio" name="m166" value="bien" checked> Bien</label><label><input type="radio" name="m166" value="doble"> Doble</label><label><input type="radio" name="m166" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m166" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="167" data-id="612" data-segundo="152.7">
+  <img src="167.jpg" loading="lazy" alt="#167">
+  <div class="datos"><b>#167</b> · 152.7 s · der -&gt; izq · car · id 612 </div>
+  <div class="opciones"><label><input type="radio" name="m167" value="bien" checked> Bien</label><label><input type="radio" name="m167" value="doble"> Doble</label><label><input type="radio" name="m167" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m167" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="168" data-id="617" data-segundo="154.3">
+  <img src="168.jpg" loading="lazy" alt="#168">
+  <div class="datos"><b>#168</b> · 154.3 s · der -&gt; izq · car · id 617 </div>
+  <div class="opciones"><label><input type="radio" name="m168" value="bien" checked> Bien</label><label><input type="radio" name="m168" value="doble"> Doble</label><label><input type="radio" name="m168" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m168" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="169" data-id="627" data-segundo="163.2">
+  <img src="169.jpg" loading="lazy" alt="#169">
+  <div class="datos"><b>#169</b> · 163.2 s · izq -&gt; der · truck · id 627 </div>
+  <div class="opciones"><label><input type="radio" name="m169" value="bien" checked> Bien</label><label><input type="radio" name="m169" value="doble"> Doble</label><label><input type="radio" name="m169" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m169" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="170" data-id="625" data-segundo="163.2">
+  <img src="170.jpg" loading="lazy" alt="#170">
+  <div class="datos"><b>#170</b> · 163.2 s · izq -&gt; der · car · id 625 </div>
+  <div class="opciones"><label><input type="radio" name="m170" value="bien" checked> Bien</label><label><input type="radio" name="m170" value="doble"> Doble</label><label><input type="radio" name="m170" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m170" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="171" data-id="640" data-segundo="169.6">
+  <img src="171.jpg" loading="lazy" alt="#171">
+  <div class="datos"><b>#171</b> · 169.6 s · izq -&gt; der · car · id 640 </div>
+  <div class="opciones"><label><input type="radio" name="m171" value="bien" checked> Bien</label><label><input type="radio" name="m171" value="doble"> Doble</label><label><input type="radio" name="m171" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m171" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="172" data-id="655" data-segundo="170.1">
+  <img src="172.jpg" loading="lazy" alt="#172">
+  <div class="datos"><b>#172</b> · 170.1 s · der -&gt; izq · truck · id 655 <span class="aviso">posible doble</span></div>
+  <div class="opciones"><label><input type="radio" name="m172" value="bien" checked> Bien</label><label><input type="radio" name="m172" value="doble"> Doble</label><label><input type="radio" name="m172" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m172" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="173" data-id="619" data-segundo="170.1">
+  <img src="173.jpg" loading="lazy" alt="#173">
+  <div class="datos"><b>#173</b> · 170.1 s · der -&gt; izq · car · id 619 <span class="aviso">posible doble</span></div>
+  <div class="opciones"><label><input type="radio" name="m173" value="bien" checked> Bien</label><label><input type="radio" name="m173" value="doble"> Doble</label><label><input type="radio" name="m173" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m173" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="174" data-id="659" data-segundo="170.4">
+  <img src="174.jpg" loading="lazy" alt="#174">
+  <div class="datos"><b>#174</b> · 170.4 s · der -&gt; izq · car · id 659 <span class="aviso">posible doble</span></div>
+  <div class="opciones"><label><input type="radio" name="m174" value="bien" checked> Bien</label><label><input type="radio" name="m174" value="doble"> Doble</label><label><input type="radio" name="m174" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m174" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="175" data-id="656" data-segundo="170.4">
+  <img src="175.jpg" loading="lazy" alt="#175">
+  <div class="datos"><b>#175</b> · 170.4 s · der -&gt; izq · truck · id 656 <span class="aviso">posible doble</span></div>
+  <div class="opciones"><label><input type="radio" name="m175" value="bien" checked> Bien</label><label><input type="radio" name="m175" value="doble"> Doble</label><label><input type="radio" name="m175" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m175" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="176" data-id="657" data-segundo="173.7">
+  <img src="176.jpg" loading="lazy" alt="#176">
+  <div class="datos"><b>#176</b> · 173.7 s · der -&gt; izq · car · id 657 </div>
+  <div class="opciones"><label><input type="radio" name="m176" value="bien" checked> Bien</label><label><input type="radio" name="m176" value="doble"> Doble</label><label><input type="radio" name="m176" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m176" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="177" data-id="669" data-segundo="175.2">
+  <img src="177.jpg" loading="lazy" alt="#177">
+  <div class="datos"><b>#177</b> · 175.2 s · der -&gt; izq · car · id 669 </div>
+  <div class="opciones"><label><input type="radio" name="m177" value="bien" checked> Bien</label><label><input type="radio" name="m177" value="doble"> Doble</label><label><input type="radio" name="m177" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m177" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="178" data-id="670" data-segundo="176.1">
+  <img src="178.jpg" loading="lazy" alt="#178">
+  <div class="datos"><b>#178</b> · 176.1 s · der -&gt; izq · car · id 670 </div>
+  <div class="opciones"><label><input type="radio" name="m178" value="bien" checked> Bien</label><label><input type="radio" name="m178" value="doble"> Doble</label><label><input type="radio" name="m178" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m178" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="179" data-id="671" data-segundo="176.7">
+  <img src="179.jpg" loading="lazy" alt="#179">
+  <div class="datos"><b>#179</b> · 176.7 s · der -&gt; izq · car · id 671 </div>
+  <div class="opciones"><label><input type="radio" name="m179" value="bien" checked> Bien</label><label><input type="radio" name="m179" value="doble"> Doble</label><label><input type="radio" name="m179" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m179" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="180" data-id="675" data-segundo="178.2">
+  <img src="180.jpg" loading="lazy" alt="#180">
+  <div class="datos"><b>#180</b> · 178.2 s · der -&gt; izq · car · id 675 </div>
+  <div class="opciones"><label><input type="radio" name="m180" value="bien" checked> Bien</label><label><input type="radio" name="m180" value="doble"> Doble</label><label><input type="radio" name="m180" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m180" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="181" data-id="667" data-segundo="178.6">
+  <img src="181.jpg" loading="lazy" alt="#181">
+  <div class="datos"><b>#181</b> · 178.6 s · der -&gt; izq · car · id 667 </div>
+  <div class="opciones"><label><input type="radio" name="m181" value="bien" checked> Bien</label><label><input type="radio" name="m181" value="doble"> Doble</label><label><input type="radio" name="m181" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m181" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="182" data-id="680" data-segundo="180.3">
+  <img src="182.jpg" loading="lazy" alt="#182">
+  <div class="datos"><b>#182</b> · 180.3 s · der -&gt; izq · car · id 680 </div>
+  <div class="opciones"><label><input type="radio" name="m182" value="bien" checked> Bien</label><label><input type="radio" name="m182" value="doble"> Doble</label><label><input type="radio" name="m182" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m182" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="183" data-id="700" data-segundo="184.4">
+  <img src="183.jpg" loading="lazy" alt="#183">
+  <div class="datos"><b>#183</b> · 184.4 s · der -&gt; izq · car · id 700 </div>
+  <div class="opciones"><label><input type="radio" name="m183" value="bien" checked> Bien</label><label><input type="radio" name="m183" value="doble"> Doble</label><label><input type="radio" name="m183" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m183" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="184" data-id="582" data-segundo="197.2">
+  <img src="184.jpg" loading="lazy" alt="#184">
+  <div class="datos"><b>#184</b> · 197.2 s · izq -&gt; der · car · id 582 </div>
+  <div class="opciones"><label><input type="radio" name="m184" value="bien" checked> Bien</label><label><input type="radio" name="m184" value="doble"> Doble</label><label><input type="radio" name="m184" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m184" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="185" data-id="716" data-segundo="197.9">
+  <img src="185.jpg" loading="lazy" alt="#185">
+  <div class="datos"><b>#185</b> · 197.9 s · izq -&gt; der · car · id 716 </div>
+  <div class="opciones"><label><input type="radio" name="m185" value="bien" checked> Bien</label><label><input type="radio" name="m185" value="doble"> Doble</label><label><input type="radio" name="m185" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m185" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="186" data-id="631" data-segundo="198.8">
+  <img src="186.jpg" loading="lazy" alt="#186">
+  <div class="datos"><b>#186</b> · 198.8 s · izq -&gt; der · car · id 631 </div>
+  <div class="opciones"><label><input type="radio" name="m186" value="bien" checked> Bien</label><label><input type="radio" name="m186" value="doble"> Doble</label><label><input type="radio" name="m186" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m186" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="187" data-id="741" data-segundo="200.1">
+  <img src="187.jpg" loading="lazy" alt="#187">
+  <div class="datos"><b>#187</b> · 200.1 s · izq -&gt; der · car · id 741 </div>
+  <div class="opciones"><label><input type="radio" name="m187" value="bien" checked> Bien</label><label><input type="radio" name="m187" value="doble"> Doble</label><label><input type="radio" name="m187" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m187" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="188" data-id="730" data-segundo="200.3">
+  <img src="188.jpg" loading="lazy" alt="#188">
+  <div class="datos"><b>#188</b> · 200.3 s · izq -&gt; der · car · id 730 </div>
+  <div class="opciones"><label><input type="radio" name="m188" value="bien" checked> Bien</label><label><input type="radio" name="m188" value="doble"> Doble</label><label><input type="radio" name="m188" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m188" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="189" data-id="729" data-segundo="200.4">
+  <img src="189.jpg" loading="lazy" alt="#189">
+  <div class="datos"><b>#189</b> · 200.4 s · izq -&gt; der · truck · id 729 </div>
+  <div class="opciones"><label><input type="radio" name="m189" value="bien" checked> Bien</label><label><input type="radio" name="m189" value="doble"> Doble</label><label><input type="radio" name="m189" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m189" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="190" data-id="673" data-segundo="200.6">
+  <img src="190.jpg" loading="lazy" alt="#190">
+  <div class="datos"><b>#190</b> · 200.6 s · izq -&gt; der · truck · id 673 </div>
+  <div class="opciones"><label><input type="radio" name="m190" value="bien" checked> Bien</label><label><input type="radio" name="m190" value="doble"> Doble</label><label><input type="radio" name="m190" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m190" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="191" data-id="697" data-segundo="200.6">
+  <img src="191.jpg" loading="lazy" alt="#191">
+  <div class="datos"><b>#191</b> · 200.6 s · izq -&gt; der · car · id 697 </div>
+  <div class="opciones"><label><input type="radio" name="m191" value="bien" checked> Bien</label><label><input type="radio" name="m191" value="doble"> Doble</label><label><input type="radio" name="m191" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m191" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="192" data-id="712" data-segundo="202.4">
+  <img src="192.jpg" loading="lazy" alt="#192">
+  <div class="datos"><b>#192</b> · 202.4 s · izq -&gt; der · car · id 712 </div>
+  <div class="opciones"><label><input type="radio" name="m192" value="bien" checked> Bien</label><label><input type="radio" name="m192" value="doble"> Doble</label><label><input type="radio" name="m192" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m192" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="193" data-id="721" data-segundo="202.7">
+  <img src="193.jpg" loading="lazy" alt="#193">
+  <div class="datos"><b>#193</b> · 202.7 s · izq -&gt; der · car · id 721 </div>
+  <div class="opciones"><label><input type="radio" name="m193" value="bien" checked> Bien</label><label><input type="radio" name="m193" value="doble"> Doble</label><label><input type="radio" name="m193" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m193" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="194" data-id="641" data-segundo="203.3">
+  <img src="194.jpg" loading="lazy" alt="#194">
+  <div class="datos"><b>#194</b> · 203.3 s · izq -&gt; der · car · id 641 </div>
+  <div class="opciones"><label><input type="radio" name="m194" value="bien" checked> Bien</label><label><input type="radio" name="m194" value="doble"> Doble</label><label><input type="radio" name="m194" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m194" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="195" data-id="744" data-segundo="203.3">
+  <img src="195.jpg" loading="lazy" alt="#195">
+  <div class="datos"><b>#195</b> · 203.3 s · izq -&gt; der · truck · id 744 </div>
+  <div class="opciones"><label><input type="radio" name="m195" value="bien" checked> Bien</label><label><input type="radio" name="m195" value="doble"> Doble</label><label><input type="radio" name="m195" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m195" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="196" data-id="746" data-segundo="204.1">
+  <img src="196.jpg" loading="lazy" alt="#196">
+  <div class="datos"><b>#196</b> · 204.1 s · izq -&gt; der · car · id 746 </div>
+  <div class="opciones"><label><input type="radio" name="m196" value="bien" checked> Bien</label><label><input type="radio" name="m196" value="doble"> Doble</label><label><input type="radio" name="m196" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m196" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="197" data-id="739" data-segundo="204.5">
+  <img src="197.jpg" loading="lazy" alt="#197">
+  <div class="datos"><b>#197</b> · 204.5 s · izq -&gt; der · truck · id 739 </div>
+  <div class="opciones"><label><input type="radio" name="m197" value="bien" checked> Bien</label><label><input type="radio" name="m197" value="doble"> Doble</label><label><input type="radio" name="m197" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m197" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="198" data-id="736" data-segundo="204.5">
+  <img src="198.jpg" loading="lazy" alt="#198">
+  <div class="datos"><b>#198</b> · 204.5 s · izq -&gt; der · car · id 736 </div>
+  <div class="opciones"><label><input type="radio" name="m198" value="bien" checked> Bien</label><label><input type="radio" name="m198" value="doble"> Doble</label><label><input type="radio" name="m198" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m198" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="199" data-id="757" data-segundo="206.3">
+  <img src="199.jpg" loading="lazy" alt="#199">
+  <div class="datos"><b>#199</b> · 206.3 s · izq -&gt; der · car · id 757 </div>
+  <div class="opciones"><label><input type="radio" name="m199" value="bien" checked> Bien</label><label><input type="radio" name="m199" value="doble"> Doble</label><label><input type="radio" name="m199" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m199" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="200" data-id="756" data-segundo="206.3">
+  <img src="200.jpg" loading="lazy" alt="#200">
+  <div class="datos"><b>#200</b> · 206.3 s · izq -&gt; der · truck · id 756 </div>
+  <div class="opciones"><label><input type="radio" name="m200" value="bien" checked> Bien</label><label><input type="radio" name="m200" value="doble"> Doble</label><label><input type="radio" name="m200" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m200" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="201" data-id="662" data-segundo="206.3">
+  <img src="201.jpg" loading="lazy" alt="#201">
+  <div class="datos"><b>#201</b> · 206.3 s · der -&gt; izq · car · id 662 </div>
+  <div class="opciones"><label><input type="radio" name="m201" value="bien" checked> Bien</label><label><input type="radio" name="m201" value="doble"> Doble</label><label><input type="radio" name="m201" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m201" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="202" data-id="760" data-segundo="206.9">
+  <img src="202.jpg" loading="lazy" alt="#202">
+  <div class="datos"><b>#202</b> · 206.9 s · izq -&gt; der · car · id 760 </div>
+  <div class="opciones"><label><input type="radio" name="m202" value="bien" checked> Bien</label><label><input type="radio" name="m202" value="doble"> Doble</label><label><input type="radio" name="m202" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m202" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="203" data-id="772" data-segundo="207.8">
+  <img src="203.jpg" loading="lazy" alt="#203">
+  <div class="datos"><b>#203</b> · 207.8 s · der -&gt; izq · car · id 772 </div>
+  <div class="opciones"><label><input type="radio" name="m203" value="bien" checked> Bien</label><label><input type="radio" name="m203" value="doble"> Doble</label><label><input type="radio" name="m203" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m203" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="204" data-id="764" data-segundo="207.9">
+  <img src="204.jpg" loading="lazy" alt="#204">
+  <div class="datos"><b>#204</b> · 207.9 s · izq -&gt; der · car · id 764 </div>
+  <div class="opciones"><label><input type="radio" name="m204" value="bien" checked> Bien</label><label><input type="radio" name="m204" value="doble"> Doble</label><label><input type="radio" name="m204" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m204" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="205" data-id="755" data-segundo="208.1">
+  <img src="205.jpg" loading="lazy" alt="#205">
+  <div class="datos"><b>#205</b> · 208.1 s · izq -&gt; der · car · id 755 </div>
+  <div class="opciones"><label><input type="radio" name="m205" value="bien" checked> Bien</label><label><input type="radio" name="m205" value="doble"> Doble</label><label><input type="radio" name="m205" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m205" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="206" data-id="767" data-segundo="209.0">
+  <img src="206.jpg" loading="lazy" alt="#206">
+  <div class="datos"><b>#206</b> · 209.0 s · izq -&gt; der · car · id 767 </div>
+  <div class="opciones"><label><input type="radio" name="m206" value="bien" checked> Bien</label><label><input type="radio" name="m206" value="doble"> Doble</label><label><input type="radio" name="m206" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m206" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="207" data-id="719" data-segundo="209.1">
+  <img src="207.jpg" loading="lazy" alt="#207">
+  <div class="datos"><b>#207</b> · 209.1 s · izq -&gt; der · car · id 719 </div>
+  <div class="opciones"><label><input type="radio" name="m207" value="bien" checked> Bien</label><label><input type="radio" name="m207" value="doble"> Doble</label><label><input type="radio" name="m207" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m207" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="208" data-id="765" data-segundo="210.2">
+  <img src="208.jpg" loading="lazy" alt="#208">
+  <div class="datos"><b>#208</b> · 210.2 s · izq -&gt; der · car · id 765 </div>
+  <div class="opciones"><label><input type="radio" name="m208" value="bien" checked> Bien</label><label><input type="radio" name="m208" value="doble"> Doble</label><label><input type="radio" name="m208" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m208" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="209" data-id="726" data-segundo="210.4">
+  <img src="209.jpg" loading="lazy" alt="#209">
+  <div class="datos"><b>#209</b> · 210.4 s · der -&gt; izq · car · id 726 </div>
+  <div class="opciones"><label><input type="radio" name="m209" value="bien" checked> Bien</label><label><input type="radio" name="m209" value="doble"> Doble</label><label><input type="radio" name="m209" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m209" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="210" data-id="784" data-segundo="210.9">
+  <img src="210.jpg" loading="lazy" alt="#210">
+  <div class="datos"><b>#210</b> · 210.9 s · der -&gt; izq · car · id 784 </div>
+  <div class="opciones"><label><input type="radio" name="m210" value="bien" checked> Bien</label><label><input type="radio" name="m210" value="doble"> Doble</label><label><input type="radio" name="m210" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m210" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="211" data-id="787" data-segundo="211.9">
+  <img src="211.jpg" loading="lazy" alt="#211">
+  <div class="datos"><b>#211</b> · 211.9 s · izq -&gt; der · car · id 787 </div>
+  <div class="opciones"><label><input type="radio" name="m211" value="bien" checked> Bien</label><label><input type="radio" name="m211" value="doble"> Doble</label><label><input type="radio" name="m211" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m211" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="212" data-id="800" data-segundo="212.3">
+  <img src="212.jpg" loading="lazy" alt="#212">
+  <div class="datos"><b>#212</b> · 212.3 s · der -&gt; izq · car · id 800 </div>
+  <div class="opciones"><label><input type="radio" name="m212" value="bien" checked> Bien</label><label><input type="radio" name="m212" value="doble"> Doble</label><label><input type="radio" name="m212" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m212" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="213" data-id="788" data-segundo="212.4">
+  <img src="213.jpg" loading="lazy" alt="#213">
+  <div class="datos"><b>#213</b> · 212.4 s · izq -&gt; der · car · id 788 </div>
+  <div class="opciones"><label><input type="radio" name="m213" value="bien" checked> Bien</label><label><input type="radio" name="m213" value="doble"> Doble</label><label><input type="radio" name="m213" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m213" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="214" data-id="806" data-segundo="213.0">
+  <img src="214.jpg" loading="lazy" alt="#214">
+  <div class="datos"><b>#214</b> · 213.0 s · der -&gt; izq · car · id 806 </div>
+  <div class="opciones"><label><input type="radio" name="m214" value="bien" checked> Bien</label><label><input type="radio" name="m214" value="doble"> Doble</label><label><input type="radio" name="m214" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m214" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="215" data-id="804" data-segundo="213.6">
+  <img src="215.jpg" loading="lazy" alt="#215">
+  <div class="datos"><b>#215</b> · 213.6 s · izq -&gt; der · car · id 804 </div>
+  <div class="opciones"><label><input type="radio" name="m215" value="bien" checked> Bien</label><label><input type="radio" name="m215" value="doble"> Doble</label><label><input type="radio" name="m215" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m215" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="216" data-id="812" data-segundo="214.2">
+  <img src="216.jpg" loading="lazy" alt="#216">
+  <div class="datos"><b>#216</b> · 214.2 s · der -&gt; izq · car · id 812 </div>
+  <div class="opciones"><label><input type="radio" name="m216" value="bien" checked> Bien</label><label><input type="radio" name="m216" value="doble"> Doble</label><label><input type="radio" name="m216" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m216" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="217" data-id="793" data-segundo="215.1">
+  <img src="217.jpg" loading="lazy" alt="#217">
+  <div class="datos"><b>#217</b> · 215.1 s · der -&gt; izq · car · id 793 </div>
+  <div class="opciones"><label><input type="radio" name="m217" value="bien" checked> Bien</label><label><input type="radio" name="m217" value="doble"> Doble</label><label><input type="radio" name="m217" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m217" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="218" data-id="809" data-segundo="215.7">
+  <img src="218.jpg" loading="lazy" alt="#218">
+  <div class="datos"><b>#218</b> · 215.7 s · der -&gt; izq · car · id 809 </div>
+  <div class="opciones"><label><input type="radio" name="m218" value="bien" checked> Bien</label><label><input type="radio" name="m218" value="doble"> Doble</label><label><input type="radio" name="m218" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m218" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="219" data-id="783" data-segundo="215.8">
+  <img src="219.jpg" loading="lazy" alt="#219">
+  <div class="datos"><b>#219</b> · 215.8 s · izq -&gt; der · car · id 783 </div>
+  <div class="opciones"><label><input type="radio" name="m219" value="bien" checked> Bien</label><label><input type="radio" name="m219" value="doble"> Doble</label><label><input type="radio" name="m219" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m219" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="220" data-id="799" data-segundo="217.1">
+  <img src="220.jpg" loading="lazy" alt="#220">
+  <div class="datos"><b>#220</b> · 217.1 s · der -&gt; izq · car · id 799 </div>
+  <div class="opciones"><label><input type="radio" name="m220" value="bien" checked> Bien</label><label><input type="radio" name="m220" value="doble"> Doble</label><label><input type="radio" name="m220" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m220" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="221" data-id="814" data-segundo="218.5">
+  <img src="221.jpg" loading="lazy" alt="#221">
+  <div class="datos"><b>#221</b> · 218.5 s · der -&gt; izq · car · id 814 </div>
+  <div class="opciones"><label><input type="radio" name="m221" value="bien" checked> Bien</label><label><input type="radio" name="m221" value="doble"> Doble</label><label><input type="radio" name="m221" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m221" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="222" data-id="834" data-segundo="219.0">
+  <img src="222.jpg" loading="lazy" alt="#222">
+  <div class="datos"><b>#222</b> · 219.0 s · der -&gt; izq · car · id 834 </div>
+  <div class="opciones"><label><input type="radio" name="m222" value="bien" checked> Bien</label><label><input type="radio" name="m222" value="doble"> Doble</label><label><input type="radio" name="m222" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m222" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="223" data-id="839" data-segundo="219.4">
+  <img src="223.jpg" loading="lazy" alt="#223">
+  <div class="datos"><b>#223</b> · 219.4 s · der -&gt; izq · car · id 839 </div>
+  <div class="opciones"><label><input type="radio" name="m223" value="bien" checked> Bien</label><label><input type="radio" name="m223" value="doble"> Doble</label><label><input type="radio" name="m223" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m223" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="224" data-id="830" data-segundo="219.4">
+  <img src="224.jpg" loading="lazy" alt="#224">
+  <div class="datos"><b>#224</b> · 219.4 s · izq -&gt; der · car · id 830 </div>
+  <div class="opciones"><label><input type="radio" name="m224" value="bien" checked> Bien</label><label><input type="radio" name="m224" value="doble"> Doble</label><label><input type="radio" name="m224" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m224" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="225" data-id="832" data-segundo="220.2">
+  <img src="225.jpg" loading="lazy" alt="#225">
+  <div class="datos"><b>#225</b> · 220.2 s · izq -&gt; der · car · id 832 </div>
+  <div class="opciones"><label><input type="radio" name="m225" value="bien" checked> Bien</label><label><input type="radio" name="m225" value="doble"> Doble</label><label><input type="radio" name="m225" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m225" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="226" data-id="843" data-segundo="220.5">
+  <img src="226.jpg" loading="lazy" alt="#226">
+  <div class="datos"><b>#226</b> · 220.5 s · der -&gt; izq · car · id 843 </div>
+  <div class="opciones"><label><input type="radio" name="m226" value="bien" checked> Bien</label><label><input type="radio" name="m226" value="doble"> Doble</label><label><input type="radio" name="m226" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m226" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="227" data-id="835" data-segundo="220.8">
+  <img src="227.jpg" loading="lazy" alt="#227">
+  <div class="datos"><b>#227</b> · 220.8 s · der -&gt; izq · car · id 835 </div>
+  <div class="opciones"><label><input type="radio" name="m227" value="bien" checked> Bien</label><label><input type="radio" name="m227" value="doble"> Doble</label><label><input type="radio" name="m227" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m227" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="228" data-id="778" data-segundo="222.3">
+  <img src="228.jpg" loading="lazy" alt="#228">
+  <div class="datos"><b>#228</b> · 222.3 s · der -&gt; izq · car · id 778 </div>
+  <div class="opciones"><label><input type="radio" name="m228" value="bien" checked> Bien</label><label><input type="radio" name="m228" value="doble"> Doble</label><label><input type="radio" name="m228" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m228" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="229" data-id="847" data-segundo="222.4">
+  <img src="229.jpg" loading="lazy" alt="#229">
+  <div class="datos"><b>#229</b> · 222.4 s · izq -&gt; der · car · id 847 </div>
+  <div class="opciones"><label><input type="radio" name="m229" value="bien" checked> Bien</label><label><input type="radio" name="m229" value="doble"> Doble</label><label><input type="radio" name="m229" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m229" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="230" data-id="849" data-segundo="222.9">
+  <img src="230.jpg" loading="lazy" alt="#230">
+  <div class="datos"><b>#230</b> · 222.9 s · der -&gt; izq · car · id 849 </div>
+  <div class="opciones"><label><input type="radio" name="m230" value="bien" checked> Bien</label><label><input type="radio" name="m230" value="doble"> Doble</label><label><input type="radio" name="m230" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m230" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="231" data-id="852" data-segundo="223.2">
+  <img src="231.jpg" loading="lazy" alt="#231">
+  <div class="datos"><b>#231</b> · 223.2 s · izq -&gt; der · car · id 852 </div>
+  <div class="opciones"><label><input type="radio" name="m231" value="bien" checked> Bien</label><label><input type="radio" name="m231" value="doble"> Doble</label><label><input type="radio" name="m231" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m231" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="232" data-id="858" data-segundo="223.9">
+  <img src="232.jpg" loading="lazy" alt="#232">
+  <div class="datos"><b>#232</b> · 223.9 s · der -&gt; izq · car · id 858 <span class="aviso">posible doble</span></div>
+  <div class="opciones"><label><input type="radio" name="m232" value="bien" checked> Bien</label><label><input type="radio" name="m232" value="doble"> Doble</label><label><input type="radio" name="m232" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m232" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="233" data-id="857" data-segundo="224.1">
+  <img src="233.jpg" loading="lazy" alt="#233">
+  <div class="datos"><b>#233</b> · 224.1 s · der -&gt; izq · car · id 857 <span class="aviso">posible doble</span></div>
+  <div class="opciones"><label><input type="radio" name="m233" value="bien" checked> Bien</label><label><input type="radio" name="m233" value="doble"> Doble</label><label><input type="radio" name="m233" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m233" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="234" data-id="842" data-segundo="225.4">
+  <img src="234.jpg" loading="lazy" alt="#234">
+  <div class="datos"><b>#234</b> · 225.4 s · der -&gt; izq · car · id 842 <span class="aviso">posible doble</span></div>
+  <div class="opciones"><label><input type="radio" name="m234" value="bien" checked> Bien</label><label><input type="radio" name="m234" value="doble"> Doble</label><label><input type="radio" name="m234" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m234" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="235" data-id="854" data-segundo="225.7">
+  <img src="235.jpg" loading="lazy" alt="#235">
+  <div class="datos"><b>#235</b> · 225.7 s · der -&gt; izq · car · id 854 <span class="aviso">posible doble</span></div>
+  <div class="opciones"><label><input type="radio" name="m235" value="bien" checked> Bien</label><label><input type="radio" name="m235" value="doble"> Doble</label><label><input type="radio" name="m235" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m235" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="236" data-id="863" data-segundo="225.8">
+  <img src="236.jpg" loading="lazy" alt="#236">
+  <div class="datos"><b>#236</b> · 225.8 s · izq -&gt; der · car · id 863 </div>
+  <div class="opciones"><label><input type="radio" name="m236" value="bien" checked> Bien</label><label><input type="radio" name="m236" value="doble"> Doble</label><label><input type="radio" name="m236" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m236" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="237" data-id="872" data-segundo="226.4">
+  <img src="237.jpg" loading="lazy" alt="#237">
+  <div class="datos"><b>#237</b> · 226.4 s · der -&gt; izq · car · id 872 </div>
+  <div class="opciones"><label><input type="radio" name="m237" value="bien" checked> Bien</label><label><input type="radio" name="m237" value="doble"> Doble</label><label><input type="radio" name="m237" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m237" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="238" data-id="865" data-segundo="226.9">
+  <img src="238.jpg" loading="lazy" alt="#238">
+  <div class="datos"><b>#238</b> · 226.9 s · der -&gt; izq · car · id 865 </div>
+  <div class="opciones"><label><input type="radio" name="m238" value="bien" checked> Bien</label><label><input type="radio" name="m238" value="doble"> Doble</label><label><input type="radio" name="m238" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m238" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="239" data-id="871" data-segundo="227.0">
+  <img src="239.jpg" loading="lazy" alt="#239">
+  <div class="datos"><b>#239</b> · 227.0 s · izq -&gt; der · car · id 871 </div>
+  <div class="opciones"><label><input type="radio" name="m239" value="bien" checked> Bien</label><label><input type="radio" name="m239" value="doble"> Doble</label><label><input type="radio" name="m239" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m239" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="240" data-id="883" data-segundo="227.9">
+  <img src="240.jpg" loading="lazy" alt="#240">
+  <div class="datos"><b>#240</b> · 227.9 s · der -&gt; izq · car · id 883 <span class="aviso">posible doble</span></div>
+  <div class="opciones"><label><input type="radio" name="m240" value="bien" checked> Bien</label><label><input type="radio" name="m240" value="doble"> Doble</label><label><input type="radio" name="m240" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m240" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="241" data-id="869" data-segundo="228.1">
+  <img src="241.jpg" loading="lazy" alt="#241">
+  <div class="datos"><b>#241</b> · 228.1 s · der -&gt; izq · car · id 869 <span class="aviso">posible doble</span></div>
+  <div class="opciones"><label><input type="radio" name="m241" value="bien" checked> Bien</label><label><input type="radio" name="m241" value="doble"> Doble</label><label><input type="radio" name="m241" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m241" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="242" data-id="879" data-segundo="228.4">
+  <img src="242.jpg" loading="lazy" alt="#242">
+  <div class="datos"><b>#242</b> · 228.4 s · izq -&gt; der · car · id 879 </div>
+  <div class="opciones"><label><input type="radio" name="m242" value="bien" checked> Bien</label><label><input type="radio" name="m242" value="doble"> Doble</label><label><input type="radio" name="m242" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m242" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="243" data-id="888" data-segundo="229.2">
+  <img src="243.jpg" loading="lazy" alt="#243">
+  <div class="datos"><b>#243</b> · 229.2 s · der -&gt; izq · car · id 888 </div>
+  <div class="opciones"><label><input type="radio" name="m243" value="bien" checked> Bien</label><label><input type="radio" name="m243" value="doble"> Doble</label><label><input type="radio" name="m243" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m243" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="244" data-id="887" data-segundo="229.5">
+  <img src="244.jpg" loading="lazy" alt="#244">
+  <div class="datos"><b>#244</b> · 229.5 s · der -&gt; izq · car · id 887 <span class="aviso">posible doble</span></div>
+  <div class="opciones"><label><input type="radio" name="m244" value="bien" checked> Bien</label><label><input type="radio" name="m244" value="doble"> Doble</label><label><input type="radio" name="m244" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m244" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="245" data-id="841" data-segundo="229.7">
+  <img src="245.jpg" loading="lazy" alt="#245">
+  <div class="datos"><b>#245</b> · 229.7 s · der -&gt; izq · car · id 841 <span class="aviso">posible doble</span></div>
+  <div class="opciones"><label><input type="radio" name="m245" value="bien" checked> Bien</label><label><input type="radio" name="m245" value="doble"> Doble</label><label><input type="radio" name="m245" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m245" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="246" data-id="889" data-segundo="230.4">
+  <img src="246.jpg" loading="lazy" alt="#246">
+  <div class="datos"><b>#246</b> · 230.4 s · izq -&gt; der · car · id 889 </div>
+  <div class="opciones"><label><input type="radio" name="m246" value="bien" checked> Bien</label><label><input type="radio" name="m246" value="doble"> Doble</label><label><input type="radio" name="m246" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m246" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="247" data-id="873" data-segundo="230.6">
+  <img src="247.jpg" loading="lazy" alt="#247">
+  <div class="datos"><b>#247</b> · 230.6 s · der -&gt; izq · car · id 873 </div>
+  <div class="opciones"><label><input type="radio" name="m247" value="bien" checked> Bien</label><label><input type="radio" name="m247" value="doble"> Doble</label><label><input type="radio" name="m247" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m247" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="248" data-id="860" data-segundo="230.9">
+  <img src="248.jpg" loading="lazy" alt="#248">
+  <div class="datos"><b>#248</b> · 230.9 s · der -&gt; izq · car · id 860 </div>
+  <div class="opciones"><label><input type="radio" name="m248" value="bien" checked> Bien</label><label><input type="radio" name="m248" value="doble"> Doble</label><label><input type="radio" name="m248" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m248" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="249" data-id="897" data-segundo="232.0">
+  <img src="249.jpg" loading="lazy" alt="#249">
+  <div class="datos"><b>#249</b> · 232.0 s · izq -&gt; der · car · id 897 </div>
+  <div class="opciones"><label><input type="radio" name="m249" value="bien" checked> Bien</label><label><input type="radio" name="m249" value="doble"> Doble</label><label><input type="radio" name="m249" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m249" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="250" data-id="909" data-segundo="232.7">
+  <img src="250.jpg" loading="lazy" alt="#250">
+  <div class="datos"><b>#250</b> · 232.7 s · der -&gt; izq · car · id 909 </div>
+  <div class="opciones"><label><input type="radio" name="m250" value="bien" checked> Bien</label><label><input type="radio" name="m250" value="doble"> Doble</label><label><input type="radio" name="m250" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m250" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="251" data-id="904" data-segundo="232.7">
+  <img src="251.jpg" loading="lazy" alt="#251">
+  <div class="datos"><b>#251</b> · 232.7 s · izq -&gt; der · car · id 904 </div>
+  <div class="opciones"><label><input type="radio" name="m251" value="bien" checked> Bien</label><label><input type="radio" name="m251" value="doble"> Doble</label><label><input type="radio" name="m251" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m251" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="252" data-id="911" data-segundo="233.6">
+  <img src="252.jpg" loading="lazy" alt="#252">
+  <div class="datos"><b>#252</b> · 233.6 s · der -&gt; izq · car · id 911 </div>
+  <div class="opciones"><label><input type="radio" name="m252" value="bien" checked> Bien</label><label><input type="radio" name="m252" value="doble"> Doble</label><label><input type="radio" name="m252" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m252" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="253" data-id="903" data-segundo="233.9">
+  <img src="253.jpg" loading="lazy" alt="#253">
+  <div class="datos"><b>#253</b> · 233.9 s · der -&gt; izq · car · id 903 <span class="aviso">posible doble</span></div>
+  <div class="opciones"><label><input type="radio" name="m253" value="bien" checked> Bien</label><label><input type="radio" name="m253" value="doble"> Doble</label><label><input type="radio" name="m253" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m253" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="254" data-id="891" data-segundo="234.2">
+  <img src="254.jpg" loading="lazy" alt="#254">
+  <div class="datos"><b>#254</b> · 234.2 s · der -&gt; izq · car · id 891 <span class="aviso">posible doble</span></div>
+  <div class="opciones"><label><input type="radio" name="m254" value="bien" checked> Bien</label><label><input type="radio" name="m254" value="doble"> Doble</label><label><input type="radio" name="m254" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m254" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="255" data-id="923" data-segundo="235.4">
+  <img src="255.jpg" loading="lazy" alt="#255">
+  <div class="datos"><b>#255</b> · 235.4 s · der -&gt; izq · car · id 923 </div>
+  <div class="opciones"><label><input type="radio" name="m255" value="bien" checked> Bien</label><label><input type="radio" name="m255" value="doble"> Doble</label><label><input type="radio" name="m255" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m255" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="256" data-id="927" data-segundo="235.7">
+  <img src="256.jpg" loading="lazy" alt="#256">
+  <div class="datos"><b>#256</b> · 235.7 s · izq -&gt; der · car · id 927 </div>
+  <div class="opciones"><label><input type="radio" name="m256" value="bien" checked> Bien</label><label><input type="radio" name="m256" value="doble"> Doble</label><label><input type="radio" name="m256" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m256" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="257" data-id="921" data-segundo="235.7">
+  <img src="257.jpg" loading="lazy" alt="#257">
+  <div class="datos"><b>#257</b> · 235.7 s · izq -&gt; der · car · id 921 </div>
+  <div class="opciones"><label><input type="radio" name="m257" value="bien" checked> Bien</label><label><input type="radio" name="m257" value="doble"> Doble</label><label><input type="radio" name="m257" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m257" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="258" data-id="928" data-segundo="236.1">
+  <img src="258.jpg" loading="lazy" alt="#258">
+  <div class="datos"><b>#258</b> · 236.1 s · izq -&gt; der · car · id 928 </div>
+  <div class="opciones"><label><input type="radio" name="m258" value="bien" checked> Bien</label><label><input type="radio" name="m258" value="doble"> Doble</label><label><input type="radio" name="m258" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m258" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="259" data-id="917" data-segundo="236.1">
+  <img src="259.jpg" loading="lazy" alt="#259">
+  <div class="datos"><b>#259</b> · 236.1 s · izq -&gt; der · truck · id 917 </div>
+  <div class="opciones"><label><input type="radio" name="m259" value="bien" checked> Bien</label><label><input type="radio" name="m259" value="doble"> Doble</label><label><input type="radio" name="m259" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m259" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="260" data-id="910" data-segundo="236.7">
+  <img src="260.jpg" loading="lazy" alt="#260">
+  <div class="datos"><b>#260</b> · 236.7 s · der -&gt; izq · car · id 910 </div>
+  <div class="opciones"><label><input type="radio" name="m260" value="bien" checked> Bien</label><label><input type="radio" name="m260" value="doble"> Doble</label><label><input type="radio" name="m260" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m260" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="261" data-id="925" data-segundo="237.3">
+  <img src="261.jpg" loading="lazy" alt="#261">
+  <div class="datos"><b>#261</b> · 237.3 s · der -&gt; izq · car · id 925 </div>
+  <div class="opciones"><label><input type="radio" name="m261" value="bien" checked> Bien</label><label><input type="radio" name="m261" value="doble"> Doble</label><label><input type="radio" name="m261" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m261" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="262" data-id="936" data-segundo="238.0">
+  <img src="262.jpg" loading="lazy" alt="#262">
+  <div class="datos"><b>#262</b> · 238.0 s · der -&gt; izq · car · id 936 </div>
+  <div class="opciones"><label><input type="radio" name="m262" value="bien" checked> Bien</label><label><input type="radio" name="m262" value="doble"> Doble</label><label><input type="radio" name="m262" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m262" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="263" data-id="938" data-segundo="238.5">
+  <img src="263.jpg" loading="lazy" alt="#263">
+  <div class="datos"><b>#263</b> · 238.5 s · der -&gt; izq · car · id 938 </div>
+  <div class="opciones"><label><input type="radio" name="m263" value="bien" checked> Bien</label><label><input type="radio" name="m263" value="doble"> Doble</label><label><input type="radio" name="m263" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m263" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="264" data-id="916" data-segundo="238.6">
+  <img src="264.jpg" loading="lazy" alt="#264">
+  <div class="datos"><b>#264</b> · 238.6 s · izq -&gt; der · car · id 916 </div>
+  <div class="opciones"><label><input type="radio" name="m264" value="bien" checked> Bien</label><label><input type="radio" name="m264" value="doble"> Doble</label><label><input type="radio" name="m264" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m264" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="265" data-id="931" data-segundo="239.8">
+  <img src="265.jpg" loading="lazy" alt="#265">
+  <div class="datos"><b>#265</b> · 239.8 s · der -&gt; izq · car · id 931 <span class="aviso">posible doble</span></div>
+  <div class="opciones"><label><input type="radio" name="m265" value="bien" checked> Bien</label><label><input type="radio" name="m265" value="doble"> Doble</label><label><input type="radio" name="m265" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m265" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="266" data-id="932" data-segundo="240.0">
+  <img src="266.jpg" loading="lazy" alt="#266">
+  <div class="datos"><b>#266</b> · 240.0 s · der -&gt; izq · car · id 932 <span class="aviso">posible doble</span></div>
+  <div class="opciones"><label><input type="radio" name="m266" value="bien" checked> Bien</label><label><input type="radio" name="m266" value="doble"> Doble</label><label><input type="radio" name="m266" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m266" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="267" data-id="950" data-segundo="240.4">
+  <img src="267.jpg" loading="lazy" alt="#267">
+  <div class="datos"><b>#267</b> · 240.4 s · izq -&gt; der · car · id 950 </div>
+  <div class="opciones"><label><input type="radio" name="m267" value="bien" checked> Bien</label><label><input type="radio" name="m267" value="doble"> Doble</label><label><input type="radio" name="m267" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m267" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="268" data-id="943" data-segundo="240.4">
+  <img src="268.jpg" loading="lazy" alt="#268">
+  <div class="datos"><b>#268</b> · 240.4 s · izq -&gt; der · truck · id 943 </div>
+  <div class="opciones"><label><input type="radio" name="m268" value="bien" checked> Bien</label><label><input type="radio" name="m268" value="doble"> Doble</label><label><input type="radio" name="m268" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m268" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="269" data-id="930" data-segundo="240.8">
+  <img src="269.jpg" loading="lazy" alt="#269">
+  <div class="datos"><b>#269</b> · 240.8 s · der -&gt; izq · car · id 930 <span class="aviso">posible doble</span></div>
+  <div class="opciones"><label><input type="radio" name="m269" value="bien" checked> Bien</label><label><input type="radio" name="m269" value="doble"> Doble</label><label><input type="radio" name="m269" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m269" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="270" data-id="934" data-segundo="241.1">
+  <img src="270.jpg" loading="lazy" alt="#270">
+  <div class="datos"><b>#270</b> · 241.1 s · der -&gt; izq · car · id 934 <span class="aviso">posible doble</span></div>
+  <div class="opciones"><label><input type="radio" name="m270" value="bien" checked> Bien</label><label><input type="radio" name="m270" value="doble"> Doble</label><label><input type="radio" name="m270" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m270" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="271" data-id="949" data-segundo="241.5">
+  <img src="271.jpg" loading="lazy" alt="#271">
+  <div class="datos"><b>#271</b> · 241.5 s · izq -&gt; der · truck · id 949 </div>
+  <div class="opciones"><label><input type="radio" name="m271" value="bien" checked> Bien</label><label><input type="radio" name="m271" value="doble"> Doble</label><label><input type="radio" name="m271" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m271" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="272" data-id="944" data-segundo="241.5">
+  <img src="272.jpg" loading="lazy" alt="#272">
+  <div class="datos"><b>#272</b> · 241.5 s · izq -&gt; der · car · id 944 </div>
+  <div class="opciones"><label><input type="radio" name="m272" value="bien" checked> Bien</label><label><input type="radio" name="m272" value="doble"> Doble</label><label><input type="radio" name="m272" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m272" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="273" data-id="954" data-segundo="242.5">
+  <img src="273.jpg" loading="lazy" alt="#273">
+  <div class="datos"><b>#273</b> · 242.5 s · der -&gt; izq · car · id 954 </div>
+  <div class="opciones"><label><input type="radio" name="m273" value="bien" checked> Bien</label><label><input type="radio" name="m273" value="doble"> Doble</label><label><input type="radio" name="m273" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m273" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="274" data-id="963" data-segundo="245.2">
+  <img src="274.jpg" loading="lazy" alt="#274">
+  <div class="datos"><b>#274</b> · 245.2 s · izq -&gt; der · car · id 963 </div>
+  <div class="opciones"><label><input type="radio" name="m274" value="bien" checked> Bien</label><label><input type="radio" name="m274" value="doble"> Doble</label><label><input type="radio" name="m274" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m274" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="275" data-id="948" data-segundo="245.6">
+  <img src="275.jpg" loading="lazy" alt="#275">
+  <div class="datos"><b>#275</b> · 245.6 s · der -&gt; izq · car · id 948 </div>
+  <div class="opciones"><label><input type="radio" name="m275" value="bien" checked> Bien</label><label><input type="radio" name="m275" value="doble"> Doble</label><label><input type="radio" name="m275" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m275" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="276" data-id="972" data-segundo="248.3">
+  <img src="276.jpg" loading="lazy" alt="#276">
+  <div class="datos"><b>#276</b> · 248.3 s · der -&gt; izq · car · id 972 </div>
+  <div class="opciones"><label><input type="radio" name="m276" value="bien" checked> Bien</label><label><input type="radio" name="m276" value="doble"> Doble</label><label><input type="radio" name="m276" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m276" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="277" data-id="977" data-segundo="248.9">
+  <img src="277.jpg" loading="lazy" alt="#277">
+  <div class="datos"><b>#277</b> · 248.9 s · der -&gt; izq · car · id 977 </div>
+  <div class="opciones"><label><input type="radio" name="m277" value="bien" checked> Bien</label><label><input type="radio" name="m277" value="doble"> Doble</label><label><input type="radio" name="m277" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m277" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="278" data-id="981" data-segundo="249.6">
+  <img src="278.jpg" loading="lazy" alt="#278">
+  <div class="datos"><b>#278</b> · 249.6 s · der -&gt; izq · car · id 981 </div>
+  <div class="opciones"><label><input type="radio" name="m278" value="bien" checked> Bien</label><label><input type="radio" name="m278" value="doble"> Doble</label><label><input type="radio" name="m278" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m278" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="279" data-id="985" data-segundo="252.1">
+  <img src="279.jpg" loading="lazy" alt="#279">
+  <div class="datos"><b>#279</b> · 252.1 s · izq -&gt; der · truck · id 985 </div>
+  <div class="opciones"><label><input type="radio" name="m279" value="bien" checked> Bien</label><label><input type="radio" name="m279" value="doble"> Doble</label><label><input type="radio" name="m279" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m279" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="280" data-id="996" data-segundo="253.1">
+  <img src="280.jpg" loading="lazy" alt="#280">
+  <div class="datos"><b>#280</b> · 253.1 s · izq -&gt; der · truck · id 996 </div>
+  <div class="opciones"><label><input type="radio" name="m280" value="bien" checked> Bien</label><label><input type="radio" name="m280" value="doble"> Doble</label><label><input type="radio" name="m280" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m280" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="281" data-id="986" data-segundo="253.1">
+  <img src="281.jpg" loading="lazy" alt="#281">
+  <div class="datos"><b>#281</b> · 253.1 s · izq -&gt; der · car · id 986 </div>
+  <div class="opciones"><label><input type="radio" name="m281" value="bien" checked> Bien</label><label><input type="radio" name="m281" value="doble"> Doble</label><label><input type="radio" name="m281" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m281" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="282" data-id="980" data-segundo="253.3">
+  <img src="282.jpg" loading="lazy" alt="#282">
+  <div class="datos"><b>#282</b> · 253.3 s · der -&gt; izq · car · id 980 </div>
+  <div class="opciones"><label><input type="radio" name="m282" value="bien" checked> Bien</label><label><input type="radio" name="m282" value="doble"> Doble</label><label><input type="radio" name="m282" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m282" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="283" data-id="1021" data-segundo="254.3">
+  <img src="283.jpg" loading="lazy" alt="#283">
+  <div class="datos"><b>#283</b> · 254.3 s · izq -&gt; der · car · id 1021 </div>
+  <div class="opciones"><label><input type="radio" name="m283" value="bien" checked> Bien</label><label><input type="radio" name="m283" value="doble"> Doble</label><label><input type="radio" name="m283" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m283" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="284" data-id="1024" data-segundo="254.7">
+  <img src="284.jpg" loading="lazy" alt="#284">
+  <div class="datos"><b>#284</b> · 254.7 s · izq -&gt; der · car · id 1024 </div>
+  <div class="opciones"><label><input type="radio" name="m284" value="bien" checked> Bien</label><label><input type="radio" name="m284" value="doble"> Doble</label><label><input type="radio" name="m284" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m284" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="285" data-id="1026" data-segundo="254.8">
+  <img src="285.jpg" loading="lazy" alt="#285">
+  <div class="datos"><b>#285</b> · 254.8 s · izq -&gt; der · truck · id 1026 </div>
+  <div class="opciones"><label><input type="radio" name="m285" value="bien" checked> Bien</label><label><input type="radio" name="m285" value="doble"> Doble</label><label><input type="radio" name="m285" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m285" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="286" data-id="1031" data-segundo="254.8">
+  <img src="286.jpg" loading="lazy" alt="#286">
+  <div class="datos"><b>#286</b> · 254.8 s · izq -&gt; der · truck · id 1031 </div>
+  <div class="opciones"><label><input type="radio" name="m286" value="bien" checked> Bien</label><label><input type="radio" name="m286" value="doble"> Doble</label><label><input type="radio" name="m286" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m286" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="287" data-id="1041" data-segundo="256.9">
+  <img src="287.jpg" loading="lazy" alt="#287">
+  <div class="datos"><b>#287</b> · 256.9 s · der -&gt; izq · truck · id 1041 </div>
+  <div class="opciones"><label><input type="radio" name="m287" value="bien" checked> Bien</label><label><input type="radio" name="m287" value="doble"> Doble</label><label><input type="radio" name="m287" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m287" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="288" data-id="1043" data-segundo="257.4">
+  <img src="288.jpg" loading="lazy" alt="#288">
+  <div class="datos"><b>#288</b> · 257.4 s · der -&gt; izq · car · id 1043 </div>
+  <div class="opciones"><label><input type="radio" name="m288" value="bien" checked> Bien</label><label><input type="radio" name="m288" value="doble"> Doble</label><label><input type="radio" name="m288" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m288" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="289" data-id="1025" data-segundo="257.7">
+  <img src="289.jpg" loading="lazy" alt="#289">
+  <div class="datos"><b>#289</b> · 257.7 s · izq -&gt; der · car · id 1025 </div>
+  <div class="opciones"><label><input type="radio" name="m289" value="bien" checked> Bien</label><label><input type="radio" name="m289" value="doble"> Doble</label><label><input type="radio" name="m289" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m289" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="290" data-id="1042" data-segundo="260.2">
+  <img src="290.jpg" loading="lazy" alt="#290">
+  <div class="datos"><b>#290</b> · 260.2 s · der -&gt; izq · car · id 1042 </div>
+  <div class="opciones"><label><input type="radio" name="m290" value="bien" checked> Bien</label><label><input type="radio" name="m290" value="doble"> Doble</label><label><input type="radio" name="m290" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m290" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="izq-der" data-numero="291" data-id="1045" data-segundo="260.2">
+  <img src="291.jpg" loading="lazy" alt="#291">
+  <div class="datos"><b>#291</b> · 260.2 s · izq -&gt; der · car · id 1045 </div>
+  <div class="opciones"><label><input type="radio" name="m291" value="bien" checked> Bien</label><label><input type="radio" name="m291" value="doble"> Doble</label><label><input type="radio" name="m291" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m291" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="292" data-id="1056" data-segundo="260.7">
+  <img src="292.jpg" loading="lazy" alt="#292">
+  <div class="datos"><b>#292</b> · 260.7 s · der -&gt; izq · car · id 1056 <span class="aviso">posible doble</span></div>
+  <div class="opciones"><label><input type="radio" name="m292" value="bien" checked> Bien</label><label><input type="radio" name="m292" value="doble"> Doble</label><label><input type="radio" name="m292" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m292" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="293" data-id="1038" data-segundo="260.9">
+  <img src="293.jpg" loading="lazy" alt="#293">
+  <div class="datos"><b>#293</b> · 260.9 s · der -&gt; izq · truck · id 1038 <span class="aviso">posible doble</span></div>
+  <div class="opciones"><label><input type="radio" name="m293" value="bien" checked> Bien</label><label><input type="radio" name="m293" value="doble"> Doble</label><label><input type="radio" name="m293" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m293" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="294" data-id="1061" data-segundo="264.5">
+  <img src="294.jpg" loading="lazy" alt="#294">
+  <div class="datos"><b>#294</b> · 264.5 s · der -&gt; izq · car · id 1061 </div>
+  <div class="opciones"><label><input type="radio" name="m294" value="bien" checked> Bien</label><label><input type="radio" name="m294" value="doble"> Doble</label><label><input type="radio" name="m294" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m294" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="295" data-id="1073" data-segundo="266.0">
+  <img src="295.jpg" loading="lazy" alt="#295">
+  <div class="datos"><b>#295</b> · 266.0 s · der -&gt; izq · car · id 1073 </div>
+  <div class="opciones"><label><input type="radio" name="m295" value="bien" checked> Bien</label><label><input type="radio" name="m295" value="doble"> Doble</label><label><input type="radio" name="m295" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m295" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="296" data-id="1088" data-segundo="271.3">
+  <img src="296.jpg" loading="lazy" alt="#296">
+  <div class="datos"><b>#296</b> · 271.3 s · der -&gt; izq · truck · id 1088 </div>
+  <div class="opciones"><label><input type="radio" name="m296" value="bien" checked> Bien</label><label><input type="radio" name="m296" value="doble"> Doble</label><label><input type="radio" name="m296" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m296" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="297" data-id="1097" data-segundo="272.4">
+  <img src="297.jpg" loading="lazy" alt="#297">
+  <div class="datos"><b>#297</b> · 272.4 s · der -&gt; izq · car · id 1097 </div>
+  <div class="opciones"><label><input type="radio" name="m297" value="bien" checked> Bien</label><label><input type="radio" name="m297" value="doble"> Doble</label><label><input type="radio" name="m297" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m297" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="298" data-id="1108" data-segundo="273.7">
+  <img src="298.jpg" loading="lazy" alt="#298">
+  <div class="datos"><b>#298</b> · 273.7 s · der -&gt; izq · car · id 1108 </div>
+  <div class="opciones"><label><input type="radio" name="m298" value="bien" checked> Bien</label><label><input type="radio" name="m298" value="doble"> Doble</label><label><input type="radio" name="m298" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m298" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="299" data-id="1143" data-segundo="289.9">
+  <img src="299.jpg" loading="lazy" alt="#299">
+  <div class="datos"><b>#299</b> · 289.9 s · der -&gt; izq · car · id 1143 </div>
+  <div class="opciones"><label><input type="radio" name="m299" value="bien" checked> Bien</label><label><input type="radio" name="m299" value="doble"> Doble</label><label><input type="radio" name="m299" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m299" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="300" data-id="1145" data-segundo="290.6">
+  <img src="300.jpg" loading="lazy" alt="#300">
+  <div class="datos"><b>#300</b> · 290.6 s · der -&gt; izq · car · id 1145 </div>
+  <div class="opciones"><label><input type="radio" name="m300" value="bien" checked> Bien</label><label><input type="radio" name="m300" value="doble"> Doble</label><label><input type="radio" name="m300" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m300" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="301" data-id="1124" data-segundo="294.7">
+  <img src="301.jpg" loading="lazy" alt="#301">
+  <div class="datos"><b>#301</b> · 294.7 s · der -&gt; izq · truck · id 1124 <span class="aviso">posible doble</span></div>
+  <div class="opciones"><label><input type="radio" name="m301" value="bien" checked> Bien</label><label><input type="radio" name="m301" value="doble"> Doble</label><label><input type="radio" name="m301" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m301" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="302" data-id="1154" data-segundo="294.8">
+  <img src="302.jpg" loading="lazy" alt="#302">
+  <div class="datos"><b>#302</b> · 294.8 s · der -&gt; izq · truck · id 1154 <span class="aviso">posible doble</span></div>
+  <div class="opciones"><label><input type="radio" name="m302" value="bien" checked> Bien</label><label><input type="radio" name="m302" value="doble"> Doble</label><label><input type="radio" name="m302" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m302" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="303" data-id="1142" data-segundo="294.8">
+  <img src="303.jpg" loading="lazy" alt="#303">
+  <div class="datos"><b>#303</b> · 294.8 s · der -&gt; izq · truck · id 1142 <span class="aviso">posible doble</span></div>
+  <div class="opciones"><label><input type="radio" name="m303" value="bien" checked> Bien</label><label><input type="radio" name="m303" value="doble"> Doble</label><label><input type="radio" name="m303" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m303" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="304" data-id="1160" data-segundo="296.7">
+  <img src="304.jpg" loading="lazy" alt="#304">
+  <div class="datos"><b>#304</b> · 296.7 s · der -&gt; izq · car · id 1160 </div>
+  <div class="opciones"><label><input type="radio" name="m304" value="bien" checked> Bien</label><label><input type="radio" name="m304" value="doble"> Doble</label><label><input type="radio" name="m304" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m304" value="otro_sentido"> Otro sentido</label></div>
+</div>
+<div class="tarjeta" data-sentido="der-izq" data-numero="305" data-id="1159" data-segundo="299.0">
+  <img src="305.jpg" loading="lazy" alt="#305">
+  <div class="datos"><b>#305</b> · 299.0 s · der -&gt; izq · car · id 1159 </div>
+  <div class="opciones"><label><input type="radio" name="m305" value="bien" checked> Bien</label><label><input type="radio" name="m305" value="doble"> Doble</label><label><input type="radio" name="m305" value="no_vehiculo"> No es vehículo</label><label><input type="radio" name="m305" value="otro_sentido"> Otro sentido</label></div>
+</div></div>
+<script>
+const tarjetas = [...document.querySelectorAll('.tarjeta')];
+function marca(t) { return t.querySelector('input:checked').value; }
+function actualizar() {
+  const f = document.getElementById('filtro').value, dobles = document.getElementById('solo_dobles').checked;
+  let n = 0, mal = 0;
+  for (const t of tarjetas) {
+    const ver = (f === 'todos' || t.dataset.sentido === f) && (!dobles || t.querySelector('.aviso'));
+    t.classList.toggle('oculta', !ver);
+    t.classList.toggle('mal', marca(t) !== 'bien');
+    if (f === 'todos' || t.dataset.sentido === f) { n++; if (marca(t) !== 'bien') mal++; }
+  }
+  document.getElementById('cuenta').textContent = `${n} contados, ${mal} marcados mal, ${n - mal} bien`;
+}
+document.addEventListener('change', actualizar);
+document.getElementById('descargar').onclick = () => {
+  const filas = ['Numero,ID tracker,Segundo,Sentido,Marca'];
+  for (const t of tarjetas) filas.push([t.dataset.numero, t.dataset.id, t.dataset.segundo, t.dataset.sentido, marca(t)].join(','));
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([filas.join('\n')], {type: 'text/csv'}));
+  a.download = 'marcas_chihuahua_5min.csv';
+  a.click();
+};
+actualizar();
+</script></body></html>
