@@ -12,7 +12,9 @@ import argparse #leer argumentos de la terminal
 # Las marcas se descargan como CSV desde la misma pagina.
 
 # zona del recorte (coordenadas del video de 1280x720): la franja esta en x 800-860
-# y los autos recien contados quedan justo a un lado
+# y los autos recien contados suelen quedar justo a un lado. Si el reporte trae la
+# caja del auto, el recorte se centra en ella (un auto que el tracker perdio detras
+# de la columna puede contarse lejos de la franja) y la caja se marca en rojo.
 RECORTE_X = (520, 1140)
 RECORTE_Y = (230, 450)
 ESCALA = 1.5
@@ -31,8 +33,11 @@ def leer_reporte(ruta_csv):
                 break # despues de la lista viene el RESUMEN
             if fila[0] == "Numero":
                 continue
-            contados.append({"numero": int(fila[0]), "id": int(fila[1]), "segundo": float(fila[2]),
-                             "sentido": fila[3], "clase": fila[4]})
+            c = {"numero": int(fila[0]), "id": int(fila[1]), "segundo": float(fila[2]),
+                 "sentido": fila[3], "clase": fila[4], "caja": None}
+            if len(fila) >= 9: # reportes viejos no traen la caja
+                c["caja"] = tuple(int(v) for v in fila[5:9])
+            contados.append(c)
     return contados
 
 
@@ -65,7 +70,16 @@ def guardar_recortes(ruta_video, contados, carpeta):
             break
         frame_count += 1
         for c in por_frame.get(frame_count, []):
-            recorte = frame[RECORTE_Y[0]:RECORTE_Y[1], RECORTE_X[0]:RECORTE_X[1]]
+            x0, x1 = RECORTE_X
+            imagen = frame
+            if c["caja"] is not None:
+                bx1, by1, bx2, by2 = c["caja"]
+                ancho = x1 - x0
+                x0 = min(max((bx1 + bx2) // 2 - ancho // 2, 0), frame.shape[1] - ancho)
+                x1 = x0 + ancho
+                imagen = frame.copy()
+                cv2.rectangle(imagen, (bx1 - 3, by1 - 3), (bx2 + 3, by2 + 3), (0, 0, 255), 2)
+            recorte = imagen[RECORTE_Y[0]:RECORTE_Y[1], x0:x1]
             recorte = cv2.resize(recorte, None, fx=ESCALA, fy=ESCALA)
             c["imagen"] = f"{c['numero']:03d}.jpg"
             cv2.imwrite(os.path.join(carpeta, c["imagen"]), recorte, [cv2.IMWRITE_JPEG_QUALITY, 85])

@@ -3,6 +3,7 @@ import numpy as np #matrices y operaciones matemáticas
 from ultralytics import YOLO, RTDETR #importar modelo de yolo (o RT-DETR)
 from boxmot.trackers.bbox.ocsort import OcSort #mismo tracker que count_cars(E1) del TEC
 import torch #saber si hay GPU para el modelo de apariencia (ReID) de los otros trackers
+import torchvision #NMS para los cuadros de RT-DETR
 import csv #usar csv para reporte final
 import os #abrir rutas de archivos
 import argparse #leer argumentos de la terminal
@@ -150,7 +151,7 @@ def detector(video_path, mostrar, x_izq=FRANJA_X_IZQ, x_der=FRANJA_X_DER, max_ag
     oc_tracker = crear_tracker(tracker, max_age)
 
     ultimo_lado = {} # id del tracker -> ultimo lado ("izq"/"der") donde se le vio fuera de la franja
-    contados = [] # (numero, id, segundo, sentido, clase)
+    contados = [] # (numero, id, segundo, sentido, clase, x1, y1, x2, y2)
     id_contado = {} # id del tracker -> numero de conteo (cada ID cuenta una sola vez)
     conteo_sentido = {"izq -> der": 0, "der -> izq": 0}
     frame_count = 0
@@ -171,6 +172,13 @@ def detector(video_path, mostrar, x_izq=FRANJA_X_IZQ, x_der=FRANJA_X_DER, max_ag
         det_boxes = results[0].boxes.xyxy.cpu().numpy()
         det_conf = results[0].boxes.conf.cpu().numpy()
         det_cls = results[0].boxes.cls.cpu().numpy()
+        if len(det_boxes) > 1:
+            # RT-DETR no hace NMS (ignora iou y agnostic_nms) y a veces pone dos cuadros
+            # casi iguales sobre el mismo auto (ej. uno "car" y otro "truck"): el
+            # tracker les da dos IDs y el auto se cuenta doble. Se aplica aqui, sin
+            # importar la clase; con YOLO no cambia nada porque ya viene hecho.
+            quedan = torchvision.ops.nms(torch.from_numpy(det_boxes), torch.from_numpy(det_conf), iou).numpy()
+            det_boxes, det_conf, det_cls = det_boxes[quedan], det_conf[quedan], det_cls[quedan]
         if conf_arriba > conf:
             # confianza distinta por carril: abajo (izq -> der, autos tapados) basta con
             # conf; arriba de Y_SENTIDOS (der -> izq) se pide conf_arriba para no
@@ -205,7 +213,8 @@ def detector(video_path, mostrar, x_izq=FRANJA_X_IZQ, x_der=FRANJA_X_DER, max_ag
                         numero = len(contados) + 1
                         id_contado[id_obj] = numero
                         conteo_sentido[sentido] += 1
-                        contados.append((numero, id_obj, round(frame_count / fps, 1), sentido, nombres[int(cls)]))
+                        contados.append((numero, id_obj, round(frame_count / fps, 1), sentido, nombres[int(cls)],
+                                         int(xmin), int(ymin), int(xmax), int(ymax)))
                     ultimo_lado[id_obj] = lado
 
                 color = (0, 255, 0) if id_obj in id_contado else (200, 200, 200)
@@ -242,10 +251,11 @@ def detector(video_path, mostrar, x_izq=FRANJA_X_IZQ, x_der=FRANJA_X_DER, max_ag
         print(f"  {sentido}: {cantidad}")
 
     # lista de cada vehiculo contado con su segundo, para poder compararlo
-    # contra un conteo a mano viendo el video
+    # contra un conteo a mano viendo el video; la caja (x1..y2) es donde estaba al
+    # contarse, la usa hoja_revision.py
     with open(ruta_csv, mode="w", newline="") as csv_file:
         csv_writer = csv.writer(csv_file)
-        csv_writer.writerow(["Numero", "ID tracker", "Segundo", "Sentido", "Clase"])
+        csv_writer.writerow(["Numero", "ID tracker", "Segundo", "Sentido", "Clase", "x1", "y1", "x2", "y2"])
         csv_writer.writerows(contados)
         csv_writer.writerow([])
         csv_writer.writerow(["RESUMEN"])
