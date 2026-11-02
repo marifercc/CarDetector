@@ -80,13 +80,16 @@ def crear_tracker(nombre, max_age, umbral):
     raise ValueError(f"Tracker desconocido: {nombre}")
 
 
-def encimado(a, b):
-    # fraccion de la caja mas chica que queda dentro de la otra
+def dentro_de(a, b):
+    # fraccion de la caja a que queda dentro de la caja b (0 si a es mas grande que b)
+    area_a = (a[2] - a[0]) * (a[3] - a[1])
+    if area_a >= (b[2] - b[0]) * (b[3] - b[1]):
+        return 0.0
     ancho = min(a[2], b[2]) - max(a[0], b[0])
     alto = min(a[3], b[3]) - max(a[1], b[1])
     if ancho <= 0 or alto <= 0:
         return 0.0
-    return ancho * alto / min((a[2] - a[0]) * (a[3] - a[1]), (b[2] - b[0]) * (b[3] - b[1]))
+    return ancho * alto / area_a
 
 
 def lado_de(xc, yc, x_izq, x_der):
@@ -172,11 +175,11 @@ def detector(video_path, mostrar, x_izq=FRANJA_X_IZQ, x_der=FRANJA_X_DER, max_ag
     ultimo_lado = {} # id del tracker -> ultimo lado ("izq"/"der") donde se le vio fuera de la franja
     contados = [] # (numero, id, segundo, sentido, clase, x1, y1, x2, y2)
     id_contado = {} # id del tracker -> numero de conteo (cada ID cuenta una sola vez)
-    # Dos IDs sobre el mismo auto (un cuadro chico dentro de otro que el NMS no quita)
-    # cruzan la franja juntos: si un conteo cae a menos de SEG_DOBLE de otro del mismo
-    # sentido y su caja queda >= ENCIMADO_DOBLE dentro de la del otro, es el mismo auto
-    # y se le da el mismo numero. Dos autos reales en fila se enciman ~50-60%.
-    SEG_DOBLE, ENCIMADO_DOBLE = 0.2, 0.8
+    # Con conf baja aparecen cuadros sobre pedazos de un auto (ej. la cajuela) con su
+    # propio ID, que cruzan la franja un poco despues que el auto. Si al contarse la
+    # caja es mas chica y queda >= ENCIMADO_DOBLE dentro de la caja actual de un auto
+    # ya contado en el mismo sentido, es el mismo auto y se le da el mismo numero.
+    ENCIMADO_DOBLE = 0.8
     conteo_sentido = {"izq -> der": 0, "der -> izq": 0}
     frame_count = 0
 
@@ -224,6 +227,7 @@ def detector(video_path, mostrar, x_izq=FRANJA_X_IZQ, x_der=FRANJA_X_DER, max_ag
 
         if len(tracks) > 0:
             nombres = results[0].names
+            cajas_frame = {int(i): b for b, i in zip(tracks.xyxy, tracks.id)}
             for box, id_obj, cls, conf_obj in zip(tracks.xyxy, tracks.id, tracks.cls, tracks.conf):
                 id_obj = int(id_obj)
                 xmin, ymin, xmax, ymax = box
@@ -239,11 +243,12 @@ def detector(video_path, mostrar, x_izq=FRANJA_X_IZQ, x_der=FRANJA_X_DER, max_ag
                         sentido = "izq -> der" if lado == "der" else "der -> izq"
                         segundo = round(frame_count / fps, 1)
                         caja = (int(xmin), int(ymin), int(xmax), int(ymax))
-                        doble = next((c for c in reversed(contados)
-                                      if segundo - c[2] <= SEG_DOBLE and c[3] == sentido
-                                      and encimado(caja, c[5:9]) >= ENCIMADO_DOBLE), None)
+                        doble = next((id_contado[j] for j, b in cajas_frame.items()
+                                      if j != id_obj and j in id_contado
+                                      and contados[id_contado[j] - 1][3] == sentido
+                                      and dentro_de(caja, b) >= ENCIMADO_DOBLE), None)
                         if doble is not None:
-                            id_contado[id_obj] = doble[0]
+                            id_contado[id_obj] = doble
                         else:
                             numero = len(contados) + 1
                             id_contado[id_obj] = numero
