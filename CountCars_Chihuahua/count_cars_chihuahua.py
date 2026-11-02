@@ -28,12 +28,15 @@ W, H = 1280, 720 # mismo tamaño que en el TEC: las coordenadas estan en este es
 
 # --- CONFIGURACION DE DETECCION ---
 # Calibrada con chihuahua_5min.mp4 contra un conteo a mano (izq->der 152,
-# der->izq 153, total 305). Con estos valores da 140 / 165 / 305: ~8% de error
-# en cada sentido. Con YOLO11x y los parametros del TEC daba 110 / 150 / 260
-# (-28% en izq->der). Todas las pruebas estan en los reporte_chihuahua_5min_*.csv.
+# der->izq 153, total 305). Con estos valores da 154 / 158 / 312: +1% y +3%.
+# Con YOLO11x y los parametros del TEC daba 110 / 150 / 260 (-28% en izq->der).
+# Todas las pruebas estan en los reporte_chihuahua_5min_*.csv.
 #  - izq -> der va por los carriles cercanos y se detiene en el semaforo en 2-3
-#    filas: los autos de adentro quedan medio tapados por los de afuera. RT-DETR
-#    los detecta mejor que YOLO, y con conf 0.3 y max_age 90 (3 s) se recuperan mas.
+#    filas: los autos de adentro quedan medio tapados por los de afuera y salen
+#    con muy poca confianza, por eso conf 0.08. El conteo es sensible a este valor
+#    (conf 0.1 da 140, 0.12 da 135): falta validarlo con otro video contado a mano.
+#    Con conf tan baja aparecen cuadros dobles y sobre pedazos de autos; se quitan
+#    con NMS y al contar (ver ENCIMADO_DOBLE).
 #  - der -> izq va por el carril del fondo (centro y < Y_SENTIDOS) y ya contaba
 #    bien; ahi RT-DETR pone cuadros duplicados sobre partes del mismo auto, asi que
 #    se quitan los cuadros anidados y se pide conf 0.4.
@@ -42,7 +45,7 @@ DEFAULTS = {
     "max_age": 90,
     "imgsz": 640,
     "iou": 0.7,
-    "conf": 0.3, # carriles de abajo (izq -> der)
+    "conf": 0.08, # carriles de abajo (izq -> der)
     "conf_arriba": 0.4, # carril de arriba (der -> izq); 0 = misma conf que abajo
     "modelo": "rtdetr-x",
     "anidados": 0.9, # 0 = no quitar cuadros anidados
