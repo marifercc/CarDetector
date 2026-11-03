@@ -7,6 +7,7 @@ import torchvision #NMS para los cuadros de RT-DETR
 import csv #usar csv para reporte final
 import os #abrir rutas de archivos
 import argparse #leer argumentos de la terminal
+from preparar_etiquetado import tapar_fuera_de_calle #mismo recorte con que se entreno el modelo propio
 
 # --- FRANJA DE CONTEO ---
 # En este video (camara de lado, a traves de la reja) los autos cruzan todo el
@@ -154,6 +155,10 @@ def detector(video_path, mostrar, x_izq=FRANJA_X_IZQ, x_der=FRANJA_X_DER, max_ag
         model = RTDETR(os.path.join(ruta_base, f"{modelo}.pt"))
     else:
         model = YOLO(os.path.join(ruta_base, f"{modelo}.pt"))
+    # el modelo reentrenado con esta camara (entrenar_detector.py) tiene una sola
+    # clase "vehiculo" y se entreno con lo que no es calle tapado en gris
+    propio = "vehiculo" in model.names.values()
+    clases = None if propio else [2, 3, 5, 7]
     cap = cv2.VideoCapture(video_full_path)
     if not cap.isOpened():
         raise FileNotFoundError(f"No se pudo abrir el video: {video_full_path}")
@@ -196,7 +201,7 @@ def detector(video_path, mostrar, x_izq=FRANJA_X_IZQ, x_der=FRANJA_X_DER, max_ag
         # se predice con conf (la mas baja) y abajo se le pide conf_arriba al carril de
         # arriba; ver CONFIGURACION DE DETECCION para por que cada valor
         results = model.predict(
-            frame, classes=[2, 3, 5, 7], verbose=False,
+            tapar_fuera_de_calle(frame) if propio else frame, classes=clases, verbose=False,
             conf=conf, agnostic_nms=True, imgsz=imgsz, iou=iou
         )
         det_boxes = results[0].boxes.xyxy.cpu().numpy()
