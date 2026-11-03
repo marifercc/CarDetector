@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Etiquetado Chihuahua</title>
+<style>
+body { font-family: system-ui, sans-serif; margin: 12px; background: #222; color: #eee; }
+#barra { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 8px; }
+button { padding: 5px 10px; }
+canvas { display: block; cursor: crosshair; max-width: 100%; }
+#ayuda { font-size: 13px; color: #bbb; margin-top: 8px; line-height: 1.5; }
+.ok { color: #6d6; } .pend { color: #fc6; }
+kbd { background: #444; padding: 1px 5px; border-radius: 3px; }
+</style></head><body>
+<div id="barra">
+  <b id="titulo"></b> <span id="estado"></span>
+  <button id="ant">← Anterior</button>
+  <button id="sig">Listo, siguiente →</button>
+  <button id="pend">Ir al primero sin revisar</button>
+  <button id="exportar">Descargar etiquetas.json</button>
+  <label>Cargar: <input type="file" id="importar" accept=".json"></label>
+  <span id="progreso"></span>
+</div>
+<canvas id="lienzo"></canvas>
+<div id="ayuda">
+  <b>Marca todos los vehículos de la calle</b>, también los medio tapados por otros coches o por la reja, si se ve al menos una cuarta parte. La caja va sobre la parte que se ve.<br>
+  <b>Arrastra</b> en un espacio vacío para dibujar una caja · <b>clic derecho</b> sobre una caja para borrarla · <kbd>Z</kbd> deshacer ·
+  <kbd>D</kbd> / <kbd>→</kbd> listo y siguiente · <kbd>A</kbd> / <kbd>←</kbd> anterior.<br>
+  Borra las cajas que no son vehículo, las que tapan un pedazo de un coche que ya tiene su caja y las repetidas.
+  Amarillo = el modelo duda (confianza &lt; 0.5) · verde = seguro · azul = dibujada por ti.<br>
+  Se guarda solo en este navegador, pero <b>descarga etiquetas.json</b> de vez en cuando y al terminar: ese archivo es el que se usa para entrenar.
+</div>
+<script src="datos.js"></script>
+<script>
+const CLAVE = 'etiquetado_chihuahua_v1';
+const lienzo = document.getElementById('lienzo'), ctx = lienzo.getContext('2d');
+const [Y0, Y1] = FRANJA;
+let estado = { cajas: {}, revisados: {} }; // imagen -> [[x1,y1,x2,y2,conf|null]]
+try { const g = localStorage.getItem(CLAVE); if (g) estado = JSON.parse(g); } catch (e) {}
+for (const d of DATOS) if (!estado.cajas[d.imagen]) estado.cajas[d.imagen] = d.cajas.map(c => c.slice());
+let i = 0, img = new Image(), escala = 1, arrastre = null, historial = [];
+
+function guardar() { try { localStorage.setItem(CLAVE, JSON.stringify(estado)); } catch (e) {} }
+function actual() { return DATOS[i].imagen; }
+function cargar() {
+  historial = [];
+  img = new Image();
+  img.onload = dibujar;
+  img.src = 'frames/' + actual();
+  document.getElementById('titulo').textContent = `${i + 1} / ${DATOS.length} · ${actual()}`;
+  const rev = estado.revisados[actual()];
+  document.getElementById('estado').innerHTML = rev ? '<span class="ok">revisado</span>' : '<span class="pend">sin revisar</span>';
+  const n = Object.keys(estado.revisados).length;
+  document.getElementById('progreso').textContent = `${n} de ${DATOS.length} revisados`;
+}
+function dibujar() {
+  const ancho = Math.min(window.innerWidth - 24, 1900);
+  escala = ancho / 1280;
+  lienzo.width = ancho; lienzo.height = (Y1 - Y0) * escala;
+  ctx.drawImage(img, 0, Y0, 1280, Y1 - Y0, 0, 0, lienzo.width, lienzo.height);
+  ctx.lineWidth = 2; ctx.font = '12px sans-serif';
+  for (const c of estado.cajas[actual()]) {
+    const col = c[4] == null ? '#3af' : (c[4] < 0.5 ? '#fd3' : '#3e3');
+    ctx.strokeStyle = col;
+    ctx.strokeRect(c[0] * escala, (c[1] - Y0) * escala, (c[2] - c[0]) * escala, (c[3] - c[1]) * escala);
+    if (c[4] != null) { ctx.fillStyle = col; ctx.fillText(c[4].toFixed(2), c[0] * escala + 2, (c[1] - Y0) * escala - 3); }
+  }
+  if (arrastre) {
+    ctx.strokeStyle = '#3af'; ctx.setLineDash([5, 4]);
+    ctx.strokeRect(arrastre.x0, arrastre.y0, arrastre.x1 - arrastre.x0, arrastre.y1 - arrastre.y0);
+    ctx.setLineDash([]);
+  }
+}
+function aImagen(px, py) { return [px / escala, py / escala + Y0]; }
+function posicion(ev) { const r = lienzo.getBoundingClientRect(); return [(ev.clientX - r.left) * lienzo.width / r.width, (ev.clientY - r.top) * lienzo.height / r.height]; }
+function cajaEn(px, py) {
+  // la caja mas chica que contiene el punto (para poder borrar una adentro de otra)
+  const [x, y] = aImagen(px, py);
+  let mejor = -1, area = Infinity;
+  estado.cajas[actual()].forEach((c, k) => {
+    const a = (c[2] - c[0]) * (c[3] - c[1]);
+    if (x >= c[0] && x <= c[2] && y >= c[1] && y <= c[3] && a < area) { mejor = k; area = a; }
+  });
+  return mejor;
+}
+lienzo.addEventListener('contextmenu', ev => {
+  ev.preventDefault();
+  const k = cajaEn(...posicion(ev));
+  if (k >= 0) { historial.push(estado.cajas[actual()].map(c => c.slice())); estado.cajas[actual()].splice(k, 1); guardar(); dibujar(); }
+});
+lienzo.addEventListener('mousedown', ev => {
+  if (ev.button !== 0) return;
+  const [x, y] = posicion(ev); arrastre = { x0: x, y0: y, x1: x, y1: y };
+});
+window.addEventListener('mousemove', ev => { if (arrastre) { [arrastre.x1, arrastre.y1] = posicion(ev); dibujar(); } });
+window.addEventListener('mouseup', () => {
+  if (!arrastre) return;
+  const [ax, ay] = aImagen(Math.min(arrastre.x0, arrastre.x1), Math.min(arrastre.y0, arrastre.y1));
+  const [bx, by] = aImagen(Math.max(arrastre.x0, arrastre.x1), Math.max(arrastre.y0, arrastre.y1));
+  arrastre = null;
+  if (bx - ax >= 6 && by - ay >= 6) {
+    historial.push(estado.cajas[actual()].map(c => c.slice()));
+    estado.cajas[actual()].push([Math.round(Math.max(ax, 0)), Math.round(Math.max(ay, Y0)), Math.round(Math.min(bx, 1280)), Math.round(Math.min(by, Y1)), null]);
+    guardar();
+  }
+  dibujar();
+});
+function ir(k) { i = Math.max(0, Math.min(DATOS.length - 1, k)); cargar(); }
+function listo() { estado.revisados[actual()] = true; guardar(); ir(i + 1); }
+document.getElementById('sig').onclick = listo;
+document.getElementById('ant').onclick = () => ir(i - 1);
+document.getElementById('pend').onclick = () => { const k = DATOS.findIndex(d => !estado.revisados[d.imagen]); if (k >= 0) ir(k); };
+window.addEventListener('keydown', ev => {
+  if (ev.key === 'd' || ev.key === 'ArrowRight') listo();
+  else if (ev.key === 'a' || ev.key === 'ArrowLeft') ir(i - 1);
+  else if (ev.key === 'z' && historial.length) { estado.cajas[actual()] = historial.pop(); guardar(); dibujar(); }
+});
+window.addEventListener('resize', dibujar);
+document.getElementById('exportar').onclick = () => {
+  const salida = { franja: FRANJA, imagenes: {} };
+  for (const d of DATOS) if (estado.revisados[d.imagen]) salida.imagenes[d.imagen] = estado.cajas[d.imagen].map(c => c.slice(0, 4));
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([JSON.stringify(salida)], { type: 'application/json' }));
+  a.download = 'etiquetas.json'; a.click();
+};
+document.getElementById('importar').onchange = async ev => {
+  const f = ev.target.files[0]; if (!f) return;
+  const datos = JSON.parse(await f.text());
+  for (const [im, cajas] of Object.entries(datos.imagenes || {})) { estado.cajas[im] = cajas.map(c => [...c.slice(0, 4), null]); estado.revisados[im] = true; }
+  guardar(); cargar();
+};
+const k0 = DATOS.findIndex(d => !estado.revisados[d.imagen]);
+i = k0 >= 0 ? k0 : 0;
+cargar();
+</script></body></html>
