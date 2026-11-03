@@ -1,1 +1,2 @@
 *.mp4 filter=lfs diff=lfs merge=lfs -text
+CountCars_Chihuahua/rtdetr-chihuahua.pt filter=lfs diff=lfs merge=lfs -text

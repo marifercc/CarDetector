@@ -13,3 +13,8 @@ CountCars_Tec/resultado_trafico_intento1.mp4
 .venv/
 __pycache__/
 *.pyc
+
+# el modelo reentrenado con la camara de Chihuahua si se sube (por LFS): no se puede descargar
+!CountCars_Chihuahua/rtdetr-chihuahua.pt
+# se regenera con entrenar_detector.py a partir de etiquetado/
+CountCars_Chihuahua/dataset/
