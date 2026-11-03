@@ -45,12 +45,18 @@ if __name__ == "__main__":
         nombre_video = os.path.splitext(os.path.basename(ruta))[0]
         cap = cv2.VideoCapture(ruta)
         fps = cap.get(cv2.CAP_PROP_FPS)
+        # se lee frame por frame en vez de saltar con CAP_PROP_POS_FRAMES: en estos mp4
+        # el salto no cae en el frame exacto y las imagenes no cuadrarian con las
+        # trayectorias del contador (que lee frame por frame)
         t = t0
+        indice = -1
         while t < t1:
-            cap.set(cv2.CAP_PROP_POS_FRAMES, int(t * fps))
             ret, frame = cap.read()
             if not ret:
                 break
+            indice += 1
+            if indice < int(t * fps):
+                continue
             frame = tapar_fuera_de_calle(cv2.resize(frame, (W, H)))
             nombre = f"{nombre_video}_{int(t * 10):05d}.jpg"
             cv2.imwrite(os.path.join(carpeta, "frames", nombre), frame, [cv2.IMWRITE_JPEG_QUALITY, 92])

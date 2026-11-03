@@ -9,25 +9,30 @@ from collections import defaultdict
 # count_cars_chihuahua.py --trayectorias. Ventaja sobre las cajas de un solo frame:
 # si un auto se vio antes y despues de quedar tapado, su caja se rellena en los
 # frames donde el detector no lo vio, que son justo los que hay que ensenarle.
-# Se quitan trayectorias cortas (detecciones falsas sueltas), las que nunca se
-# mueven (letreros) y cajas que son un pedazo de otro auto.
+# Solo se usan trayectorias que en algun momento fueron claramente un auto (conf
+# >= MIN_CONF_MAX) y que se movieron: con la conf baja del contador salen
+# detecciones falsas que se repiten en la calle vacia o en la sombra de la reja, y
+# el tracker las junta en un ID. Tambien se quitan cajas que son pedazo de otro auto.
 # Escribe etiquetado/etiquetas_auto.json con el mismo formato que descarga
 # etiquetado/index.html, asi se puede revisar ahi con "Cargar".
 
 MIN_OBS = 10 # frames en que se detecto el ID
-MIN_MOVIMIENTO = 25 # px que se aleja de donde aparecio; menos = algo fijo (letrero)
-MAX_HUECO = 60 # frames (2 s) maximos a rellenar entre dos detecciones del mismo ID
+MIN_CONF_MAX = 0.5 # confianza que debe alcanzar el ID en al menos un frame
+MIN_MOVIMIENTO = 60 # px que se aleja de donde aparecio; menos = algo fijo o un fantasma
+MAX_HUECO = 15 # frames (0.5 s) maximos a rellenar; huecos mas largos suelen ser dos cosas distintas con el mismo ID
 DENTRO_PEDAZO = 0.8 # caja mas chica >= esto dentro de otra = pedazo del mismo auto
 
 
 def leer_trayectorias(ruta):
     tray = defaultdict(dict) # id -> frame -> caja
+    conf_max = defaultdict(float) # id -> confianza mas alta
     with open(ruta, newline="") as f:
         r = csv.reader(f)
         next(r)
-        for fr, i, x1, y1, x2, y2, _conf, _clase in r:
+        for fr, i, x1, y1, x2, y2, conf, _clase in r:
             tray[int(i)][int(fr)] = (int(x1), int(y1), int(x2), int(y2))
-    return tray
+            conf_max[int(i)] = max(conf_max[int(i)], float(conf))
+    return tray, conf_max
 
 
 def se_mueve(cajas):
@@ -84,9 +89,9 @@ if __name__ == "__main__":
         cap = cv2.VideoCapture(ruta_video)
         fps = cap.get(cv2.CAP_PROP_FPS)
         cap.release()
-        tray = leer_trayectorias(os.path.join(ruta_base, ruta_csv))
+        tray, conf_max = leer_trayectorias(os.path.join(ruta_base, ruta_csv))
         buenas = {i: t for i, t in tray.items()
-                  if len(t) >= MIN_OBS and se_mueve([t[f] for f in sorted(t)])}
+                  if len(t) >= MIN_OBS and conf_max[i] >= MIN_CONF_MAX and se_mueve([t[f] for f in sorted(t)])}
         print(f"{video}: {len(buenas)} de {len(tray)} IDs se usan")
         for d in datos:
             if not d["imagen"].startswith(video + "_"):
