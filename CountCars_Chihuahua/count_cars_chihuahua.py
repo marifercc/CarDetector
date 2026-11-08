@@ -132,7 +132,7 @@ def sin_anidados(boxes, umbral=0.9, y_max=None):
 def detector(video_path, mostrar, x_izq=FRANJA_X_IZQ, x_der=FRANJA_X_DER, max_age=DEFAULTS["max_age"],
              imgsz=DEFAULTS["imgsz"], iou=DEFAULTS["iou"], conf=DEFAULTS["conf"], modelo=DEFAULTS["modelo"],
              anidados=DEFAULTS["anidados"], conf_arriba=DEFAULTS["conf_arriba"], tracker=DEFAULTS["tracker"],
-             trayectorias=False):
+             trayectorias=False, guardar_video=True, carpeta_salida=None):
     ruta_base = os.path.dirname(os.path.abspath(__file__))
     video_full_path = video_path if os.path.isabs(video_path) else os.path.join(ruta_base, video_path)
     nombre = os.path.splitext(os.path.basename(video_full_path))[0]
@@ -165,14 +165,20 @@ def detector(video_path, mostrar, x_izq=FRANJA_X_IZQ, x_der=FRANJA_X_DER, max_ag
 
     fps = cap.get(cv2.CAP_PROP_FPS)
     # salidas con el nombre del video para no sobreescribir resultados de otros videos
-    ruta_video_salida = os.path.join(ruta_base, f"resultado_{nombre}.mp4")
-    ruta_csv = os.path.join(ruta_base, f"reporte_{nombre}.csv")
-    video_writer = cv2.VideoWriter(ruta_video_salida, cv2.VideoWriter_fourcc(*'mp4v'), fps, (W, H))
+    # para lotes de muchos videos: sin el video de salida (~650 MB cada uno) y con
+    # los reportes en otra carpeta
+    carpeta = carpeta_salida or ruta_base
+    os.makedirs(carpeta, exist_ok=True)
+    ruta_video_salida = os.path.join(carpeta, f"resultado_{nombre}.mp4")
+    ruta_csv = os.path.join(carpeta, f"reporte_{nombre}.csv")
+    video_writer = None
+    if guardar_video:
+        video_writer = cv2.VideoWriter(ruta_video_salida, cv2.VideoWriter_fourcc(*'mp4v'), fps, (W, H))
     # caja de cada ID en cada frame, para estudiar donde se cortan los recorridos
     # sin volver a correr el detector
     archivo_tray = None
     if trayectorias:
-        archivo_tray = open(os.path.join(ruta_base, f"trayectorias_{nombre}.csv"), "w", newline="")
+        archivo_tray = open(os.path.join(carpeta, f"trayectorias_{nombre}.csv"), "w", newline="")
         csv_tray = csv.writer(archivo_tray)
         csv_tray.writerow(["frame", "id", "x1", "y1", "x2", "y2", "conf", "clase"])
 
@@ -283,12 +289,14 @@ def detector(video_path, mostrar, x_izq=FRANJA_X_IZQ, x_der=FRANJA_X_DER, max_ag
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
 
-        video_writer.write(frame)
+        if video_writer:
+            video_writer.write(frame)
         if frame_count % int(fps * 10) == 0:
             print(f"  {frame_count / fps:.0f} s procesados, {len(contados)} contados")
 
     cap.release()
-    video_writer.release()
+    if video_writer:
+        video_writer.release()
     if archivo_tray:
         archivo_tray.close()
     cv2.destroyAllWindows()
@@ -313,7 +321,8 @@ def detector(video_path, mostrar, x_izq=FRANJA_X_IZQ, x_der=FRANJA_X_DER, max_ag
         csv_writer.writerow(["Total", len(contados)])
 
     print(f"Resultados guardados en: {ruta_csv}")
-    print(f"Video procesado guardado en: {ruta_video_salida}")
+    if video_writer:
+        print(f"Video procesado guardado en: {ruta_video_salida}")
 
 
 if __name__ == "__main__":
@@ -343,8 +352,12 @@ if __name__ == "__main__":
     parser.add_argument("--tracker", default=DEFAULTS["tracker"],
                         choices=["ocsort", "bytetrack", "botsort", "deepocsort", "strongsort"],
                         help=f"Tracker de boxmot (default {DEFAULTS['tracker']}).")
+    parser.add_argument("--sin-video", action="store_true",
+                        help="No guardar resultado_<nombre>.mp4 (para lotes de muchos videos).")
+    parser.add_argument("--carpeta-salida", help="Carpeta para los reportes (default la del script).")
     parser.add_argument("--trayectorias", action="store_true",
                         help="Guardar la caja de cada ID en cada frame en trayectorias_<nombre>.csv.")
     args = parser.parse_args()
     detector(args.video_path, not args.sin_ventana, *args.franja, args.max_age, args.imgsz, args.iou, args.conf,
-             args.modelo, args.anidados, args.conf_arriba, args.tracker, args.trayectorias)
+             args.modelo, args.anidados, args.conf_arriba, args.tracker, args.trayectorias,
+             not args.sin_video, args.carpeta_salida)

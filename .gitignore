@@ -18,3 +18,7 @@ __pycache__/
 !CountCars_Chihuahua/rtdetr-chihuahua.pt
 # se regenera con entrenar_detector.py a partir de etiquetado/
 CountCars_Chihuahua/dataset/
+
+# trayectorias del lote (~8 MB por video, se regeneran con lote_14oct.py)
+CountCars_Chihuahua/lote_14oct/trayectorias_*.csv
+CountCars_Chihuahua/lote_14oct/_videos/
