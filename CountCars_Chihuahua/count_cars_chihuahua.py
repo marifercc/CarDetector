@@ -52,9 +52,22 @@ DEFAULTS = {
     "anidados": 0.9, # 0 = no quitar cuadros anidados
     "tracker": "ocsort",
 }
+ENCIMADO_DOBLE = 0.8 # ver el bloque de los trackers en detector()
+# --modo-f1: busca el mejor F1 por vehiculo en vez del total por sentido mas cercano.
+# Ajustado con replay_conteo.py / busca_replay.py sobre chihuahua_5min.mp4 contra la
+# revision vehiculo por vehiculo: F1 0.88 -> 0.90 (izq -> der 0.78 -> 0.83, der -> izq
+# 0.97 -> 0.98). En izq -> der quita casi todos los dobles de la fila del semaforo
+# (33 -> 9 de mas) pero cuenta menos (124 vs 152 a mano): sirve para F1, no para el
+# total del aforo. Ojo: ajustado y medido en el mismo video.
+MODO_F1 = {
+    "conf": 0.06, # tracker de izq -> der
+    "iou_threshold": 0.5, # asociacion mas estricta: menos cambios de ID entre autos de la fila
+    "encimado": 0.6, # junta como doble una caja >= 60% dentro de la de un auto ya contado
+    "min_vistos": 15, # cuadros que se tiene que ver un ID antes de poder contarlo (ambos trackers)
+}
 
 
-def crear_tracker(nombre, max_age, umbral):
+def crear_tracker(nombre, max_age, umbral, iou_threshold=0.3):
     # OC-SORT (default) solo usa posicion y movimiento. BoT-SORT, DeepOC-SORT y
     # StrongSORT ademas comparan la apariencia del auto (modelo ReID), para no
     # cambiarle el ID cuando queda tapado un rato en la fila del semaforo.
@@ -62,7 +75,7 @@ def crear_tracker(nombre, max_age, umbral):
     # confianza y con los defaults de boxmot (0.45-0.6) no abririan track. Ojo: si
     # det_thresh queda arriba de conf, el tracker tira esas detecciones y bajar
     # conf no sirve de nada.
-    comunes = dict(det_thresh=umbral, max_age=max_age, min_hits=1, iou_threshold=0.3)
+    comunes = dict(det_thresh=umbral, max_age=max_age, min_hits=1, iou_threshold=iou_threshold)
     if nombre == "ocsort":
         return OcSort(**comunes)
     if nombre == "bytetrack":
@@ -132,7 +145,7 @@ def sin_anidados(boxes, umbral=0.9, y_max=None):
 def detector(video_path, mostrar, x_izq=FRANJA_X_IZQ, x_der=FRANJA_X_DER, max_age=DEFAULTS["max_age"],
              imgsz=DEFAULTS["imgsz"], iou=DEFAULTS["iou"], conf=DEFAULTS["conf"], modelo=DEFAULTS["modelo"],
              anidados=DEFAULTS["anidados"], conf_arriba=DEFAULTS["conf_arriba"], tracker=DEFAULTS["tracker"],
-             trayectorias=False, guardar_video=True, carpeta_salida=None):
+             trayectorias=False, guardar_video=True, carpeta_salida=None, modo_f1=False):
     ruta_base = os.path.dirname(os.path.abspath(__file__))
     video_full_path = video_path if os.path.isabs(video_path) else os.path.join(ruta_base, video_path)
     nombre = os.path.splitext(os.path.basename(video_full_path))[0]
@@ -145,6 +158,8 @@ def detector(video_path, mostrar, x_izq=FRANJA_X_IZQ, x_der=FRANJA_X_DER, max_ag
     for clave, valor in usados.items():
         if valor != DEFAULTS[clave]:
             nombre += f"_{clave.replace('_', '')}{valor}"
+    if modo_f1:
+        nombre += "_f1"
     print(f"Abriendo video: {video_full_path}")
     if modelo == "yolo11x":
         # el modelo vive en la carpeta del TEC (114 MB, para no tenerlo duplicado)
@@ -183,36 +198,35 @@ def detector(video_path, mostrar, x_izq=FRANJA_X_IZQ, x_der=FRANJA_X_DER, max_ag
         csv_tray.writerow(["frame", "id", "x1", "y1", "x2", "y2", "conf", "clase"])
 
     # mismos parametros que en el TEC, salvo max_age: aqui los autos se detienen en
-    # el semaforo y se tapan entre si, y con 30 frames (1 s) pierden el ID
-    oc_tracker = crear_tracker(tracker, max_age, conf)
-
-    ultimo_lado = {} # id del tracker -> ultimo lado ("izq"/"der") donde se le vio fuera de la franja
-    contados = [] # (numero, id, segundo, sentido, clase, x1, y1, x2, y2)
-    id_contado = {} # id del tracker -> numero de conteo (cada ID cuenta una sola vez)
+    # el semaforo y se tapan entre si, y con 30 frames (1 s) pierden el ID.
+    # Cada "conteo" es un tracker con su propio estado y los sentidos que cuenta.
+    # Normal: un solo tracker para los dos sentidos.
+    # modo_f1: dos trackers, cada uno con todas las detecciones; uno cuenta der -> izq
+    # (el de siempre, pero pide ver el auto MODO_F1["min_vistos"] cuadros antes de
+    # contarlo) y otro izq -> der con los ajustes de MODO_F1. Ver MODO_F1 arriba.
     # Con conf baja aparecen cuadros sobre pedazos de un auto (ej. la cajuela) con su
     # propio ID, que cruzan la franja un poco despues que el auto. Si al contarse la
-    # caja es mas chica y queda >= ENCIMADO_DOBLE dentro de la caja actual de un auto
-    # ya contado en el mismo sentido, es el mismo auto y se le da el mismo numero.
-    ENCIMADO_DOBLE = 0.8
+    # caja es mas chica y queda >= "encimado" dentro de la caja actual de un auto ya
+    # contado en el mismo sentido, es el mismo auto y se le da el mismo numero.
+    conteos = [dict(tracker=crear_tracker(tracker, max_age, conf), conf=conf, sentidos={"izq -> der", "der -> izq"},
+                    encimado=ENCIMADO_DOBLE, min_vistos=0, desfase=0)]
+    if modo_f1:
+        conteos[0].update(sentidos={"der -> izq"}, min_vistos=MODO_F1["min_vistos"])
+        conteos.append(dict(tracker=crear_tracker(tracker, max_age, MODO_F1["conf"], MODO_F1["iou_threshold"]),
+                            conf=MODO_F1["conf"], sentidos={"izq -> der"}, encimado=MODO_F1["encimado"],
+                            min_vistos=MODO_F1["min_vistos"], desfase=100000))
+    for c in conteos:
+        c.update(ultimo_lado={}, id_contado={}, vistos={}, otro_sentido=set())
+    conf_predice = min(c["conf"] for c in conteos)
+
+    contados = [] # (numero, id, segundo, sentido, clase, x1, y1, x2, y2)
     conteo_sentido = {"izq -> der": 0, "der -> izq": 0}
     frame_count = 0
 
-    while True:
-        ret, frame = cap.read()
-        if not ret:
-            break
-        frame_count += 1
-        frame = cv2.resize(frame, (W, H))
-
-        # se predice con conf (la mas baja) y abajo se le pide conf_arriba al carril de
-        # arriba; ver CONFIGURACION DE DETECCION para por que cada valor
-        results = model.predict(
-            tapar_fuera_de_calle(frame) if propio else frame, classes=clases, verbose=False,
-            conf=conf, agnostic_nms=True, imgsz=imgsz, iou=iou
-        )
-        det_boxes = results[0].boxes.xyxy.cpu().numpy()
-        det_conf = results[0].boxes.conf.cpu().numpy()
-        det_cls = results[0].boxes.cls.cpu().numpy()
+    def detecciones(det_boxes, det_conf, det_cls, conf_min):
+        # filtros de la deteccion para un tracker; ver CONFIGURACION DE DETECCION
+        quedan = det_conf >= conf_min
+        det_boxes, det_conf, det_cls = det_boxes[quedan], det_conf[quedan], det_cls[quedan]
         if len(det_boxes) > 1:
             # RT-DETR no hace NMS (ignora iou y agnostic_nms) y a veces pone dos cuadros
             # casi iguales sobre el mismo auto (ej. uno "car" y otro "truck"): el
@@ -220,7 +234,7 @@ def detector(video_path, mostrar, x_izq=FRANJA_X_IZQ, x_der=FRANJA_X_DER, max_ag
             # importar la clase; con YOLO no cambia nada porque ya viene hecho.
             quedan = torchvision.ops.nms(torch.from_numpy(det_boxes), torch.from_numpy(det_conf), iou).numpy()
             det_boxes, det_conf, det_cls = det_boxes[quedan], det_conf[quedan], det_cls[quedan]
-        if conf_arriba > conf:
+        if conf_arriba > conf_min and len(det_boxes):
             # confianza distinta por carril: abajo (izq -> der, autos tapados) basta con
             # conf; arriba de Y_SENTIDOS (der -> izq) se pide conf_arriba para no
             # meter detecciones dudosas en el carril que ya cuenta bien
@@ -231,45 +245,73 @@ def detector(video_path, mostrar, x_izq=FRANJA_X_IZQ, x_der=FRANJA_X_DER, max_ag
             quedan = sin_anidados(det_boxes, anidados, Y_SENTIDOS)
             det_boxes, det_conf, det_cls = det_boxes[quedan], det_conf[quedan], det_cls[quedan]
         if len(det_boxes) > 0:
-            dets = np.concatenate([det_boxes, det_conf.reshape(-1, 1), det_cls.reshape(-1, 1)], axis=1)
-        else:
-            dets = np.empty((0, 6))
+            return np.concatenate([det_boxes, det_conf.reshape(-1, 1), det_cls.reshape(-1, 1)], axis=1)
+        return np.empty((0, 6))
 
-        tracks = oc_tracker.update(dets, frame)  # hay que llamarlo en CADA frame, incluso sin detecciones
+    while True:
+        ret, frame = cap.read()
+        if not ret:
+            break
+        frame_count += 1
+        frame = cv2.resize(frame, (W, H))
+
+        # se predice con la conf mas baja y cada tracker filtra la suya
+        results = model.predict(
+            tapar_fuera_de_calle(frame) if propio else frame, classes=clases, verbose=False,
+            conf=conf_predice, agnostic_nms=True, imgsz=imgsz, iou=iou
+        )
+        det_boxes = results[0].boxes.xyxy.cpu().numpy()
+        det_conf = results[0].boxes.conf.cpu().numpy()
+        det_cls = results[0].boxes.cls.cpu().numpy()
+        nombres = results[0].names
 
         cv2.rectangle(frame, (x_izq, FRANJA_Y_MIN), (x_der, FRANJA_Y_MAX), (255, 0, 0), 2)
 
-        if len(tracks) > 0:
-            nombres = results[0].names
+        for c in conteos:
+            dets = detecciones(det_boxes, det_conf, det_cls, c["conf"])
+            tracks = c["tracker"].update(dets, frame)  # hay que llamarlo en CADA frame, incluso sin detecciones
+            if len(tracks) == 0:
+                continue
+            ultimo_lado, id_contado, vistos = c["ultimo_lado"], c["id_contado"], c["vistos"]
             cajas_frame = {int(i): b for b, i in zip(tracks.xyxy, tracks.id)}
             for box, id_obj, cls, conf_obj in zip(tracks.xyxy, tracks.id, tracks.cls, tracks.conf):
                 id_obj = int(id_obj)
+                vistos[id_obj] = vistos.get(id_obj, 0) + 1
                 xmin, ymin, xmax, ymax = box
                 if archivo_tray:
-                    csv_tray.writerow([frame_count, id_obj, int(xmin), int(ymin), int(xmax), int(ymax),
+                    csv_tray.writerow([frame_count, id_obj + c["desfase"], int(xmin), int(ymin), int(xmax), int(ymax),
                                        round(float(conf_obj), 2), nombres[int(cls)]])
                 xc, yc = int((xmin + xmax) / 2), int((ymin + ymax) / 2)
 
                 lado = lado_de(xc, yc, x_izq, x_der)
                 if lado is not None:
                     anterior = ultimo_lado.get(id_obj)
-                    if anterior is not None and anterior != lado and id_obj not in id_contado:
-                        sentido = "izq -> der" if lado == "der" else "der -> izq"
+                    sentido = "izq -> der" if lado == "der" else "der -> izq"
+                    cruza = (anterior is not None and anterior != lado and id_obj not in id_contado
+                             and id_obj not in c["otro_sentido"] and vistos[id_obj] >= c["min_vistos"])
+                    if cruza and sentido not in c["sentidos"]:
+                        # cruzo en el sentido que cuenta el otro tracker: ese ID ya no cuenta
+                        # aqui (si no, al temblar en la franja se contaria de regreso)
+                        c["otro_sentido"].add(id_obj)
+                    elif cruza:
                         segundo = round(frame_count / fps, 1)
                         caja = (int(xmin), int(ymin), int(xmax), int(ymax))
                         doble = next((id_contado[j] for j, b in cajas_frame.items()
                                       if j != id_obj and j in id_contado
                                       and contados[id_contado[j] - 1][3] == sentido
-                                      and dentro_de(caja, b) >= ENCIMADO_DOBLE), None)
+                                      and dentro_de(caja, b) >= c["encimado"]), None)
                         if doble is not None:
                             id_contado[id_obj] = doble
                         else:
                             numero = len(contados) + 1
                             id_contado[id_obj] = numero
                             conteo_sentido[sentido] += 1
-                            contados.append((numero, id_obj, segundo, sentido, nombres[int(cls)], *caja))
+                            contados.append((numero, id_obj + c["desfase"], segundo, sentido, nombres[int(cls)], *caja))
                     ultimo_lado[id_obj] = lado
 
+                # en modo_f1 cada tracker dibuja solo su carril para no encimar cajas
+                if len(conteos) > 1 and ((yc < Y_SENTIDOS) != ("der -> izq" in c["sentidos"])):
+                    continue
                 color = (0, 255, 0) if id_obj in id_contado else (200, 200, 200)
                 cv2.rectangle(frame, (int(xmin), int(ymin)), (int(xmax), int(ymax)), color, 2)
                 etiqueta = f"#{id_contado[id_obj]}" if id_obj in id_contado else f"id {id_obj}"
@@ -355,9 +397,11 @@ if __name__ == "__main__":
     parser.add_argument("--sin-video", action="store_true",
                         help="No guardar resultado_<nombre>.mp4 (para lotes de muchos videos).")
     parser.add_argument("--carpeta-salida", help="Carpeta para los reportes (default la del script).")
+    parser.add_argument("--modo-f1", action="store_true",
+                        help="Dos trackers ajustados para F1 por vehiculo (ver MODO_F1); cuenta menos en izq -> der.")
     parser.add_argument("--trayectorias", action="store_true",
                         help="Guardar la caja de cada ID en cada frame en trayectorias_<nombre>.csv.")
     args = parser.parse_args()
     detector(args.video_path, not args.sin_ventana, *args.franja, args.max_age, args.imgsz, args.iou, args.conf,
              args.modelo, args.anidados, args.conf_arriba, args.tracker, args.trayectorias,
-             not args.sin_video, args.carpeta_salida)
+             not args.sin_video, args.carpeta_salida, args.modo_f1)

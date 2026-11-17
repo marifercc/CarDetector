@@ -1,0 +1,48 @@
+WARNING  Max age > max observations, increasing size of max observations...    
+INFO     OcSort: det_thresh=0.08, max_age=90, max_obs=50, min_hits=1,          
+         iou_threshold=0.3, per_class=False, class_ids=None, asso_func=iou,    
+         min_conf=0.1, delta_t=3, inertia=0.2, use_byte=False,                 
+         Q_xy_scaling=0.01, Q_s_scaling=0.0001                                 
+WARNING  Max age > max observations, increasing size of max observations...    
+INFO     OcSort: det_thresh=0.06, max_age=90, max_obs=50, min_hits=1,          
+         iou_threshold=0.5, per_class=False, class_ids=None, asso_func=iou,    
+         min_conf=0.1, delta_t=3, inertia=0.2, use_byte=False,                 
+         Q_xy_scaling=0.01, Q_s_scaling=0.0001                                 
+Abriendo video: C:\Users\marif\python vscode\CarDetector\CountCars_Chihuahua\chihuahua_5min.mp4
+  10 s procesados, 10 contados
+  20 s procesados, 20 contados
+  30 s procesados, 28 contados
+  40 s procesados, 35 contados
+  50 s procesados, 36 contados
+  60 s procesados, 42 contados
+  70 s procesados, 43 contados
+  80 s procesados, 50 contados
+  90 s procesados, 74 contados
+  100 s procesados, 100 contados
+  110 s procesados, 117 contados
+  120 s procesados, 128 contados
+  130 s procesados, 142 contados
+  140 s procesados, 149 contados
+  150 s procesados, 156 contados
+  160 s procesados, 159 contados
+  170 s procesados, 161 contados
+  180 s procesados, 169 contados
+  190 s procesados, 171 contados
+  200 s procesados, 174 contados
+  210 s procesados, 190 contados
+  220 s procesados, 209 contados
+  230 s procesados, 230 contados
+  240 s procesados, 248 contados
+  250 s procesados, 258 contados
+  260 s procesados, 270 contados
+  270 s procesados, 276 contados
+  280 s procesados, 279 contados
+  290 s procesados, 280 contados
+  300 s procesados, 283 contados
+
+=== RESUMEN FINAL ===
+Total de vehículos: 283
+  izq -> der: 124
+  der -> izq: 159
+Resultados guardados en: C:\Users\marif\python vscode\CarDetector\CountCars_Chihuahua\reporte_chihuahua_5min_modelortdetr-chihuahua_f1.csv
+Video procesado guardado en: C:\Users\marif\python vscode\CarDetector\CountCars_Chihuahua\resultado_chihuahua_5min_modelortdetr-chihuahua_f1.mp4

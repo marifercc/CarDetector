@@ -46,6 +46,16 @@ def contar_en_tramo(ruta_reporte, a, b):
     return conteo
 
 
+def buscar_reporte(carpeta, nombre):
+    # el contador le agrega al nombre lo que cambio (ej. _modelortdetr-chihuahua_f1)
+    if not os.path.isdir(carpeta):
+        return None
+    for archivo in sorted(os.listdir(carpeta)):
+        if archivo.startswith(f"reporte_{nombre}") and archivo.endswith(".csv"):
+            return os.path.join(carpeta, archivo)
+    return None
+
+
 def buscar_video(nombre):
     for raiz, _, archivos in os.walk(CARPETA_VIDEOS):
         if nombre + ".mp4" in archivos:
@@ -57,15 +67,18 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Corre el contador en videos del 14 de octubre y compara con el formulario.")
     parser.add_argument("--todos", action="store_true", help="Todos los videos del formulario, no solo la muestra.")
     parser.add_argument("--solo-tabla", action="store_true", help="No correr nada, solo armar la tabla con los reportes que ya hay.")
+    parser.add_argument("--carpeta", default="lote_14oct", help="Carpeta de salida (default lote_14oct).")
+    parser.add_argument("--conservar-videos", action="store_true",
+                        help="No borrar la copia local del video (para revisar los conteos despues).")
     parser.add_argument("extra", nargs="*", help="Opciones extra para el contador, ej. --modelo rtdetr-chihuahua (despues de --).")
     args = parser.parse_args()
     ruta_base = os.path.dirname(os.path.abspath(__file__))
-    salida = os.path.join(ruta_base, "lote_14oct")
+    salida = os.path.join(ruta_base, args.carpeta)
     formulario = leer_formulario(os.path.join(ruta_base, "conteos_14oct.csv"))
     videos = sorted(formulario) if args.todos else [f"20261014_{m}" for m in MUESTRA]
 
     # ya corridos: el lote se puede interrumpir (Ctrl+C) y seguir despues donde se quedo
-    pendientes = [n for n in videos if not os.path.exists(os.path.join(salida, f"reporte_{n}.csv"))]
+    pendientes = [n for n in videos if buscar_reporte(salida, n) is None]
     print(f"{len(videos)} videos, {len(videos) - len(pendientes)} ya corridos, {len(pendientes)} por correr", flush=True)
     if args.solo_tabla:
         pendientes = []
@@ -106,7 +119,8 @@ if __name__ == "__main__":
             if "procesados" in linea:
                 print(f"\r[{k}/{len(pendientes)}] {nombre}: {linea.strip()} de ~300 s{faltan}      ", end="", flush=True)
         proceso.wait()
-        os.remove(local)
+        if not args.conservar_videos:
+            os.remove(local)
         duraciones.append(time.time() - t0)
         estado = "listo" if proceso.returncode == 0 else f"ERROR (codigo {proceso.returncode})"
         print(f"\r[{k}/{len(pendientes)}] {nombre}: {estado} en {duraciones[-1] / 60:.1f} min{faltan}" + " " * 30,
@@ -114,8 +128,8 @@ if __name__ == "__main__":
 
     filas = []
     for nombre in videos:
-        ruta_reporte = os.path.join(salida, f"reporte_{nombre}.csv")
-        if not os.path.exists(ruta_reporte):
+        ruta_reporte = buscar_reporte(salida, nombre)
+        if ruta_reporte is None:
             continue
         f = formulario[nombre]
         a, b = tramo(f)

@@ -1,0 +1,42 @@
+WARNING  Max age > max observations, increasing size of max observations...    
+INFO     OcSort: det_thresh=0.08, max_age=90, max_obs=50, min_hits=1,          
+         iou_threshold=0.3, per_class=False, class_ids=None, asso_func=iou,    
+         min_conf=0.1, delta_t=3, inertia=0.2, use_byte=False,                 
+         Q_xy_scaling=0.01, Q_s_scaling=0.0001                                 
+Abriendo video: C:\Users\marif\python vscode\CarDetector\CountCars_Chihuahua\chihuahua_5min.mp4
+  10 s procesados, 12 contados
+  20 s procesados, 22 contados
+  30 s procesados, 29 contados
+  40 s procesados, 36 contados
+  50 s procesados, 37 contados
+  60 s procesados, 43 contados
+  70 s procesados, 45 contados
+  80 s procesados, 53 contados
+  90 s procesados, 83 contados
+  100 s procesados, 114 contados
+  110 s procesados, 132 contados
+  120 s procesados, 143 contados
+  130 s procesados, 159 contados
+  140 s procesados, 166 contados
+  150 s procesados, 173 contados
+  160 s procesados, 176 contados
+  170 s procesados, 178 contados
+  180 s procesados, 187 contados
+  190 s procesados, 189 contados
+  200 s procesados, 193 contados
+  210 s procesados, 212 contados
+  220 s procesados, 231 contados
+  230 s procesados, 253 contados
+  240 s procesados, 270 contados
+  250 s procesados, 281 contados
+  260 s procesados, 296 contados
+  270 s procesados, 302 contados
+  280 s procesados, 305 contados
+  290 s procesados, 306 contados
+  300 s procesados, 309 contados
+
+=== RESUMEN FINAL ===
+Total de vehículos: 309
+  izq -> der: 152
+  der -> izq: 157
+Resultados guardados en: corrida_refactor\reporte_chihuahua_5min_modelortdetr-chihuahua.csv
