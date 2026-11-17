@@ -1,0 +1,26 @@
+Numero,ID tracker,Segundo,Sentido,Clase,x1,y1,x2,y2
+1,27,28.1,der -> izq,vehiculo,771,319,825,341
+2,45,33.3,der -> izq,vehiculo,765,317,828,351
+3,100139,67.2,izq -> der,vehiculo,824,347,911,387
+4,111,73.5,der -> izq,vehiculo,760,317,836,343
+5,182,147.1,der -> izq,vehiculo,756,317,842,343
+6,175,149.3,der -> izq,vehiculo,772,319,825,340
+7,195,150.9,der -> izq,vehiculo,771,318,823,341
+8,203,153.7,der -> izq,vehiculo,770,319,826,340
+9,227,178.8,der -> izq,vehiculo,757,314,831,339
+10,100364,198.6,izq -> der,vehiculo,815,343,909,387
+11,100469,258.0,izq -> der,vehiculo,827,343,897,388
+12,351,267.9,der -> izq,vehiculo,762,317,812,359
+13,357,269.2,der -> izq,vehiculo,767,318,817,340
+14,353,271.4,der -> izq,vehiculo,765,320,826,344
+15,375,272.0,der -> izq,vehiculo,774,316,821,339
+16,376,274.1,der -> izq,vehiculo,768,316,825,344
+17,401,275.3,der -> izq,vehiculo,771,321,826,343
+18,100609,275.8,izq -> der,vehiculo,818,346,909,386
+19,430,277.1,der -> izq,vehiculo,770,318,822,339
+20,100717,293.1,izq -> der,vehiculo,830,337,903,371
+
+RESUMEN
+izq -> der,5
+der -> izq,15
+Total,20

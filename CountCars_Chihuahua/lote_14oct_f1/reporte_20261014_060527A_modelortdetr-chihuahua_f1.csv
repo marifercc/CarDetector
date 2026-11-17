@@ -1,0 +1,54 @@
+Numero,ID tracker,Segundo,Sentido,Clase,x1,y1,x2,y2
+1,100000,17.7,izq -> der,vehiculo,834,348,897,381
+2,100076,17.9,izq -> der,vehiculo,806,351,917,411
+3,100105,19.0,izq -> der,vehiculo,760,340,967,391
+4,100074,22.1,izq -> der,vehiculo,807,334,915,387
+5,100058,24.3,izq -> der,vehiculo,837,339,886,370
+6,100178,25.1,izq -> der,vehiculo,814,337,908,384
+7,100172,25.4,izq -> der,vehiculo,878,346,1031,425
+8,9,26.0,der -> izq,vehiculo,774,317,824,335
+9,133,32.7,der -> izq,vehiculo,737,298,860,340
+10,128,33.1,der -> izq,vehiculo,707,323,749,351
+11,142,38.7,der -> izq,vehiculo,766,320,824,343
+12,159,41.6,der -> izq,vehiculo,767,323,827,343
+13,166,43.7,der -> izq,vehiculo,770,319,824,339
+14,168,45.1,der -> izq,vehiculo,772,320,826,340
+15,100401,58.0,izq -> der,vehiculo,810,317,919,384
+16,100411,63.8,izq -> der,vehiculo,797,328,984,375
+17,100441,63.8,izq -> der,vehiculo,816,329,915,375
+18,100502,69.8,izq -> der,vehiculo,817,341,912,388
+19,303,89.4,der -> izq,vehiculo,772,315,826,336
+20,100601,97.0,izq -> der,vehiculo,804,365,925,411
+21,100665,102.1,izq -> der,vehiculo,830,324,891,350
+22,100787,138.7,izq -> der,vehiculo,838,336,888,355
+23,100687,138.9,izq -> der,vehiculo,822,338,908,384
+24,100813,141.3,izq -> der,vehiculo,823,344,905,387
+25,100783,142.2,izq -> der,vehiculo,834,324,889,369
+26,100920,143.8,izq -> der,vehiculo,820,332,984,391
+27,101000,146.6,izq -> der,vehiculo,816,335,911,383
+28,524,148.6,der -> izq,vehiculo,772,316,826,337
+29,536,152.6,der -> izq,vehiculo,771,317,826,340
+30,528,154.8,der -> izq,vehiculo,770,319,826,339
+31,101114,164.8,izq -> der,vehiculo,817,340,911,386
+32,577,170.2,der -> izq,vehiculo,770,316,828,336
+33,582,172.9,der -> izq,vehiculo,758,317,832,343
+34,101191,184.2,izq -> der,vehiculo,823,342,904,386
+35,100955,188.4,izq -> der,vehiculo,822,339,915,386
+36,101288,198.3,izq -> der,vehiculo,798,359,926,413
+37,685,204.9,der -> izq,vehiculo,767,319,824,341
+38,101392,222.2,izq -> der,vehiculo,828,324,895,352
+39,101435,227.7,izq -> der,vehiculo,805,358,916,411
+40,741,232.4,der -> izq,vehiculo,752,327,845,359
+41,780,255.9,der -> izq,vehiculo,775,318,823,336
+42,101523,259.6,izq -> der,vehiculo,819,334,958,388
+43,796,267.9,der -> izq,vehiculo,768,319,826,338
+44,806,269.5,der -> izq,vehiculo,769,318,830,344
+45,809,270.4,der -> izq,vehiculo,768,313,826,339
+46,810,271.2,der -> izq,vehiculo,767,317,831,344
+47,830,274.0,der -> izq,vehiculo,767,320,827,343
+48,101614,278.6,izq -> der,vehiculo,816,338,907,384
+
+RESUMEN
+izq -> der,27
+der -> izq,21
+Total,48

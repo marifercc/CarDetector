@@ -14,7 +14,8 @@ from datetime import datetime
 # mientras se procesa (necesita la app de OneDrive abierta) y luego se borra.
 
 CARPETA_VIDEOS = (r"C:\Users\marif\OneDrive - Instituto Tecnologico y de Estudios Superiores de Monterrey"
-                  r"\Shortcuts\IMPLAN - Datos\Videos\14-10-2026\Teofilo Borunda y Pedro de Zulouaga")
+                  r"\Shortcuts\IMPLAN - Datos\Videos\14-10-2026")
+# se busca en toda la carpeta del dia: la subcarpeta del crucero ya cambio de nombre una vez
 MOVIMIENTOS = ["M4", "M3", "M2", "M1", "M9_4B", "M9_4A", "M9_3", "M9_2", "M6", "M5", "M8", "M7"]
 
 # muestra repartida en el dia: madrugada (oscuro), hora pico, mediodia y tarde
