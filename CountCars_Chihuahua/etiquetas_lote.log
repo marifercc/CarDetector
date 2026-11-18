@@ -1,0 +1,207 @@
+WARNING  Max age > max observations, increasing size of max observations...    
+INFO     OcSort: det_thresh=0.08, max_age=90, max_obs=50, min_hits=1,          
+         iou_threshold=0.3, per_class=False, class_ids=None, asso_func=iou,    
+         min_conf=0.1, delta_t=3, inertia=0.2, use_byte=False,                 
+         Q_xy_scaling=0.01, Q_s_scaling=0.0001                                 
+20261014_054527A 29 imagenes 94 cajas
+WARNING  Max age > max observations, increasing size of max observations...    
+INFO     OcSort: det_thresh=0.08, max_age=90, max_obs=50, min_hits=1,          
+         iou_threshold=0.3, per_class=False, class_ids=None, asso_func=iou,    
+         min_conf=0.1, delta_t=3, inertia=0.2, use_byte=False,                 
+         Q_xy_scaling=0.01, Q_s_scaling=0.0001                                 
+20261014_061527A 29 imagenes 143 cajas
+WARNING  Max age > max observations, increasing size of max observations...    
+INFO     OcSort: det_thresh=0.08, max_age=90, max_obs=50, min_hits=1,          
+         iou_threshold=0.3, per_class=False, class_ids=None, asso_func=iou,    
+         min_conf=0.1, delta_t=3, inertia=0.2, use_byte=False,                 
+         Q_xy_scaling=0.01, Q_s_scaling=0.0001                                 
+20261014_064027A 29 imagenes 306 cajas
+WARNING  Max age > max observations, increasing size of max observations...    
+INFO     OcSort: det_thresh=0.08, max_age=90, max_obs=50, min_hits=1,          
+         iou_threshold=0.3, per_class=False, class_ids=None, asso_func=iou,    
+         min_conf=0.1, delta_t=3, inertia=0.2, use_byte=False,                 
+         Q_xy_scaling=0.01, Q_s_scaling=0.0001                                 
+20261014_070027A 29 imagenes 575 cajas
+WARNING  Max age > max observations, increasing size of max observations...    
+INFO     OcSort: det_thresh=0.08, max_age=90, max_obs=50, min_hits=1,          
+         iou_threshold=0.3, per_class=False, class_ids=None, asso_func=iou,    
+         min_conf=0.1, delta_t=3, inertia=0.2, use_byte=False,                 
+         Q_xy_scaling=0.01, Q_s_scaling=0.0001                                 
+20261014_072527A 29 imagenes 679 cajas
+20261014_075527A fallo la descarga, reintento [Errno 22] Invalid argument
+20261014_075527A fallo la descarga, reintento [Errno 22] Invalid argument
+20261014_075527A fallo la descarga, reintento [Errno 22] Invalid argument
+20261014_075527A fallo la descarga, reintento [Errno 22] Invalid argument
+20261014_075527A fallo la descarga, reintento [Errno 22] Invalid argument
+20261014_083027A fallo la descarga, reintento [Errno 22] Invalid argument
+20261014_083027A fallo la descarga, reintento [Errno 22] Invalid argument
+20261014_083027A fallo la descarga, reintento [Errno 22] Invalid argument
+20261014_083027A fallo la descarga, reintento [Errno 22] Invalid argument
+20261014_083027A fallo la descarga, reintento [Errno 22] Invalid argument
+20261014_085527A fallo la descarga, reintento [Errno 22] Invalid argument
+20261014_085527A fallo la descarga, reintento [Errno 22] Invalid argument
+20261014_085527A fallo la descarga, reintento [Errno 22] Invalid argument
+20261014_085527A fallo la descarga, reintento [Errno 22] Invalid argument
+20261014_085527A fallo la descarga, reintento [Errno 22] Invalid argument
+20261014_093027A fallo la descarga, reintento [Errno 22] Invalid argument
+20261014_093027A fallo la descarga, reintento [Errno 22] Invalid argument
+20261014_093027A fallo la descarga, reintento [Errno 22] Invalid argument
+20261014_093027A fallo la descarga, reintento [Errno 22] Invalid argument
+20261014_093027A fallo la descarga, reintento [Errno 22] Invalid argument
+20261014_110027A fallo la descarga, reintento [Errno 22] Invalid argument
+20261014_110027A fallo la descarga, reintento [Errno 22] Invalid argument
+20261014_110027A fallo la descarga, reintento [Errno 22] Invalid argument
+20261014_110027A fallo la descarga, reintento [Errno 22] Invalid argument
+20261014_110027A fallo la descarga, reintento [Errno 22] Invalid argument
+20261014_120027A fallo la descarga, reintento [Errno 22] Invalid argument
+20261014_120027A fallo la descarga, reintento [Errno 22] Invalid argument
+20261014_120027A fallo la descarga, reintento [Errno 22] Invalid argument
+20261014_120027A fallo la descarga, reintento [Errno 22] Invalid argument
+20261014_120027A fallo la descarga, reintento [Errno 22] Invalid argument
+20261014_130027A fallo la descarga, reintento [Errno 22] Invalid argument
+20261014_130027A fallo la descarga, reintento [Errno 22] Invalid argument
+20261014_130027A fallo la descarga, reintento [Errno 22] Invalid argument
+20261014_130027A fallo la descarga, reintento [Errno 22] Invalid argument
+20261014_130027A fallo la descarga, reintento [Errno 22] Invalid argument
+20261014_141027A fallo la descarga, reintento [Errno 22] Invalid argument
+20261014_141027A fallo la descarga, reintento [Errno 22] Invalid argument
+20261014_141027A fallo la descarga, reintento [Errno 22] Invalid argument
+20261014_141027A fallo la descarga, reintento [Errno 22] Invalid argument
+20261014_141027A fallo la descarga, reintento [Errno 22] Invalid argument
+20261014_145027A fallo la descarga, reintento [Errno 22] Invalid argument
+20261014_145027A fallo la descarga, reintento [Errno 22] Invalid argument
+20261014_145027A fallo la descarga, reintento [Errno 22] Invalid argument
+20261014_145027A fallo la descarga, reintento [Errno 22] Invalid argument
+20261014_145027A fallo la descarga, reintento [Errno 22] Invalid argument
+20261014_151527A fallo la descarga, reintento [Errno 22] Invalid argument
+20261014_151527A fallo la descarga, reintento [Errno 22] Invalid argument
+20261014_151527A fallo la descarga, reintento [Errno 22] Invalid argument
+20261014_151527A fallo la descarga, reintento [Errno 22] Invalid argument
+20261014_151527A fallo la descarga, reintento [Errno 22] Invalid argument
+WARNING  Max age > max observations, increasing size of max observations...    
+INFO     OcSort: det_thresh=0.08, max_age=90, max_obs=50, min_hits=1,          
+         iou_threshold=0.3, per_class=False, class_ids=None, asso_func=iou,    
+         min_conf=0.1, delta_t=3, inertia=0.2, use_byte=False,                 
+         Q_xy_scaling=0.01, Q_s_scaling=0.0001                                 
+20261014_155527A 20 imagenes 296 cajas
+20261022_173214A fallo la descarga, reintento [Errno 22] Invalid argument
+20261022_173214A fallo la descarga, reintento [Errno 22] Invalid argument
+20261022_173214A fallo la descarga, reintento [Errno 22] Invalid argument
+20261022_173214A fallo la descarga, reintento [Errno 22] Invalid argument
+20261022_173214A fallo la descarga, reintento [Errno 22] Invalid argument
+20261022_180632A fallo la descarga, reintento [Errno 22] Invalid argument
+20261022_180632A fallo la descarga, reintento [Errno 22] Invalid argument
+20261022_180632A fallo la descarga, reintento [Errno 22] Invalid argument
+20261022_180632A fallo la descarga, reintento [Errno 22] Invalid argument
+20261022_180632A fallo la descarga, reintento [Errno 22] Invalid argument
+20261022_184132A fallo la descarga, reintento [Errno 22] Invalid argument
+20261022_184132A fallo la descarga, reintento [Errno 22] Invalid argument
+20261022_184132A fallo la descarga, reintento [Errno 22] Invalid argument
+WARNING  Max age > max observations, increasing size of max observations...    
+INFO     OcSort: det_thresh=0.08, max_age=90, max_obs=50, min_hits=1,          
+         iou_threshold=0.3, per_class=False, class_ids=None, asso_func=iou,    
+         min_conf=0.1, delta_t=3, inertia=0.2, use_byte=False,                 
+         Q_xy_scaling=0.01, Q_s_scaling=0.0001                                 
+20261022_184132A 29 imagenes 307 cajas
+WARNING  Max age > max observations, increasing size of max observations...    
+INFO     OcSort: det_thresh=0.08, max_age=90, max_obs=50, min_hits=1,          
+         iou_threshold=0.3, per_class=False, class_ids=None, asso_func=iou,    
+         min_conf=0.1, delta_t=3, inertia=0.2, use_byte=False,                 
+         Q_xy_scaling=0.01, Q_s_scaling=0.0001                                 
+20261022_191632A 29 imagenes 260 cajas
+WARNING  Max age > max observations, increasing size of max observations...    
+INFO     OcSort: det_thresh=0.08, max_age=90, max_obs=50, min_hits=1,          
+         iou_threshold=0.3, per_class=False, class_ids=None, asso_func=iou,    
+         min_conf=0.1, delta_t=3, inertia=0.2, use_byte=False,                 
+         Q_xy_scaling=0.01, Q_s_scaling=0.0001                                 
+20261022_195632A 29 imagenes 226 cajas
+WARNING  Max age > max observations, increasing size of max observations...    
+INFO     OcSort: det_thresh=0.08, max_age=90, max_obs=50, min_hits=1,          
+         iou_threshold=0.3, per_class=False, class_ids=None, asso_func=iou,    
+         min_conf=0.1, delta_t=3, inertia=0.2, use_byte=False,                 
+         Q_xy_scaling=0.01, Q_s_scaling=0.0001                                 
+20261022_203132A 29 imagenes 203 cajas
+total 481 imagenes
+20261014_075527A fallo la descarga, reintento [Errno 22] Invalid argument
+20261014_075527A fallo la descarga, reintento [Errno 22] Invalid argument
+20261014_075527A fallo la descarga, reintento [Errno 22] Invalid argument
+20261014_075527A fallo la descarga, reintento [Errno 22] Invalid argument
+20261014_075527A fallo la descarga, reintento [Errno 22] Invalid argument
+WARNING  Max age > max observations, increasing size of max observations...    
+INFO     OcSort: det_thresh=0.08, max_age=90, max_obs=50, min_hits=1,          
+         iou_threshold=0.3, per_class=False, class_ids=None, asso_func=iou,    
+         min_conf=0.1, delta_t=3, inertia=0.2, use_byte=False,                 
+         Q_xy_scaling=0.01, Q_s_scaling=0.0001                                 
+20261014_083027A 29 imagenes 298 cajas
+WARNING  Max age > max observations, increasing size of max observations...    
+INFO     OcSort: det_thresh=0.08, max_age=90, max_obs=50, min_hits=1,          
+         iou_threshold=0.3, per_class=False, class_ids=None, asso_func=iou,    
+         min_conf=0.1, delta_t=3, inertia=0.2, use_byte=False,                 
+         Q_xy_scaling=0.01, Q_s_scaling=0.0001                                 
+20261014_085527A 29 imagenes 408 cajas
+WARNING  Max age > max observations, increasing size of max observations...    
+INFO     OcSort: det_thresh=0.08, max_age=90, max_obs=50, min_hits=1,          
+         iou_threshold=0.3, per_class=False, class_ids=None, asso_func=iou,    
+         min_conf=0.1, delta_t=3, inertia=0.2, use_byte=False,                 
+         Q_xy_scaling=0.01, Q_s_scaling=0.0001                                 
+WARNING  Max age > max observations, increasing size of max observations...    
+INFO     OcSort: det_thresh=0.08, max_age=90, max_obs=50, min_hits=1,          
+         iou_threshold=0.3, per_class=False, class_ids=None, asso_func=iou,    
+         min_conf=0.1, delta_t=3, inertia=0.2, use_byte=False,                 
+         Q_xy_scaling=0.01, Q_s_scaling=0.0001                                 
+20261014_075527A 29 imagenes 627 cajas
+WARNING  Max age > max observations, increasing size of max observations...    
+INFO     OcSort: det_thresh=0.08, max_age=90, max_obs=50, min_hits=1,          
+         iou_threshold=0.3, per_class=False, class_ids=None, asso_func=iou,    
+         min_conf=0.1, delta_t=3, inertia=0.2, use_byte=False,                 
+         Q_xy_scaling=0.01, Q_s_scaling=0.0001                                 
+20261014_093027A 29 imagenes 167 cajas
+WARNING  Max age > max observations, increasing size of max observations...    
+INFO     OcSort: det_thresh=0.08, max_age=90, max_obs=50, min_hits=1,          
+         iou_threshold=0.3, per_class=False, class_ids=None, asso_func=iou,    
+         min_conf=0.1, delta_t=3, inertia=0.2, use_byte=False,                 
+         Q_xy_scaling=0.01, Q_s_scaling=0.0001                                 
+20261014_110027A 29 imagenes 220 cajas
+WARNING  Max age > max observations, increasing size of max observations...    
+INFO     OcSort: det_thresh=0.08, max_age=90, max_obs=50, min_hits=1,          
+         iou_threshold=0.3, per_class=False, class_ids=None, asso_func=iou,    
+         min_conf=0.1, delta_t=3, inertia=0.2, use_byte=False,                 
+         Q_xy_scaling=0.01, Q_s_scaling=0.0001                                 
+20261014_120027A 29 imagenes 266 cajas
+WARNING  Max age > max observations, increasing size of max observations...    
+INFO     OcSort: det_thresh=0.08, max_age=90, max_obs=50, min_hits=1,          
+         iou_threshold=0.3, per_class=False, class_ids=None, asso_func=iou,    
+         min_conf=0.1, delta_t=3, inertia=0.2, use_byte=False,                 
+         Q_xy_scaling=0.01, Q_s_scaling=0.0001                                 
+20261014_130027A 29 imagenes 323 cajas
+WARNING  Max age > max observations, increasing size of max observations...    
+INFO     OcSort: det_thresh=0.08, max_age=90, max_obs=50, min_hits=1,          
+         iou_threshold=0.3, per_class=False, class_ids=None, asso_func=iou,    
+         min_conf=0.1, delta_t=3, inertia=0.2, use_byte=False,                 
+         Q_xy_scaling=0.01, Q_s_scaling=0.0001                                 
+20261014_141027A 29 imagenes 422 cajas
+WARNING  Max age > max observations, increasing size of max observations...    
+INFO     OcSort: det_thresh=0.08, max_age=90, max_obs=50, min_hits=1,          
+         iou_threshold=0.3, per_class=False, class_ids=None, asso_func=iou,    
+         min_conf=0.1, delta_t=3, inertia=0.2, use_byte=False,                 
+         Q_xy_scaling=0.01, Q_s_scaling=0.0001                                 
+20261014_145027A 29 imagenes 269 cajas
+WARNING  Max age > max observations, increasing size of max observations...    
+INFO     OcSort: det_thresh=0.08, max_age=90, max_obs=50, min_hits=1,          
+         iou_threshold=0.3, per_class=False, class_ids=None, asso_func=iou,    
+         min_conf=0.1, delta_t=3, inertia=0.2, use_byte=False,                 
+         Q_xy_scaling=0.01, Q_s_scaling=0.0001                                 
+20261014_151527A 29 imagenes 394 cajas
+WARNING  Max age > max observations, increasing size of max observations...    
+INFO     OcSort: det_thresh=0.08, max_age=90, max_obs=50, min_hits=1,          
+         iou_threshold=0.3, per_class=False, class_ids=None, asso_func=iou,    
+         min_conf=0.1, delta_t=3, inertia=0.2, use_byte=False,                 
+         Q_xy_scaling=0.01, Q_s_scaling=0.0001                                 
+20261022_173214A 29 imagenes 386 cajas
+WARNING  Max age > max observations, increasing size of max observations...    
+INFO     OcSort: det_thresh=0.08, max_age=90, max_obs=50, min_hits=1,          
+         iou_threshold=0.3, per_class=False, class_ids=None, asso_func=iou,    
+         min_conf=0.1, delta_t=3, inertia=0.2, use_byte=False,                 
+         Q_xy_scaling=0.01, Q_s_scaling=0.0001                                 
+20261022_180632A 29 imagenes 419 cajas
+total 829 imagenes

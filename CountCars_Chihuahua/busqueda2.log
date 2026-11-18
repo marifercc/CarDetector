@@ -1,0 +1,7 @@
+0.7012 0.8471 0.8662 0.7954 0.8978 {"min_vistos": 15, "abajo": {"conf": 0.06, "iou_threshold": 0.5, "encimado": 0.6, "min_vistos": 15}}
+0.6848 0.8385 0.8584 0.7909 0.884 {"min_vistos": 15, "conf_arriba": 0.3, "abajo": {"conf": 0.06, "iou_threshold": 0.5, "encimado": 0.6, "min_vistos": 15}}
+0.6991 0.8417 0.8619 0.7867 0.8971 {"min_vistos": 15, "conf_arriba": 0.5, "abajo": {"conf": 0.06, "iou_threshold": 0.5, "encimado": 0.6, "min_vistos": 15}}
+0.6985 0.8464 0.8655 0.7954 0.8963 {"min_vistos": 10, "abajo": {"conf": 0.06, "iou_threshold": 0.5, "encimado": 0.6, "min_vistos": 15}}
+0.713 0.8347 0.8468 0.7667 0.8978 {"min_vistos": 15, "abajo": {"conf": 0.1, "iou_threshold": 0.5, "encimado": 0.6, "min_vistos": 15}}
+0.6715 0.8391 0.8631 0.7838 0.8978 {"min_vistos": 15, "abajo": {"conf": 0.06, "iou_threshold": 0.35, "encimado": 0.6, "min_vistos": 15}}
+0.6902 0.8497 0.8729 0.802 0.8978 {"min_vistos": 15, "abajo": {"conf": 0.06, "iou_threshold": 0.5, "encimado": 0.6, "min_vistos": 10}}

@@ -22,3 +22,7 @@ CountCars_Chihuahua/dataset/
 # trayectorias del lote (~8 MB por video, se regeneran con lote_14oct.py)
 CountCars_Chihuahua/lote_14oct/trayectorias_*.csv
 CountCars_Chihuahua/lote_14oct/_videos/
+
+# copias locales de los videos del lote y detecciones guardadas (se regeneran con cache_lote.sh)
+CountCars_Chihuahua/lote_14oct_f1/_videos/
+CountCars_Chihuahua/detecciones/

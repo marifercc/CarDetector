@@ -47,6 +47,8 @@ if __name__ == "__main__":
                         help="JSON de etiquetas (default etiquetado/etiquetas.json).")
     parser.add_argument("--epocas", type=int, default=60)
     parser.add_argument("--batch", type=int, default=4)
+    parser.add_argument("--nombre", default="rtdetr-chihuahua",
+                        help="Nombre del modelo (entrenamiento/<nombre> y <nombre>.pt); otro nombre no pisa el actual.")
     args = parser.parse_args()
     ruta_base = os.path.dirname(os.path.abspath(__file__))
     ruta_etiquetas = args.etiquetas if os.path.isabs(args.etiquetas) else os.path.join(ruta_base, args.etiquetas)
@@ -60,8 +62,8 @@ if __name__ == "__main__":
     model = RTDETR(os.path.join(ruta_base, "rtdetr-x.pt"))
     # workers=0: en Windows los procesos extra del dataloader dan problemas
     model.train(data=ruta_yaml, epochs=args.epocas, imgsz=640, batch=args.batch, device=0, workers=0,
-                patience=20, project=os.path.join(ruta_base, "entrenamiento"), name="rtdetr-chihuahua",
+                patience=20, project=os.path.join(ruta_base, "entrenamiento"), name=args.nombre,
                 exist_ok=True)
-    mejor = os.path.join(ruta_base, "entrenamiento", "rtdetr-chihuahua", "weights", "best.pt")
-    shutil.copy(mejor, os.path.join(ruta_base, "rtdetr-chihuahua.pt"))
-    print(f"Modelo guardado en: {os.path.join(ruta_base, 'rtdetr-chihuahua.pt')}")
+    mejor = os.path.join(ruta_base, "entrenamiento", args.nombre, "weights", "best.pt")
+    shutil.copy(mejor, os.path.join(ruta_base, f"{args.nombre}.pt"))
+    print(f"Modelo guardado en: {os.path.join(ruta_base, args.nombre + '.pt')}")

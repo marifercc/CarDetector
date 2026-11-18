@@ -1,0 +1,1 @@
+{"modelo": "rtdetr-chihuahua2", "kw": {"min_vistos": 15, "abajo": {"conf": 0.06, "iou_threshold": 0.5, "encimado": 0.6, "min_vistos": 10}}}

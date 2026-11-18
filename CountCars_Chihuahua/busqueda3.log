@@ -1,0 +1,3 @@
+0.7524 0.6879 0.8174 0.325 0.414 4652 4531 {"min_vistos": 15, "abajo": {"conf": 0.06, "iou_threshold": 0.5, "encimado": 0.6, "min_vistos": 10}}
+0.7537 0.6772 0.8214 0.453 0.417 3987 4531 {"min_vistos": 15, "encimado_mutuo": true, "abajo": {"conf": 0.06, "iou_threshold": 0.5, "encimado": 0.6, "min_vistos": 10}}
+0.6793 0.6509 0.709 0.298 0.533 3054 4531 {"min_vistos": 15, "relevo_gap": 15, "abajo": {"conf": 0.06, "iou_threshold": 0.5, "encimado": 0.6, "min_vistos": 10}}

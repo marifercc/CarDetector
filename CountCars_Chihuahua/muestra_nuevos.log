@@ -1,0 +1,176 @@
+WARNING  Max age > max observations, increasing size of max observations...    
+INFO     OcSort: det_thresh=0.08, max_age=90, max_obs=50, min_hits=1,          
+         iou_threshold=0.3, per_class=False, class_ids=None, asso_func=iou,    
+         min_conf=0.08, delta_t=3, inertia=0.2, use_byte=False,                
+         Q_xy_scaling=0.01, Q_s_scaling=0.0001                                 
+WARNING  Max age > max observations, increasing size of max observations...    
+INFO     OcSort: det_thresh=0.06, max_age=90, max_obs=50, min_hits=1,          
+         iou_threshold=0.5, per_class=False, class_ids=None, asso_func=iou,    
+         min_conf=0.06, delta_t=3, inertia=0.2, use_byte=False,                
+         Q_xy_scaling=0.01, Q_s_scaling=0.0001                                 
+20261014_053527A 9
+WARNING  Max age > max observations, increasing size of max observations...    
+INFO     OcSort: det_thresh=0.08, max_age=90, max_obs=50, min_hits=1,          
+         iou_threshold=0.3, per_class=False, class_ids=None, asso_func=iou,    
+         min_conf=0.08, delta_t=3, inertia=0.2, use_byte=False,                
+         Q_xy_scaling=0.01, Q_s_scaling=0.0001                                 
+WARNING  Max age > max observations, increasing size of max observations...    
+INFO     OcSort: det_thresh=0.06, max_age=90, max_obs=50, min_hits=1,          
+         iou_threshold=0.5, per_class=False, class_ids=None, asso_func=iou,    
+         min_conf=0.06, delta_t=3, inertia=0.2, use_byte=False,                
+         Q_xy_scaling=0.01, Q_s_scaling=0.0001                                 
+20261014_060527A 15
+WARNING  Max age > max observations, increasing size of max observations...    
+INFO     OcSort: det_thresh=0.08, max_age=90, max_obs=50, min_hits=1,          
+         iou_threshold=0.3, per_class=False, class_ids=None, asso_func=iou,    
+         min_conf=0.08, delta_t=3, inertia=0.2, use_byte=False,                
+         Q_xy_scaling=0.01, Q_s_scaling=0.0001                                 
+WARNING  Max age > max observations, increasing size of max observations...    
+INFO     OcSort: det_thresh=0.06, max_age=90, max_obs=50, min_hits=1,          
+         iou_threshold=0.5, per_class=False, class_ids=None, asso_func=iou,    
+         min_conf=0.06, delta_t=3, inertia=0.2, use_byte=False,                
+         Q_xy_scaling=0.01, Q_s_scaling=0.0001                                 
+20261014_063027A 16
+WARNING  Max age > max observations, increasing size of max observations...    
+INFO     OcSort: det_thresh=0.08, max_age=90, max_obs=50, min_hits=1,          
+         iou_threshold=0.3, per_class=False, class_ids=None, asso_func=iou,    
+         min_conf=0.08, delta_t=3, inertia=0.2, use_byte=False,                
+         Q_xy_scaling=0.01, Q_s_scaling=0.0001                                 
+WARNING  Max age > max observations, increasing size of max observations...    
+INFO     OcSort: det_thresh=0.06, max_age=90, max_obs=50, min_hits=1,          
+         iou_threshold=0.5, per_class=False, class_ids=None, asso_func=iou,    
+         min_conf=0.06, delta_t=3, inertia=0.2, use_byte=False,                
+         Q_xy_scaling=0.01, Q_s_scaling=0.0001                                 
+20261014_065027A 16
+WARNING  Max age > max observations, increasing size of max observations...    
+INFO     OcSort: det_thresh=0.08, max_age=90, max_obs=50, min_hits=1,          
+         iou_threshold=0.3, per_class=False, class_ids=None, asso_func=iou,    
+         min_conf=0.08, delta_t=3, inertia=0.2, use_byte=False,                
+         Q_xy_scaling=0.01, Q_s_scaling=0.0001                                 
+WARNING  Max age > max observations, increasing size of max observations...    
+INFO     OcSort: det_thresh=0.06, max_age=90, max_obs=50, min_hits=1,          
+         iou_threshold=0.5, per_class=False, class_ids=None, asso_func=iou,    
+         min_conf=0.06, delta_t=3, inertia=0.2, use_byte=False,                
+         Q_xy_scaling=0.01, Q_s_scaling=0.0001                                 
+20261014_071027A 16
+WARNING  Max age > max observations, increasing size of max observations...    
+INFO     OcSort: det_thresh=0.08, max_age=90, max_obs=50, min_hits=1,          
+         iou_threshold=0.3, per_class=False, class_ids=None, asso_func=iou,    
+         min_conf=0.08, delta_t=3, inertia=0.2, use_byte=False,                
+         Q_xy_scaling=0.01, Q_s_scaling=0.0001                                 
+WARNING  Max age > max observations, increasing size of max observations...    
+INFO     OcSort: det_thresh=0.06, max_age=90, max_obs=50, min_hits=1,          
+         iou_threshold=0.5, per_class=False, class_ids=None, asso_func=iou,    
+         min_conf=0.06, delta_t=3, inertia=0.2, use_byte=False,                
+         Q_xy_scaling=0.01, Q_s_scaling=0.0001                                 
+20261014_074527A 16
+WARNING  Max age > max observations, increasing size of max observations...    
+INFO     OcSort: det_thresh=0.08, max_age=90, max_obs=50, min_hits=1,          
+         iou_threshold=0.3, per_class=False, class_ids=None, asso_func=iou,    
+         min_conf=0.08, delta_t=3, inertia=0.2, use_byte=False,                
+         Q_xy_scaling=0.01, Q_s_scaling=0.0001                                 
+WARNING  Max age > max observations, increasing size of max observations...    
+INFO     OcSort: det_thresh=0.06, max_age=90, max_obs=50, min_hits=1,          
+         iou_threshold=0.5, per_class=False, class_ids=None, asso_func=iou,    
+         min_conf=0.06, delta_t=3, inertia=0.2, use_byte=False,                
+         Q_xy_scaling=0.01, Q_s_scaling=0.0001                                 
+20261014_081027A 16
+WARNING  Max age > max observations, increasing size of max observations...    
+INFO     OcSort: det_thresh=0.08, max_age=90, max_obs=50, min_hits=1,          
+         iou_threshold=0.3, per_class=False, class_ids=None, asso_func=iou,    
+         min_conf=0.08, delta_t=3, inertia=0.2, use_byte=False,                
+         Q_xy_scaling=0.01, Q_s_scaling=0.0001                                 
+WARNING  Max age > max observations, increasing size of max observations...    
+INFO     OcSort: det_thresh=0.06, max_age=90, max_obs=50, min_hits=1,          
+         iou_threshold=0.5, per_class=False, class_ids=None, asso_func=iou,    
+         min_conf=0.06, delta_t=3, inertia=0.2, use_byte=False,                
+         Q_xy_scaling=0.01, Q_s_scaling=0.0001                                 
+20261014_084527A 16
+WARNING  Max age > max observations, increasing size of max observations...    
+INFO     OcSort: det_thresh=0.08, max_age=90, max_obs=50, min_hits=1,          
+         iou_threshold=0.3, per_class=False, class_ids=None, asso_func=iou,    
+         min_conf=0.08, delta_t=3, inertia=0.2, use_byte=False,                
+         Q_xy_scaling=0.01, Q_s_scaling=0.0001                                 
+WARNING  Max age > max observations, increasing size of max observations...    
+INFO     OcSort: det_thresh=0.06, max_age=90, max_obs=50, min_hits=1,          
+         iou_threshold=0.5, per_class=False, class_ids=None, asso_func=iou,    
+         min_conf=0.06, delta_t=3, inertia=0.2, use_byte=False,                
+         Q_xy_scaling=0.01, Q_s_scaling=0.0001                                 
+20261014_091527A 16
+WARNING  Max age > max observations, increasing size of max observations...    
+INFO     OcSort: det_thresh=0.08, max_age=90, max_obs=50, min_hits=1,          
+         iou_threshold=0.3, per_class=False, class_ids=None, asso_func=iou,    
+         min_conf=0.08, delta_t=3, inertia=0.2, use_byte=False,                
+         Q_xy_scaling=0.01, Q_s_scaling=0.0001                                 
+WARNING  Max age > max observations, increasing size of max observations...    
+INFO     OcSort: det_thresh=0.06, max_age=90, max_obs=50, min_hits=1,          
+         iou_threshold=0.5, per_class=False, class_ids=None, asso_func=iou,    
+         min_conf=0.06, delta_t=3, inertia=0.2, use_byte=False,                
+         Q_xy_scaling=0.01, Q_s_scaling=0.0001                                 
+20261014_100027A 16
+WARNING  Max age > max observations, increasing size of max observations...    
+INFO     OcSort: det_thresh=0.08, max_age=90, max_obs=50, min_hits=1,          
+         iou_threshold=0.3, per_class=False, class_ids=None, asso_func=iou,    
+         min_conf=0.08, delta_t=3, inertia=0.2, use_byte=False,                
+         Q_xy_scaling=0.01, Q_s_scaling=0.0001                                 
+WARNING  Max age > max observations, increasing size of max observations...    
+INFO     OcSort: det_thresh=0.06, max_age=90, max_obs=50, min_hits=1,          
+         iou_threshold=0.5, per_class=False, class_ids=None, asso_func=iou,    
+         min_conf=0.06, delta_t=3, inertia=0.2, use_byte=False,                
+         Q_xy_scaling=0.01, Q_s_scaling=0.0001                                 
+20261014_104027A 16
+WARNING  Max age > max observations, increasing size of max observations...    
+INFO     OcSort: det_thresh=0.08, max_age=90, max_obs=50, min_hits=1,          
+         iou_threshold=0.3, per_class=False, class_ids=None, asso_func=iou,    
+         min_conf=0.08, delta_t=3, inertia=0.2, use_byte=False,                
+         Q_xy_scaling=0.01, Q_s_scaling=0.0001                                 
+WARNING  Max age > max observations, increasing size of max observations...    
+INFO     OcSort: det_thresh=0.06, max_age=90, max_obs=50, min_hits=1,          
+         iou_threshold=0.5, per_class=False, class_ids=None, asso_func=iou,    
+         min_conf=0.06, delta_t=3, inertia=0.2, use_byte=False,                
+         Q_xy_scaling=0.01, Q_s_scaling=0.0001                                 
+20261014_113027A 16
+WARNING  Max age > max observations, increasing size of max observations...    
+INFO     OcSort: det_thresh=0.08, max_age=90, max_obs=50, min_hits=1,          
+         iou_threshold=0.3, per_class=False, class_ids=None, asso_func=iou,    
+         min_conf=0.08, delta_t=3, inertia=0.2, use_byte=False,                
+         Q_xy_scaling=0.01, Q_s_scaling=0.0001                                 
+WARNING  Max age > max observations, increasing size of max observations...    
+INFO     OcSort: det_thresh=0.06, max_age=90, max_obs=50, min_hits=1,          
+         iou_threshold=0.5, per_class=False, class_ids=None, asso_func=iou,    
+         min_conf=0.06, delta_t=3, inertia=0.2, use_byte=False,                
+         Q_xy_scaling=0.01, Q_s_scaling=0.0001                                 
+20261014_122527A 16
+WARNING  Max age > max observations, increasing size of max observations...    
+INFO     OcSort: det_thresh=0.08, max_age=90, max_obs=50, min_hits=1,          
+         iou_threshold=0.3, per_class=False, class_ids=None, asso_func=iou,    
+         min_conf=0.08, delta_t=3, inertia=0.2, use_byte=False,                
+         Q_xy_scaling=0.01, Q_s_scaling=0.0001                                 
+WARNING  Max age > max observations, increasing size of max observations...    
+INFO     OcSort: det_thresh=0.06, max_age=90, max_obs=50, min_hits=1,          
+         iou_threshold=0.5, per_class=False, class_ids=None, asso_func=iou,    
+         min_conf=0.06, delta_t=3, inertia=0.2, use_byte=False,                
+         Q_xy_scaling=0.01, Q_s_scaling=0.0001                                 
+20261014_135527A 16
+WARNING  Max age > max observations, increasing size of max observations...    
+INFO     OcSort: det_thresh=0.08, max_age=90, max_obs=50, min_hits=1,          
+         iou_threshold=0.3, per_class=False, class_ids=None, asso_func=iou,    
+         min_conf=0.08, delta_t=3, inertia=0.2, use_byte=False,                
+         Q_xy_scaling=0.01, Q_s_scaling=0.0001                                 
+WARNING  Max age > max observations, increasing size of max observations...    
+INFO     OcSort: det_thresh=0.06, max_age=90, max_obs=50, min_hits=1,          
+         iou_threshold=0.5, per_class=False, class_ids=None, asso_func=iou,    
+         min_conf=0.06, delta_t=3, inertia=0.2, use_byte=False,                
+         Q_xy_scaling=0.01, Q_s_scaling=0.0001                                 
+20261014_143527A 16
+WARNING  Max age > max observations, increasing size of max observations...    
+INFO     OcSort: det_thresh=0.08, max_age=90, max_obs=50, min_hits=1,          
+         iou_threshold=0.3, per_class=False, class_ids=None, asso_func=iou,    
+         min_conf=0.08, delta_t=3, inertia=0.2, use_byte=False,                
+         Q_xy_scaling=0.01, Q_s_scaling=0.0001                                 
+WARNING  Max age > max observations, increasing size of max observations...    
+INFO     OcSort: det_thresh=0.06, max_age=90, max_obs=50, min_hits=1,          
+         iou_threshold=0.5, per_class=False, class_ids=None, asso_func=iou,    
+         min_conf=0.06, delta_t=3, inertia=0.2, use_byte=False,                
+         Q_xy_scaling=0.01, Q_s_scaling=0.0001                                 
+20261014_154527A 16
